@@ -13,9 +13,9 @@ Turnkey stores private keys in secure enclaves (AWS Nitro, etc.) — keys are **
 All skills require these three variables:
 
 ```env
-API_PUBLIC_KEY=<your-api-public-key>
-API_PRIVATE_KEY=<your-api-private-key>
-ORGANIZATION_ID=<your-organization-id>
+TURNKEY_API_PUBLIC_KEY=<your-api-public-key>
+TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
+TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
 
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
@@ -63,6 +63,32 @@ npx tsx examples/ethereum-ethers.ts   # or ethereum-viem.ts
 npx tsx examples/ethereum-viem.ts
 npx tsx examples/solana-signing.ts
 ```
+
+## Running Evals
+
+Each skill includes test cases in `skills/<category>/<skill-name>/evals/evals.json`. To run them, spawn two agents per eval — one with the skill loaded, one without — then grade the outputs against the assertions.
+
+**With-skill run** (give the agent skill context):
+```
+Read skills/<category>/<skill-name>/SKILL.md and any files in its references/ directory.
+Task: <eval prompt>
+Write your solution to: evals-workspace/iteration-1/<eval-name>/with_skill/outputs/solution.ts
+```
+
+**Without-skill run** (baseline, no skill context):
+```
+Task: <eval prompt>
+Write your solution to: evals-workspace/iteration-1/<eval-name>/without_skill/outputs/solution.ts
+Do not read any files in this repository.
+```
+
+**Grading** — compare each output against the assertions in `evals.json`. Key things to check:
+- Correct `TURNKEY_`-prefixed env var names
+- `signRawPayload` uses the nested `parameters: { ... }` shape with `organizationId`
+- Wallet management checks for existing wallet before creating (`getWallets` before `createWallet`)
+- Correct packages imported for the target chain
+
+Eval run outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` is committed.
 
 ## Adding New Skills
 

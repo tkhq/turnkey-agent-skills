@@ -1,0 +1,23 @@
+{
+  "skill_name": "turnkey-ethereum-evm",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Send 0.001 ETH to 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 on Sepolia using my Turnkey wallet. I prefer viem.",
+      "expected_output": "Working TypeScript code using @turnkey/viem. Sets up TurnkeyClient, calls createAccount with the SIGN_WITH address, creates a viem WalletClient connected to Sepolia, and calls walletClient.sendTransaction with to and value. Logs the transaction hash.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Use my Turnkey wallet to send ETH on Arbitrum with ethers.js. I already have the signer set up — just show me how to send the transaction.",
+      "expected_output": "Code using TurnkeySigner from @turnkey/ethers connected to an Arbitrum RPC provider. Calls connectedSigner.sendTransaction with to and value fields. Uses the correct Arbitrum RPC URL or notes that the provider URL should point to Arbitrum. Logs the tx hash.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Sign an EIP-712 typed data message with my Turnkey Ethereum wallet using viem.",
+      "expected_output": "Code using walletClient.signTypedData (viem) with a domain, types, and message object. Includes a minimal but complete typed data example (e.g., a simple Transfer type). The account is created via createAccount from @turnkey/viem. Logs the resulting signature.",
+      "files": []
+    }
+  ]
+}

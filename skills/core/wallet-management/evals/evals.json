@@ -1,0 +1,23 @@
+{
+  "skill_name": "turnkey-wallet-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a Turnkey wallet for my agent that can hold both ETH and SOL. Use env vars TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, and TURNKEY_ORGANIZATION_ID.",
+      "expected_output": "Working TypeScript code that initializes a Turnkey client, checks whether a wallet already exists (calls getWallets), and only creates a new wallet if none is found. The createWallet call should include both ADDRESS_FORMAT_ETHEREUM and ADDRESS_FORMAT_SOLANA accounts. Code logs both derived addresses.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My agent already has a Turnkey org set up with a wallet. I just need the Ethereum address so I can start signing transactions.",
+      "expected_output": "Code that calls getWallets to find the existing wallet ID, then calls getWalletAccounts and filters for addressFormat === 'ADDRESS_FORMAT_ETHEREUM' to retrieve the address. Does NOT create a new wallet. Logs the ETH address.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Bootstrap an agent wallet using Turnkey and print out all derived addresses.",
+      "expected_output": "Code that implements the full bootstrap flow: initialize client, list wallets, create one if none exists (deriving at minimum an ETH address), then print wallet ID and all account addresses. Should use @turnkey/sdk-server for automatic activity polling.",
+      "files": []
+    }
+  ]
+}

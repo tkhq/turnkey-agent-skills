@@ -179,45 +179,7 @@ const { r, s, v } = signResponse.activity.result.signRawPayloadResult!;
 
 ## Examples
 
-### Sign a pre-hashed payload (no-op hash function)
-
-```typescript
-import { Turnkey } from "@turnkey/sdk-server";
-
-const client = new Turnkey({
-  apiBaseUrl: "https://api.turnkey.com",
-  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-}).apiClient();
-
-const response = await client.signRawPayload({
-  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_NO_OP",
-  },
-});
-
-const { r, s, v } = response.activity.result.signRawPayloadResult!;
-console.log("Signature:", { r, s, v });
-```
-
-### Sign with Keccak256 hashing (EVM raw)
-
-```typescript
-const response = await client.signRawPayload({
-  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: rlpEncodedTransactionHex, // un-hashed RLP-encoded EVM tx
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_KECCAK256", // Turnkey hashes before signing
-  },
-});
-```
+For concrete examples — pre-hashed payload, EVM Keccak256, Cosmos SHA256, and UTF-8 message signing — see `references/raw-payload-examples.md`.
 
 ## Troubleshooting
 

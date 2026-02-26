@@ -1,14 +1,7 @@
 ---
 name: turnkey-wallet-management
 description: Creates and manages Turnkey wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, and other chains. Use when the agent needs a blockchain address, has no wallet yet, or user says "create a wallet", "get my ETH address", "set up a wallet", "derive a Solana address", or "bootstrap agent wallet".
-license: MIT
 compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Lower-level: @turnkey/http and @turnkey/api-key-stamper. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
-metadata:
-  author: Turnkey
-  version: 1.0.0
-  category: blockchain
-  tags: [wallet, turnkey, ethereum, solana, bitcoin, cosmos]
-  documentation: https://docs.turnkey.com
 ---
 
 # Turnkey Wallet Management

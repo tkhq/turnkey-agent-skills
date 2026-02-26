@@ -1,0 +1,27 @@
+{
+  "name": "turnkey-agent-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit && vitest run"
+  },
+  "devDependencies": {
+    "@turnkey/api-key-stamper": "*",
+    "@turnkey/ethers": "*",
+    "@turnkey/http": "*",
+    "@turnkey/solana": "*",
+    "@turnkey/viem": "*",
+    "@solana/web3.js": "^1.87.0",
+    "@types/node": "^20.0.0",
+    "ethers": "^6.0.0",
+    "gray-matter": "^4.0.3",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "viem": "^2.0.0",
+    "vitest": "^2.0.0"
+  }
+}

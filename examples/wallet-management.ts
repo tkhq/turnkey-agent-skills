@@ -2,7 +2,7 @@
  * Turnkey Wallet Management — Runnable Example
  *
  * Demonstrates the agent bootstrap flow:
- * 1. Initialize TurnkeyClient with API key stamper
+ * 1. Initialize Turnkey client via @turnkey/sdk-server
  * 2. Check if a wallet already exists
  * 3. Create a wallet with ETH + Solana accounts if none exists
  * 4. Retrieve and display all derived addresses
@@ -16,56 +16,21 @@
  *   npx tsx examples/wallet-management.ts
  */
 
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 
 // ---------------------------------------------------------------------------
 // Client initialization
 // ---------------------------------------------------------------------------
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
 
+const client = turnkey.apiClient();
 const ORGANIZATION_ID = process.env.TURNKEY_ORGANIZATION_ID!;
-
-// ---------------------------------------------------------------------------
-// Activity polling helper
-// ---------------------------------------------------------------------------
-
-async function pollUntilComplete(activityId: string) {
-  while (true) {
-    const { activity } = await client.getActivity({
-      organizationId: ORGANIZATION_ID,
-      activityId,
-    });
-
-    switch (activity.status) {
-      case "ACTIVITY_STATUS_COMPLETED":
-        return activity;
-
-      case "ACTIVITY_STATUS_FAILED":
-      case "ACTIVITY_STATUS_REJECTED":
-        throw new Error(
-          `Activity ${activityId} ended with status: ${activity.status}`
-        );
-
-      case "ACTIVITY_STATUS_CONSENSUS_NEEDED":
-        throw new Error(
-          `Activity ${activityId} requires consensus approval. ` +
-            `Approve it in the Turnkey console, then re-run.`
-        );
-
-      default:
-        // ACTIVITY_STATUS_PENDING — keep polling
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Main bootstrap function
@@ -86,36 +51,22 @@ async function bootstrapWallet() {
     console.log(`\nFound existing wallet: ${walletId}`);
     console.log(`Wallet name: ${wallets[0].walletName}`);
   } else {
-    // Step 2: Create a new wallet with ETH and Solana accounts
+    // Step 2: Create a new wallet with ETH and Solana accounts.
+    // @turnkey/sdk-server handles activity polling automatically.
     console.log("\nNo wallets found. Creating a new wallet...");
 
     const createResponse = await client.createWallet({
-      type: "ACTIVITY_TYPE_CREATE_WALLET",
-      timestampMs: String(Date.now()),
       organizationId: ORGANIZATION_ID,
       parameters: {
         walletName: "Agent Wallet",
         accounts: [
-          // Ethereum / EVM
-          {
-            curve: "CURVE_SECP256K1",
-            pathFormat: "PATH_FORMAT_BIP32",
-            path: "m/44'/60'/0'/0/0",
-            addressFormat: "ADDRESS_FORMAT_ETHEREUM",
-          },
-          // Solana
-          {
-            curve: "CURVE_ED25519",
-            pathFormat: "PATH_FORMAT_BIP32",
-            path: "m/44'/501'/0'/0'",
-            addressFormat: "ADDRESS_FORMAT_SOLANA",
-          },
+          "ADDRESS_FORMAT_ETHEREUM",
+          "ADDRESS_FORMAT_SOLANA",
         ],
       },
     });
 
-    const activity = await pollUntilComplete(createResponse.activity.id);
-    const result = activity.result.createWalletResult!;
+    const result = createResponse.activity.result.createWalletResult!;
     walletId = result.walletId;
 
     console.log(`\nWallet created: ${walletId}`);

@@ -13,6 +13,7 @@
     "@turnkey/api-key-stamper": "*",
     "@turnkey/ethers": "*",
     "@turnkey/http": "*",
+    "@turnkey/sdk-server": "*",
     "@turnkey/solana": "*",
     "@turnkey/viem": "*",
     "@solana/web3.js": "^1.87.0",

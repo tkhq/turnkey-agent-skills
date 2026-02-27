@@ -5,19 +5,46 @@
       "id": 1,
       "prompt": "Send 0.01 SOL to 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU on Solana devnet using my Turnkey wallet.",
       "expected_output": "Working TypeScript code that initializes TurnkeyClient and TurnkeySigner, creates a Connection to devnet, fetches a fresh blockhash, builds a SystemProgram.transfer transaction, calls signer.signTransaction(tx, solanaAddress), then connection.sendRawTransaction and confirmTransaction. Logs the transaction signature.",
-      "files": []
+      "files": [
+        "skills/signing/solana-signing/references/solana-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "calls", "value": "getLatestBlockhash" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "calls", "value": "sendRawTransaction" }
+      ]
     },
     {
       "id": 2,
       "prompt": "I need to batch send SOL to three different addresses using my Turnkey wallet: 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU, 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM, and DYw8jCTfwHNRJhhmFcbXvVDTqWMEVFBX6ZKUmG5WUSHI. Send 0.001 SOL to each.",
       "expected_output": "Code that builds an array of transactions (one per recipient), each with a fresh blockhash, then calls signer.signAllTransactions(transactions, solanaAddress). Sends all signed transactions via connection.sendRawTransaction and confirms each. Logs all signatures.",
-      "files": []
+      "files": [
+        "skills/signing/solana-signing/references/solana-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "calls", "value": "signAllTransactions" },
+        { "type": "calls", "value": "sendRawTransaction" }
+      ]
     },
     {
       "id": 3,
       "prompt": "Sign the message 'Hello from my Turnkey agent' with my Solana key.",
       "expected_output": "Code that encodes the message with TextEncoder, calls signer.signMessage(messageBytes, solanaAddress), and logs the resulting signature bytes (Uint8Array). Includes full client and signer setup.",
-      "files": []
+      "files": [
+        "skills/signing/solana-signing/references/solana-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "calls", "value": "TextEncoder" },
+        { "type": "calls", "value": "signMessage" }
+      ]
     }
   ]
 }

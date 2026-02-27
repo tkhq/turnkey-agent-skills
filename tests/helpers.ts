@@ -1,6 +1,20 @@
 import { readdirSync } from "fs";
 import { join, resolve } from "path";
 
+/** Recursively find all evals.json files under a directory. */
+export function findEvalsFiles(dir: string): string[] {
+  const results: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...findEvalsFiles(fullPath));
+    } else if (entry.name === "evals.json") {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
 export const PROJECT_ROOT = resolve(process.cwd());
 export const SKILLS_ROOT = resolve(PROJECT_ROOT, "skills");
 export const ROOT_SKILL_FILE = join(PROJECT_ROOT, "SKILL.md");

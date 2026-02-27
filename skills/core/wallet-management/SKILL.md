@@ -97,45 +97,30 @@ Create a wallet and specify which chain accounts to derive upfront. You can deri
 
 `createWallet` is an async activity. With `@turnkey/sdk-server` polling is automatic; with `@turnkey/http` use `withAsyncPolling`.
 
-**Address format shortcut** — pass format strings directly for standard BIP-44 derivation paths:
-
 ```typescript
 // @turnkey/sdk-server (recommended) — polling handled automatically
 const createResponse = await client.createWallet({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    walletName: "Agent Wallet",
-    // Shortcut: pass address format strings; Turnkey uses standard BIP-44 paths
-    accounts: [
-      "ADDRESS_FORMAT_ETHEREUM",
-      "ADDRESS_FORMAT_SOLANA",
-    ],
-  },
+  walletName: "Agent Wallet",
+  accounts: [
+    {
+      curve: "CURVE_SECP256K1",
+      pathFormat: "PATH_FORMAT_BIP32",
+      path: "m/44'/60'/0'/0/0",
+      addressFormat: "ADDRESS_FORMAT_ETHEREUM",
+    },
+    {
+      curve: "CURVE_ED25519",
+      pathFormat: "PATH_FORMAT_BIP32",
+      path: "m/44'/501'/0'/0'",
+      addressFormat: "ADDRESS_FORMAT_SOLANA",
+    },
+  ],
 });
 
-const walletId = createResponse.activity.result.createWalletResult!.walletId;
-const addresses = createResponse.activity.result.createWalletResult!.addresses;
+const walletId = createResponse.walletId;
+const addresses = createResponse.addresses;
 console.log("Created wallet:", walletId, "Addresses:", addresses);
-```
-
-For explicit BIP-44 paths or non-standard derivations, use the verbose form:
-
-```typescript
-// Verbose form — explicit curve, path, and format
-accounts: [
-  {
-    curve: "CURVE_SECP256K1",
-    pathFormat: "PATH_FORMAT_BIP32",
-    path: "m/44'/60'/0'/0/0",
-    addressFormat: "ADDRESS_FORMAT_ETHEREUM",
-  },
-  {
-    curve: "CURVE_ED25519",
-    pathFormat: "PATH_FORMAT_BIP32",
-    path: "m/44'/501'/0'/0'",
-    addressFormat: "ADDRESS_FORMAT_SOLANA",
-  },
-]
 ```
 
 **Supported address formats:**

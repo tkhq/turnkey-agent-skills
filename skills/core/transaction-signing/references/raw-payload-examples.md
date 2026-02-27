@@ -9,15 +9,13 @@ Use when your payload is already hashed and Turnkey should sign it as-is.
 ```typescript
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_NO_OP",
-  },
+  signWith: process.env.SIGN_WITH!,
+  payload: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
+  hashFunction: "HASH_FUNCTION_NO_OP",
 });
 
-const { r, s, v } = response.activity.result.signRawPayloadResult!;
+const { r, s, v } = response;
 console.log("Signature:", { r, s, v });
 ```
 
@@ -28,12 +26,10 @@ Use when you have an un-hashed RLP-encoded EVM transaction and want Turnkey to K
 ```typescript
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: rlpEncodedTransactionHex,
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_KECCAK256",
-  },
+  signWith: process.env.SIGN_WITH!,
+  payload: rlpEncodedTransactionHex,
+  encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
+  hashFunction: "HASH_FUNCTION_KECCAK256",
 });
 ```
 
@@ -47,15 +43,13 @@ const payload = Buffer.from(txBytes).toString("hex");
 
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload,
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_SHA256",
-  },
+  signWith: process.env.SIGN_WITH!,
+  payload,
+  encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
+  hashFunction: "HASH_FUNCTION_SHA256",
 });
 
-const { r, s } = response.activity.result.signRawPayloadResult!;
+const { r, s } = response;
 // Cosmos expects compact signature: r || s (64 bytes)
 const compactSignature = Buffer.from(r + s, "hex");
 ```
@@ -67,11 +61,9 @@ Use when signing a plain text string (e.g., EIP-191 personal_sign without a libr
 ```typescript
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: "Hello from Turnkey",
-    encoding: "PAYLOAD_ENCODING_TEXT_UTF8",
-    hashFunction: "HASH_FUNCTION_NO_OP",
-  },
+  signWith: process.env.SIGN_WITH!,
+  payload: "Hello from Turnkey",
+  encoding: "PAYLOAD_ENCODING_TEXT_UTF8",
+  hashFunction: "HASH_FUNCTION_NO_OP",
 });
 ```

@@ -59,12 +59,10 @@ describe("claude --plugin-dir", () => {
     const output = (result.stdout ?? "") + (result.stderr ?? "");
 
     for (const name of SKILL_NAMES) {
-      if (!output.includes(name)) {
-        console.warn(
-          `[warn] Skill "${name}" not found in --plugin-dir output. ` +
-          `Nested skill directories may not be resolved — consider flattening skills/ to a single level.`
-        );
-      }
+      expect(
+        output,
+        `Skill "${name}" not found in --plugin-dir output. Nested skill directories may not be resolved — consider flattening skills/ to a single level.`
+      ).toContain(name);
     }
   });
 });

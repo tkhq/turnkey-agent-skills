@@ -8,9 +8,9 @@
  * 4. Retrieve and display all derived addresses
  *
  * Required environment variables:
- *   API_PUBLIC_KEY    — Turnkey API key public component
- *   API_PRIVATE_KEY   — Turnkey API key private component
- *   ORGANIZATION_ID   — Turnkey organization UUID
+ *   TURNKEY_API_PUBLIC_KEY    — Turnkey API key public component
+ *   TURNKEY_API_PRIVATE_KEY   — Turnkey API key private component
+ *   TURNKEY_ORGANIZATION_ID   — Turnkey organization UUID
  *
  * Run with:
  *   npx tsx examples/wallet-management.ts
@@ -26,12 +26,12 @@ import { ApiKeyStamper } from "@turnkey/api-key-stamper";
 const client = new TurnkeyClient(
   { baseUrl: "https://api.turnkey.com" },
   new ApiKeyStamper({
-    apiPublicKey: process.env.API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.API_PRIVATE_KEY!,
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
   })
 );
 
-const ORGANIZATION_ID = process.env.ORGANIZATION_ID!;
+const ORGANIZATION_ID = process.env.TURNKEY_ORGANIZATION_ID!;
 
 // ---------------------------------------------------------------------------
 // Activity polling helper

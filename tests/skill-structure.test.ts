@@ -71,9 +71,7 @@ for (const filePath of skillFiles) {
     describe("required sections", () => {
       for (const section of REQUIRED_SECTIONS) {
         it(`has ## ${section}`, () => {
-          if (!content.includes(`## ${section}`)) {
-            console.warn(`[warn] ${name}: missing recommended section "## ${section}"`);
-          }
+          expect(content, `Missing required section "## ${section}"`).toContain(`## ${section}`);
         });
       }
 

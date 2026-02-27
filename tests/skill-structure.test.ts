@@ -12,7 +12,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
-import { findSkillFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT } from "./helpers.js";
+import { findSkillFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT, ROOT_SKILL_FILE } from "./helpers.js";
 
 const REQUIRED_SECTIONS = [
   "Overview",
@@ -111,3 +111,49 @@ for (const filePath of skillFiles) {
     });
   });
 }
+
+// ---------------------------------------------------------------------------
+// Root SKILL.md — package manifest, frontmatter only
+//
+// The root SKILL.md is a ClawHub package entry point, not a skill guide.
+// It must have valid frontmatter but is not required to have the standard
+// skill sections (Prerequisites, Troubleshooting, etc.).
+// ---------------------------------------------------------------------------
+
+const rootContent = readFileSync(ROOT_SKILL_FILE, "utf-8");
+const rootParsed = matter(rootContent);
+
+describe("SKILL.md (root package manifest)", () => {
+  describe("frontmatter", () => {
+    it("has a name field", () => {
+      expect(rootParsed.data).toHaveProperty("name");
+      expect(typeof rootParsed.data.name).toBe("string");
+      expect((rootParsed.data.name as string).length).toBeGreaterThan(0);
+    });
+
+    it("name is kebab-case", () => {
+      expect(rootParsed.data.name).toMatch(/^[a-z][a-z0-9-]*$/);
+    });
+
+    it("has a description field", () => {
+      expect(rootParsed.data).toHaveProperty("description");
+      expect(typeof rootParsed.data.description).toBe("string");
+      expect((rootParsed.data.description as string).length).toBeGreaterThan(0);
+    });
+
+    it("description fits on one line (no newlines)", () => {
+      expect(rootParsed.data.description).not.toContain("\n");
+    });
+
+    it("has a version field", () => {
+      expect(rootParsed.data).toHaveProperty("version");
+      expect(typeof rootParsed.data.version).toBe("string");
+    });
+
+    it("has a tags field (array)", () => {
+      expect(rootParsed.data).toHaveProperty("tags");
+      expect(Array.isArray(rootParsed.data.tags)).toBe(true);
+      expect((rootParsed.data.tags as unknown[]).length).toBeGreaterThan(0);
+    });
+  });
+});

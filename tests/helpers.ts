@@ -3,6 +3,7 @@ import { join, resolve } from "path";
 
 export const PROJECT_ROOT = resolve(process.cwd());
 export const SKILLS_ROOT = resolve(PROJECT_ROOT, "skills");
+export const ROOT_SKILL_FILE = join(PROJECT_ROOT, "SKILL.md");
 
 /** Recursively find all SKILL.md files under a directory. */
 export function findSkillFiles(dir: string): string[] {

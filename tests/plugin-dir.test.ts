@@ -56,7 +56,7 @@ describe("claude --plugin-dir", () => {
 
   it.skipIf(shouldSkip)("all four skill names appear in output (nested path resolution)", () => {
     const result = runPluginDir();
-    const output = (result.stdout ?? "") + (result.stderr ?? "");
+    const output = String(result.stdout ?? "") + String(result.stderr ?? "");
 
     for (const name of SKILL_NAMES) {
       expect(

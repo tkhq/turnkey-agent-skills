@@ -20,23 +20,30 @@ async function bootstrapWallet() {
     walletId = wallets[0].walletId;
     console.log("Using existing wallet:", walletId);
   } else {
-    // 2. Create wallet with ETH + Solana accounts
-    // Polling is handled automatically by @turnkey/sdk-server
+    // 2. Create wallet with ETH + Solana accounts.
+    // @turnkey/sdk-server handles activity polling automatically.
     const createResponse = await client.createWallet({
       organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-      parameters: {
-        walletName: "Agent Wallet",
-        // Shortcut form — Turnkey uses standard BIP-44 paths
-        accounts: [
-          "ADDRESS_FORMAT_ETHEREUM",
-          "ADDRESS_FORMAT_SOLANA",
-        ],
-      },
+      walletName: "Agent Wallet",
+      accounts: [
+        {
+          curve: "CURVE_SECP256K1",
+          pathFormat: "PATH_FORMAT_BIP32",
+          path: "m/44'/60'/0'/0/0",
+          addressFormat: "ADDRESS_FORMAT_ETHEREUM",
+        },
+        {
+          curve: "CURVE_ED25519",
+          pathFormat: "PATH_FORMAT_BIP32",
+          path: "m/44'/501'/0'/0'",
+          addressFormat: "ADDRESS_FORMAT_SOLANA",
+        },
+      ],
     });
 
-    walletId = createResponse.activity.result.createWalletResult!.walletId;
+    walletId = createResponse.walletId;
     console.log("Created wallet:", walletId);
-    console.log("Initial addresses:", createResponse.activity.result.createWalletResult!.addresses);
+    console.log("Initial addresses:", createResponse.addresses);
   }
 
   // 3. Fetch all accounts for this wallet

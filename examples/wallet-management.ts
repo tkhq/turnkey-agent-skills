@@ -57,20 +57,27 @@ async function bootstrapWallet() {
 
     const createResponse = await client.createWallet({
       organizationId: ORGANIZATION_ID,
-      parameters: {
-        walletName: "Agent Wallet",
-        accounts: [
-          "ADDRESS_FORMAT_ETHEREUM",
-          "ADDRESS_FORMAT_SOLANA",
-        ],
-      },
+      walletName: "Agent Wallet",
+      accounts: [
+        {
+          curve: "CURVE_SECP256K1",
+          pathFormat: "PATH_FORMAT_BIP32",
+          path: "m/44'/60'/0'/0/0",
+          addressFormat: "ADDRESS_FORMAT_ETHEREUM",
+        },
+        {
+          curve: "CURVE_ED25519",
+          pathFormat: "PATH_FORMAT_BIP32",
+          path: "m/44'/501'/0'/0'",
+          addressFormat: "ADDRESS_FORMAT_SOLANA",
+        },
+      ],
     });
 
-    const result = createResponse.activity.result.createWalletResult!;
-    walletId = result.walletId;
+    walletId = createResponse.walletId;
 
     console.log(`\nWallet created: ${walletId}`);
-    console.log("Initial addresses:", result.addresses);
+    console.log("Initial addresses:", createResponse.addresses);
   }
 
   // Step 3: Fetch all accounts for the wallet

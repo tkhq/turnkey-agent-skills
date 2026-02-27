@@ -97,7 +97,10 @@ Eval run outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` is
    ```yaml
    ---
    name: skill_identifier
+   version: "1.0.0"
    description: One-sentence description for skill discovery
+   tags: ["turnkey", "relevant-tag", "another-tag"]
+   compatibility: "Runtime requirements and required env vars"
    ---
    ```
 3. Include these sections: **Overview**, **Prerequisites**, **Environment Variables**, **Instructions**, **Code Examples**, **Error Handling**, **Related Skills**

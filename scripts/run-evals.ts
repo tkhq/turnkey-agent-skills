@@ -270,6 +270,8 @@ function createClaudeProvider(model?: string): Provider {
       "text",
       "--verbose",
       "--no-session-persistence",
+      "--temperature",
+      "0",
     ];
     if (model) args.push("--model", model);
 

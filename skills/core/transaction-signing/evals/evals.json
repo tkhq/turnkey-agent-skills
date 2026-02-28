@@ -37,7 +37,7 @@
       "prompt": "Which Turnkey signing package should I use for Base? What about for Solana? And what if I'm on Aptos?",
       "expected_output": "A clear routing answer: Base (EVM) → @turnkey/ethers or @turnkey/viem (ethereum-evm skill); Solana → @turnkey/solana (solana-signing skill); Aptos → no dedicated package, use signRawPayload directly. Includes or references the chain routing table.",
       "files": [
-        "skills/core/transaction-signing/references/raw-payload-examples.md"
+        "skills/core/transaction-signing/SKILL.md"
       ],
       "assertions": [
         { "type": "regex", "pattern": "@turnkey/(ethers|viem)", "flags": "i" },

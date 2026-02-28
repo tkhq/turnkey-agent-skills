@@ -12,7 +12,8 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
-import { findSkillFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT, ROOT_SKILL_FILE } from "./helpers.js";
+import { findSkillFiles, findEvalsFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT, ROOT_SKILL_FILE } from "./helpers.js";
+import type { EvalsFile } from "./grader.js";
 
 const REQUIRED_SECTIONS = [
   "Overview",
@@ -122,6 +123,34 @@ for (const filePath of skillFiles) {
 
 const rootContent = readFileSync(ROOT_SKILL_FILE, "utf-8");
 const rootParsed = matter(rootContent);
+
+// ---------------------------------------------------------------------------
+// evals.json ↔ SKILL.md cross-validation
+//
+// Each evals.json has a skill_name field that must match the name in its
+// parent SKILL.md frontmatter. Drift between these causes confusing workspace
+// directory names and broken eval filtering.
+// ---------------------------------------------------------------------------
+
+const evalsFiles = findEvalsFiles(SKILLS_ROOT);
+
+describe("evals.json skill_name matches SKILL.md name", () => {
+  for (const evalsPath of evalsFiles) {
+    const evalsData: EvalsFile = JSON.parse(readFileSync(evalsPath, "utf-8"));
+    // evals/evals.json → skill dir is two levels up
+    const skillDir = join(evalsPath, "..", "..");
+    const skillMdPath = join(skillDir, "SKILL.md");
+
+    it(`${relativePath(evalsPath)}`, () => {
+      expect(existsSync(skillMdPath), `No SKILL.md found at ${skillDir}`).toBe(true);
+      const skillParsed = matter(readFileSync(skillMdPath, "utf-8"));
+      expect(
+        evalsData.skill_name,
+        `evals.json skill_name "${evalsData.skill_name}" does not match SKILL.md name "${skillParsed.data.name}"`,
+      ).toBe(skillParsed.data.name);
+    });
+  }
+});
 
 describe("SKILL.md (root package manifest)", () => {
   describe("frontmatter", () => {

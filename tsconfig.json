@@ -11,5 +11,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["examples/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"]
+  "include": ["examples/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "skills/**/*.ts"]
 }

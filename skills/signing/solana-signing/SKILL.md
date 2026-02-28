@@ -10,7 +10,7 @@ compatibility: Requires Node.js. Install @turnkey/solana and @solana/web3.js. Se
 
 ## Overview
 
-Use this skill to sign and broadcast Solana transactions using `@turnkey/solana`. `TurnkeySigner` wraps a `TurnkeyClient` and exposes `signTransaction`, `signAllTransactions`, and `signMessage` methods — each taking the sender's Solana address as a parameter.
+Use this skill to sign and broadcast Solana transactions using `@turnkey/solana`. `TurnkeySigner` wraps a Turnkey client and exposes `signTransaction`, `signAllTransactions`, and `signMessage` methods — each taking the sender's Solana address as a parameter.
 
 The wallet account must have been created with `ADDRESS_FORMAT_SOLANA` and `CURVE_ED25519`. If you haven't created a wallet yet, read `skills/core/wallet-management/SKILL.md` first.
 
@@ -37,6 +37,8 @@ SOLANA_RPC=                # Optional. Defaults to devnet public endpoint
 ## Instructions
 
 ### Step 1: Initialize TurnkeyClient and TurnkeySigner
+
+`TurnkeySigner` accepts both `TurnkeyClient` (from `@turnkey/http`) and the `@turnkey/sdk-server` client. If you already have a `@turnkey/sdk-server` client from the wallet-management skill, pass `turnkey.apiClient()` directly and skip installing `@turnkey/http`.
 
 ```typescript
 import { TurnkeyClient } from "@turnkey/http";

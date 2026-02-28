@@ -67,7 +67,7 @@ const client = turnkey.apiClient();
 ```
 
 ```typescript
-// Option B — @turnkey/http (lower-level, required by chain-specific packages)
+// Option B — @turnkey/http (lower-level, manual polling control)
 import { TurnkeyClient, withAsyncPolling } from "@turnkey/http";
 import { ApiKeyStamper } from "@turnkey/api-key-stamper";
 
@@ -90,7 +90,7 @@ const client = new TurnkeyClient(
 | Bitcoin | raw payload signing | see below |
 | Aptos, Sui, TON, Tron | raw payload signing | see below |
 
-Chain-specific packages wrap `TurnkeyClient` and expose a native signer interface (e.g., an ethers `Signer`, viem `Account`, or Solana `Signer`). Use them when available — they handle transaction serialization and encoding automatically.
+Chain-specific packages accept any Turnkey client and expose a native signer interface (e.g., an ethers `Signer`, viem `Account`, or Solana `Signer`). Use them when available — they handle transaction serialization and encoding automatically.
 
 For unsupported chains, use `signRawPayload` directly.
 

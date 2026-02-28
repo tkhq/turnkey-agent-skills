@@ -33,6 +33,27 @@ export function findSkillFiles(dir: string): string[] {
   return results;
 }
 
+/** Recursively find all .md files under any references/ directory. */
+export function findReferenceFiles(dir: string): string[] {
+  const results: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "references") {
+        // Collect all .md files directly inside this references/ dir
+        for (const ref of readdirSync(fullPath, { withFileTypes: true })) {
+          if (!ref.isDirectory() && ref.name.endsWith(".md")) {
+            results.push(join(fullPath, ref.name));
+          }
+        }
+      } else {
+        results.push(...findReferenceFiles(fullPath));
+      }
+    }
+  }
+  return results;
+}
+
 /** Return a path relative to the project root, for readable test names. */
 export function relativePath(absolutePath: string): string {
   return absolutePath.replace(PROJECT_ROOT + "/", "");

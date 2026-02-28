@@ -16,7 +16,7 @@
 import { readFileSync } from "fs";
 import { describe, it, expect } from "vitest";
 import * as ts from "typescript";
-import { findSkillFiles, relativePath, SKILLS_ROOT } from "./helpers.js";
+import { findSkillFiles, findReferenceFiles, relativePath, SKILLS_ROOT } from "./helpers.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -94,8 +94,9 @@ function getSyntaxErrors(code: string): string[] {
 // ---------------------------------------------------------------------------
 
 const skillFiles = findSkillFiles(SKILLS_ROOT);
+const referenceFiles = findReferenceFiles(SKILLS_ROOT);
 
-for (const filePath of skillFiles) {
+for (const filePath of [...skillFiles, ...referenceFiles]) {
   const name = relativePath(filePath);
   const content = readFileSync(filePath, "utf-8");
   const blocks = extractTypeScriptBlocks(content);

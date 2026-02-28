@@ -44,7 +44,7 @@ Follow these steps when an agent needs wallet access:
 
 ### Step 1: Initialize the client
 
-**Option A — `@turnkey/sdk-server` (recommended):** Handles async activity polling automatically. Use this unless you need to integrate with chain-specific packages that require `TurnkeyClient`.
+**Option A — `@turnkey/sdk-server` (recommended):** Handles async activity polling automatically. Works with all chain-specific signing packages (`@turnkey/ethers`, `@turnkey/viem`, `@turnkey/solana`).
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -58,7 +58,7 @@ const turnkey = new Turnkey({
 const client = turnkey.apiClient();
 ```
 
-**Option B — `@turnkey/http` (lower-level):** Required when passing the client to `TurnkeySigner` (ethers, viem, Solana). Wrap activities with `withAsyncPolling` to avoid manual polling loops.
+**Option B — `@turnkey/http` (lower-level):** Use when you need manual control over activity polling. Wrap activities with `withAsyncPolling` to avoid manual polling loops.
 
 ```typescript
 import { TurnkeyClient, withAsyncPolling } from "@turnkey/http";

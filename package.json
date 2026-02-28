@@ -7,7 +7,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && vitest run"
+    "check": "tsc --noEmit && vitest run",
+    "evals": "tsx scripts/run-evals.ts"
   },
   "devDependencies": {
     "@turnkey/api-key-stamper": "*",

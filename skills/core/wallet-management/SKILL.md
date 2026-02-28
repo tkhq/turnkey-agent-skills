@@ -77,10 +77,7 @@ const client = new TurnkeyClient(
 
 Before creating a wallet, always list existing wallets. An agent should only create a wallet if none exists.
 
-With `@turnkey/sdk-server`, you can use `fetchWallets()` which returns wallets with their accounts already populated — a single round-trip:
-
 ```typescript
-// @turnkey/sdk-server: single call, accounts included
 const { wallets } = await client.getWallets({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });

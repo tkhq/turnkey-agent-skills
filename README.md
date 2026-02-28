@@ -66,29 +66,38 @@ npx tsx examples/solana-signing.ts
 
 ## Running Evals
 
-Each skill includes test cases in `skills/<category>/<skill-name>/evals/evals.json`. To run them, spawn two agents per eval — one with the skill loaded, one without — then grade the outputs against the assertions.
+Each skill includes test cases in `skills/<category>/<skill-name>/evals/evals.json`. The automated eval runner discovers all evals, sends them through an LLM (with and without skill context), grades the output against assertions, and prints a summary.
 
-**With-skill run** (give the agent skill context):
-```
-Read skills/<category>/<skill-name>/SKILL.md and any files in its references/ directory.
-Task: <eval prompt>
-Write your solution to: evals-workspace/iteration-1/<eval-name>/with_skill/outputs/solution.ts
+```bash
+# Run all evals with Claude (default provider)
+npm run evals
+
+# Run evals for a specific skill
+npm run evals -- --skill turnkey-ethereum-evm
+
+# Run a single eval
+npm run evals -- --skill turnkey-wallet-management --eval 1
+
+# Also run a baseline without skill context for comparison
+npm run evals -- --without-skill
+
+# Use OpenAI instead of Claude (requires OPENAI_API_KEY)
+npm run evals -- --provider openai --model gpt-4o
+
+# Use a custom command as the LLM provider
+npm run evals -- --provider custom --command "llm prompt -m claude-3.5-sonnet"
+
+# Other options
+npm run evals -- --concurrency 2    # limit parallel runs (default: 4)
+npm run evals -- --dry-run           # print prompts without executing
+npm run evals -- --verbose           # print full LLM responses
 ```
 
-**Without-skill run** (baseline, no skill context):
-```
-Task: <eval prompt>
-Write your solution to: evals-workspace/iteration-1/<eval-name>/without_skill/outputs/solution.ts
-Do not read any files in this repository.
-```
+The runner extracts the largest TypeScript code block from each response, runs the assertions from `evals.json` against it, and writes results to `evals-workspace/report.json`. Generated solutions are saved to `evals-workspace/<skill-name>/eval-<id>/solution.ts`.
 
-**Grading** — compare each output against the assertions in `evals.json`. Key things to check:
-- Correct `TURNKEY_`-prefixed env var names
-- `signRawPayload` uses the flat shape (`signWith`, `payload`, `encoding`, `hashFunction` at the top level alongside `organizationId`) — no `parameters: { ... }` wrapper; response fields `r`, `s`, `v` are directly on the response object
-- Wallet management checks for existing wallet before creating (`getWallets` before `createWallet`)
-- Correct packages imported for the target chain
+After running evals, `npm test` will grade any solutions in `evals-workspace/` against their assertions.
 
-Eval run outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` is committed.
+Eval outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` definitions are committed.
 
 ## Adding New Skills
 

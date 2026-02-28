@@ -27,6 +27,7 @@
       "assertions": [
         { "type": "imports", "value": "@turnkey/ethers" },
         { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "TurnkeySigner" },
         { "type": "calls", "value": "sendTransaction" },

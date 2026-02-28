@@ -3,7 +3,7 @@
  *
  * Validates every SKILL.md in the project:
  * - YAML frontmatter is present and has required fields
- * - name is snake_case (required by OpenClaw indexing)
+ * - name is kebab-case (required by Anthropic skills spec and OpenClaw indexing)
  * - All required markdown sections are present
  * - Cross-references in Related Skills point to files that actually exist
  */

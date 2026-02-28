@@ -12,6 +12,7 @@ build/
 
 # Claude Code local settings
 .claude/settings.local.json
+CLAUDE.md
 
 # Eval run artifacts (outputs, grading, benchmarks)
 evals-workspace/

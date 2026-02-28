@@ -96,7 +96,7 @@ Eval run outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` is
 2. Start with the standard frontmatter:
    ```yaml
    ---
-   name: skill_identifier
+   name: my-skill-name
    version: "1.0.0"
    description: One-sentence description for skill discovery
    tags: ["turnkey", "relevant-tag", "another-tag"]

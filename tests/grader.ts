@@ -20,6 +20,19 @@ export type Assertion =
   | { type: "order"; before: string; after: string }
   | { type: "regex"; pattern: string; flags?: string };
 
+export interface Eval {
+  id: number;
+  prompt: string;
+  expected_output: string;
+  files: string[];
+  assertions?: Assertion[];
+}
+
+export interface EvalsFile {
+  skill_name: string;
+  evals: Eval[];
+}
+
 export interface AssertionResult {
   passed: boolean;
   assertion: Assertion;

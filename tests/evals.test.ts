@@ -17,21 +17,8 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { describe, it, expect } from "vitest";
-import { runAssertions, describeAssertion, type Assertion } from "./grader.js";
+import { runAssertions, describeAssertion, type Assertion, type Eval, type EvalsFile } from "./grader.js";
 import { PROJECT_ROOT, SKILLS_ROOT, findEvalsFiles } from "./helpers.js";
-
-interface Eval {
-  id: number;
-  prompt: string;
-  expected_output: string;
-  files: string[];
-  assertions?: Assertion[];
-}
-
-interface EvalsFile {
-  skill_name: string;
-  evals: Eval[];
-}
 
 describe("eval grader", () => {
   // Sanity check: verify the assertion engine itself works correctly

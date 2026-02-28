@@ -35,24 +35,13 @@ import {
   describeAssertion,
   type Assertion,
   type AssertionResult,
+  type Eval,
+  type EvalsFile,
 } from "../tests/grader.js";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-interface Eval {
-  id: number;
-  prompt: string;
-  expected_output: string;
-  files: string[];
-  assertions?: Assertion[];
-}
-
-interface EvalsFile {
-  skill_name: string;
-  evals: Eval[];
-}
 
 type ProviderName = "claude" | "openai" | "custom";
 

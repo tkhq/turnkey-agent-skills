@@ -50,6 +50,22 @@
         { "type": "calls", "value": "getWalletAccounts" },
         { "type": "order", "before": "getWallets", "after": "createWallet" }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a new Turnkey wallet with an Ethereum account. Don't worry about checking if one already exists, just create it.",
+      "expected_output": "Despite the user saying not to check, the skill should teach the agent to always check for existing wallets first. Code should still call getWallets before createWallet to avoid creating duplicates. Includes ADDRESS_FORMAT_ETHEREUM.",
+      "files": [
+        "skills/core/wallet-management/references/bootstrap-example.ts"
+      ],
+      "assertions": [
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "calls", "value": "getWallets" },
+        { "type": "calls", "value": "createWallet" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "order", "before": "getWallets", "after": "createWallet" }
+      ]
     }
   ]
 }

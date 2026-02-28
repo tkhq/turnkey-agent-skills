@@ -50,6 +50,23 @@
         { "type": "calls", "value": "TextEncoder" },
         { "type": "calls", "value": "signMessage" }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Send 0.01 SOL to 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU using my Ethereum signer from @turnkey/ethers.",
+      "expected_output": "The code should use @turnkey/solana, not @turnkey/ethers, even though the user asked for their 'Ethereum signer'. Solana transactions require @turnkey/solana with TurnkeySigner.signTransaction. Should NOT import @turnkey/ethers or @turnkey/viem.",
+      "files": [
+        "skills/signing/solana-signing/references/solana-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "not_contains", "value": "from \"@turnkey/ethers\"" },
+        { "type": "not_contains", "value": "from '@turnkey/ethers'" },
+        { "type": "not_contains", "value": "from \"@turnkey/viem\"" },
+        { "type": "not_contains", "value": "from '@turnkey/viem'" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "calls", "value": "signTransaction" }
+      ]
     }
   ]
 }

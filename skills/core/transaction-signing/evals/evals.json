@@ -49,6 +49,19 @@
         { "type": "contains", "value": "@turnkey/solana" },
         { "type": "contains", "value": "signRawPayload" }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to sign a Solana transaction using @turnkey/ethers. Show me how.",
+      "expected_output": "The response should correct the user: @turnkey/ethers is for EVM chains, not Solana. For Solana, use @turnkey/solana. Should mention or reference the solana-signing skill. Should NOT produce code that imports @turnkey/ethers for Solana signing.",
+      "files": [
+        "skills/core/transaction-signing/SKILL.md"
+      ],
+      "assertions": [
+        { "type": "contains", "value": "@turnkey/solana" },
+        { "type": "not_contains", "value": "from \"@turnkey/ethers\"" },
+        { "type": "not_contains", "value": "from '@turnkey/ethers'" }
+      ]
     }
   ]
 }

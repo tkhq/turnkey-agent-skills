@@ -117,17 +117,15 @@ const client = turnkey.apiClient();
 
 const signResponse = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: "0xdeadbeef...", // hex-encoded bytes to sign
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_NO_OP", // provide pre-hashed input
-    // or: "HASH_FUNCTION_KECCAK256" — Turnkey hashes for you (EVM)
-    // or: "HASH_FUNCTION_SHA256" — Bitcoin / generic SHA256
-  },
+  signWith: process.env.SIGN_WITH!,
+  payload: "0xdeadbeef...", // hex-encoded bytes to sign
+  encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
+  hashFunction: "HASH_FUNCTION_NO_OP", // provide pre-hashed input
+  // or: "HASH_FUNCTION_KECCAK256" — Turnkey hashes for you (EVM)
+  // or: "HASH_FUNCTION_SHA256" — Bitcoin / generic SHA256
 });
 
-const { r, s, v } = signResponse.activity.result.signRawPayloadResult!;
+const { r, s, v } = signResponse;
 console.log("r:", r, "s:", s, "v:", v);
 ```
 

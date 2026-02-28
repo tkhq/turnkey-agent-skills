@@ -84,7 +84,7 @@ Do not read any files in this repository.
 
 **Grading** — compare each output against the assertions in `evals.json`. Key things to check:
 - Correct `TURNKEY_`-prefixed env var names
-- `signRawPayload` uses the nested `parameters: { ... }` shape with `organizationId`
+- `signRawPayload` uses the flat shape (`signWith`, `payload`, `encoding`, `hashFunction` at the top level alongside `organizationId`) — no `parameters: { ... }` wrapper; response fields `r`, `s`, `v` are directly on the response object
 - Wallet management checks for existing wallet before creating (`getWallets` before `createWallet`)
 - Correct packages imported for the target chain
 

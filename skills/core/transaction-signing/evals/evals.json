@@ -14,7 +14,9 @@
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "signRawPayload" },
         { "type": "contains", "value": "HASH_FUNCTION_NO_OP" },
-        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" }
+        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" },
+        { "type": "not_contains", "value": "parameters: {" },
+        { "type": "not_contains", "value": "activity.result" }
       ]
     },
     {
@@ -29,7 +31,9 @@
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "signRawPayload" },
         { "type": "contains", "value": "HASH_FUNCTION_SHA256" },
-        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" }
+        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" },
+        { "type": "not_contains", "value": "parameters: {" },
+        { "type": "not_contains", "value": "activity.result" }
       ]
     },
     {

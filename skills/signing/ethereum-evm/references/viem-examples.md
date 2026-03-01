@@ -1,11 +1,36 @@
 # viem Usage Examples
 
-Full setup is in the main SKILL.md. These examples assume `walletClient`, `publicClient`, and `account` are already initialized.
+Each example below is fully self-contained — it includes all imports and setup so you can use it directly.
 
 ## Send ETH
 
 ```typescript
-import { parseEther } from "viem";
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, createPublicClient, http, parseEther } from "viem";
+import { sepolia } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
+
+const transport = http(
+  process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"
+);
+
+const walletClient = createWalletClient({ account, chain: sepolia, transport });
+const publicClient = createPublicClient({ chain: sepolia, transport });
 
 const hash = await walletClient.sendTransaction({
   to: "0xRecipientAddress",
@@ -18,7 +43,31 @@ console.log("Confirmed in block:", receipt.blockNumber);
 ## Explicit EIP-1559 fee parameters
 
 ```typescript
-import { parseEther, parseGwei } from "viem";
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, http, parseEther, parseGwei } from "viem";
+import { sepolia } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
+
+const transport = http(
+  process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"
+);
+
+const walletClient = createWalletClient({ account, chain: sepolia, transport });
 
 const hash = await walletClient.sendTransaction({
   to: "0xRecipientAddress",
@@ -31,6 +80,32 @@ const hash = await walletClient.sendTransaction({
 ## Sign a message (EIP-191)
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, http } from "viem";
+import { sepolia } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
+
+const walletClient = createWalletClient({
+  account,
+  chain: sepolia,
+  transport: http(process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"),
+});
+
 const signature = await walletClient.signMessage({
   account,
   message: "Hello from Turnkey agent",
@@ -40,7 +115,31 @@ const signature = await walletClient.signMessage({
 ## Sign EIP-712 typed data
 
 ```typescript
-import { parseUnits } from "viem";
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, http, parseUnits } from "viem";
+import { sepolia } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
+
+const walletClient = createWalletClient({
+  account,
+  chain: sepolia,
+  transport: http(process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"),
+});
 
 const signature = await walletClient.signTypedData({
   account,
@@ -59,7 +158,31 @@ const signature = await walletClient.signTypedData({
 ## Write to a contract
 
 ```typescript
-import { parseAbi } from "viem";
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, http, parseAbi, parseUnits } from "viem";
+import { sepolia } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
+
+const walletClient = createWalletClient({
+  account,
+  chain: sepolia,
+  transport: http(process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"),
+});
 
 const hash = await walletClient.writeContract({
   address: "0xTokenAddress",
@@ -72,7 +195,25 @@ const hash = await walletClient.writeContract({
 ## Connect to a different chain
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { createAccount } from "@turnkey/viem";
+import { createWalletClient, http } from "viem";
 import { base, arbitrum } from "viem/chains";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const account = await createAccount({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+});
 
 // Same account, swap chain + transport
 const baseWalletClient = createWalletClient({

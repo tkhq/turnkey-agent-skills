@@ -23,6 +23,10 @@ Turnkey provides two EVM signing integrations. **Pick one based on your stack:**
 
 Both work with the same Turnkey wallet account and the same three environment variables. You do not need both — choose one.
 
+## Rules
+
+- **Include complete setup unless you can see the user's existing code.** Always include all imports, `TurnkeyClient` initialization, signer/account creation, and provider setup. If the user says setup is "already done" but you cannot see their code, include setup anyway — the user may be mistaken or the code may be incomplete. Only omit setup when the user's existing initialization code is visible in the conversation and you can reference their variables directly.
+
 ## Prerequisites
 
 Install only the package for your chosen library:

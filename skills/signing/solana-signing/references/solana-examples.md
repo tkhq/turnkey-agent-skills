@@ -1,10 +1,42 @@
 # Solana Usage Examples
 
-Full setup is in the main SKILL.md. These examples assume `signer`, `connection`, `solanaAddress`, and `senderPublicKey` are already initialized.
+Each example below is fully self-contained — it includes all imports and setup so you can use it directly.
 
 ## Send SOL
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { TurnkeySigner } from "@turnkey/solana";
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const signer = new TurnkeySigner({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+
+const solanaAddress = process.env.SIGN_WITH!;
+const senderPublicKey = new PublicKey(solanaAddress);
+
+const connection = new Connection(
+  process.env.SOLANA_RPC ?? "https://api.devnet.solana.com",
+  "confirmed"
+);
+
 async function sendSol(to: string, amountSol: number) {
   const balance = await connection.getBalance(senderPublicKey);
   console.log("Sender:", solanaAddress);
@@ -38,6 +70,44 @@ sendSol("RecipientBase58Address", 0.001).catch(console.error);
 ## Batch sign multiple transactions
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { TurnkeySigner } from "@turnkey/solana";
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const signer = new TurnkeySigner({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+
+const solanaAddress = process.env.SIGN_WITH!;
+const senderPublicKey = new PublicKey(solanaAddress);
+
+const connection = new Connection(
+  process.env.SOLANA_RPC ?? "https://api.devnet.solana.com",
+  "confirmed"
+);
+
+const recipients = [
+  "Recipient1Base58Address",
+  "Recipient2Base58Address",
+  "Recipient3Base58Address",
+];
+
 const transactions = await Promise.all(
   recipients.map(async (recipient) => {
     const { blockhash } = await connection.getLatestBlockhash();
@@ -75,6 +145,25 @@ console.log("All confirmed:", signatures);
 ## Sign a message
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { TurnkeySigner } from "@turnkey/solana";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const signer = new TurnkeySigner({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+
+const solanaAddress = process.env.SIGN_WITH!;
+
 const message = new TextEncoder().encode("Hello from Turnkey agent");
 const signedMessage = await signer.signMessage(message, solanaAddress);
 console.log("Signed message bytes:", signedMessage);
@@ -83,10 +172,38 @@ console.log("Signed message bytes:", signedMessage);
 ## Versioned transactions
 
 ```typescript
+import { TurnkeyClient } from "@turnkey/http";
+import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { TurnkeySigner } from "@turnkey/solana";
 import {
+  Connection,
+  PublicKey,
+  SystemProgram,
   VersionedTransaction,
   TransactionMessage,
+  LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
+
+const client = new TurnkeyClient(
+  { baseUrl: "https://api.turnkey.com" },
+  new ApiKeyStamper({
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  })
+);
+
+const signer = new TurnkeySigner({
+  client,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+
+const solanaAddress = process.env.SIGN_WITH!;
+const senderPublicKey = new PublicKey(solanaAddress);
+
+const connection = new Connection(
+  process.env.SOLANA_RPC ?? "https://api.devnet.solana.com",
+  "confirmed"
+);
 
 const { blockhash } = await connection.getLatestBlockhash();
 

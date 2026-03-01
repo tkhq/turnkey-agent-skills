@@ -1,12 +1,22 @@
 # Raw Payload Signing Examples
 
-These examples assume `client` is already initialized via `@turnkey/sdk-server`. See the main SKILL.md for client setup.
+Each example below is fully self-contained — it includes all imports and setup so you can use it directly.
 
 ## Sign a pre-hashed payload (HASH_FUNCTION_NO_OP)
 
 Use when your payload is already hashed and Turnkey should sign it as-is.
 
 ```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!,
@@ -24,6 +34,16 @@ console.log("Signature:", { r, s, v });
 Use when you have an un-hashed RLP-encoded EVM transaction and want Turnkey to Keccak256-hash it before signing.
 
 ```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!,
@@ -38,6 +58,16 @@ const response = await client.signRawPayload({
 Use when you have raw Cosmos transaction bytes and want Turnkey to SHA256-hash them before signing with a secp256k1 key.
 
 ```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+
 const txBytes = TxRaw.encode(txRaw).finish();
 const payload = Buffer.from(txBytes).toString("hex");
 
@@ -59,6 +89,16 @@ const compactSignature = Buffer.from(r + s, "hex");
 Use when signing a plain text string (e.g., EIP-191 personal_sign without a library).
 
 ```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!,

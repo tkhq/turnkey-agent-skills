@@ -4,10 +4,10 @@
  * Sends 0.001 ETH on Sepolia using @turnkey/viem createAccount with a viem WalletClient.
  *
  * Required environment variables:
- *   API_PUBLIC_KEY    — Turnkey API key public component
- *   API_PRIVATE_KEY   — Turnkey API key private component
- *   ORGANIZATION_ID   — Turnkey organization UUID
- *   SIGN_WITH         — Ethereum address of your Turnkey wallet account (0x...)
+ *   TURNKEY_API_PUBLIC_KEY    — Turnkey API key public component
+ *   TURNKEY_API_PRIVATE_KEY   — Turnkey API key private component
+ *   TURNKEY_ORGANIZATION_ID   — Turnkey organization UUID
+ *   SIGN_WITH                 — Ethereum address of your Turnkey wallet account (0x...)
  *
  * Optional:
  *   ETHEREUM_RPC      — RPC endpoint (defaults to public Sepolia endpoint)
@@ -45,8 +45,8 @@ const AMOUNT_ETH = "0.001";
 const turnkeyClient = new TurnkeyClient(
   { baseUrl: "https://api.turnkey.com" },
   new ApiKeyStamper({
-    apiPublicKey: process.env.API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.API_PRIVATE_KEY!,
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
   })
 );
 
@@ -62,7 +62,7 @@ async function main() {
   // Create the Turnkey-backed viem account
   const account = await createAccount({
     client: turnkeyClient,
-    organizationId: process.env.ORGANIZATION_ID!,
+    organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     signWith: process.env.SIGN_WITH!, // Ethereum address
   });
 

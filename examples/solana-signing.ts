@@ -4,10 +4,10 @@
  * Sends 0.001 SOL on devnet using TurnkeySigner from @turnkey/solana.
  *
  * Required environment variables:
- *   API_PUBLIC_KEY    — Turnkey API key public component
- *   API_PRIVATE_KEY   — Turnkey API key private component
- *   ORGANIZATION_ID   — Turnkey organization UUID
- *   SIGN_WITH         — Solana address of your Turnkey wallet account (base58)
+ *   TURNKEY_API_PUBLIC_KEY    — Turnkey API key public component
+ *   TURNKEY_API_PRIVATE_KEY   — Turnkey API key private component
+ *   TURNKEY_ORGANIZATION_ID   — Turnkey organization UUID
+ *   SIGN_WITH                 — Solana address of your Turnkey wallet account (base58)
  *
  * Optional:
  *   SOLANA_RPC        — RPC endpoint (defaults to devnet public endpoint)
@@ -44,15 +44,15 @@ const AMOUNT_SOL = 0.001;
 const client = new TurnkeyClient(
   { baseUrl: "https://api.turnkey.com" },
   new ApiKeyStamper({
-    apiPublicKey: process.env.API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.API_PRIVATE_KEY!,
+    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
   })
 );
 
 // TurnkeySigner does not store the address — pass it per signing call
 const signer = new TurnkeySigner({
   client,
-  organizationId: process.env.ORGANIZATION_ID!,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
 const solanaAddress = process.env.SIGN_WITH!;

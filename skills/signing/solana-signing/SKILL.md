@@ -4,6 +4,10 @@ version: "1.0.0"
 description: 'Signs and sends Solana transactions using Turnkey with @turnkey/solana. Covers SOL transfers, batch signing, message signing, and versioned transactions. Use when asked to "send SOL", "sign a Solana transaction", "transfer SPL tokens", "sign a Solana message", "interact with a Solana program", "stake SOL", "batch send to multiple addresses", or build anything on the Solana blockchain.'
 tags: ["turnkey", "solana", "signing", "blockchain", "sol", "spl-tokens", "crypto", "web3"]
 compatibility: Requires Node.js. Install @turnkey/solana and @solana/web3.js. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH (base58 Solana address) env vars.
+sdk_versions:
+  "@turnkey/http": "^3.17.0"
+  "@turnkey/api-key-stamper": "^0.6.2"
+  "@turnkey/solana": "^1.1.25"
 ---
 
 # Turnkey Solana Signing

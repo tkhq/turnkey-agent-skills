@@ -4,6 +4,10 @@ version: "1.0.0"
 description: 'Creates and manages Turnkey wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, and other chains. Use when the agent needs a blockchain address, has no wallet yet, or needs to retrieve an existing one. Triggers on: "create a wallet", "get my ETH address", "set up a wallet", "derive a Solana address", "bootstrap agent wallet", "my agent needs to hold crypto", "set up blockchain accounts", or any time a signing address is needed before the agent can transact.'
 tags: ["turnkey", "wallet", "blockchain", "ethereum", "solana", "bitcoin", "crypto", "key-management", "hd-wallet"]
 compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Lower-level: @turnkey/http and @turnkey/api-key-stamper. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
+sdk_versions:
+  "@turnkey/sdk-server": "^5.1.0"
+  "@turnkey/http": "^3.17.0"
+  "@turnkey/api-key-stamper": "^0.6.2"
 ---
 
 # Turnkey Wallet Management

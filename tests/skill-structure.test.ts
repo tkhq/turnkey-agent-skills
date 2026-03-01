@@ -64,6 +64,18 @@ for (const filePath of skillFiles) {
         // Multi-line descriptions break some skill indexers
         expect(parsed.data.description).not.toContain("\n");
       });
+
+      it("has sdk_versions with valid @turnkey/ entries", () => {
+        expect(parsed.data).toHaveProperty("sdk_versions");
+        const versions = parsed.data.sdk_versions;
+        expect(typeof versions).toBe("object");
+        expect(Array.isArray(versions)).toBe(false);
+        for (const [pkg, ver] of Object.entries(versions as Record<string, unknown>)) {
+          expect(pkg, `sdk_versions key "${pkg}" must start with @turnkey/`).toMatch(/^@turnkey\//);
+          expect(typeof ver, `sdk_versions["${pkg}"] must be a string`).toBe("string");
+          expect((ver as string).length, `sdk_versions["${pkg}"] must not be empty`).toBeGreaterThan(0);
+        }
+      });
     });
 
     // -------------------------------------------------------------------------

@@ -11,12 +11,12 @@
     "evals": "tsx scripts/run-evals.ts"
   },
   "devDependencies": {
-    "@turnkey/api-key-stamper": "*",
-    "@turnkey/ethers": "*",
-    "@turnkey/http": "*",
-    "@turnkey/sdk-server": "*",
-    "@turnkey/solana": "*",
-    "@turnkey/viem": "*",
+    "@turnkey/api-key-stamper": "^0.6.1",
+    "@turnkey/ethers": "^1.3.23",
+    "@turnkey/http": "^3.16.3",
+    "@turnkey/sdk-server": "^5.0.3",
+    "@turnkey/solana": "^1.1.23",
+    "@turnkey/viem": "^0.14.23",
     "@solana/web3.js": "^1.87.0",
     "@types/node": "^20.0.0",
     "ethers": "^6.0.0",

@@ -101,10 +101,9 @@ For unsupported chains, use `signRawPayload` directly.
 - Custom signing schemes
 - Signing arbitrary messages
 
-`signRawPayload` is an activity-based API. When using `@turnkey/sdk-server`, polling is handled automatically and the result is returned directly. When using `@turnkey/http` directly, wrap the call with `withAsyncPolling`.
+`signRawPayload` is an activity-based API. Use `@turnkey/sdk-server` — it handles activity polling automatically and returns the result directly.
 
 ```typescript
-// Option A — @turnkey/sdk-server (recommended, polling handled automatically)
 import { Turnkey } from "@turnkey/sdk-server";
 
 const turnkey = new Turnkey({
@@ -129,37 +128,7 @@ const { r, s, v } = signResponse;
 console.log("r:", r, "s:", s, "v:", v);
 ```
 
-```typescript
-// Option B — @turnkey/http with withAsyncPolling
-import { TurnkeyClient, withAsyncPolling } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
-
-const httpClient = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
-
-const signRawPayloadPolled = withAsyncPolling({
-  request: httpClient.signRawPayload.bind(httpClient),
-});
-
-const signResponse = await signRawPayloadPolled({
-  type: "ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2",
-  timestampMs: String(Date.now()),
-  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-  parameters: {
-    signWith: process.env.SIGN_WITH!,
-    payload: "0xdeadbeef...",
-    encoding: "PAYLOAD_ENCODING_HEXADECIMAL",
-    hashFunction: "HASH_FUNCTION_NO_OP",
-  },
-});
-
-const { r, s, v } = signResponse.activity.result.signRawPayloadResult!;
-```
+> **Note:** If you need lower-level control, `@turnkey/http` with `withAsyncPolling` also works, but `@turnkey/sdk-server` is preferred for simplicity.
 
 **Supported `encoding` values:**
 

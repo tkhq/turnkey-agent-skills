@@ -84,7 +84,8 @@ const connection = new Connection(
 
 const senderPublicKey = new PublicKey(solanaAddress);
 
-const { blockhash } = await connection.getLatestBlockhash();
+const { blockhash, lastValidBlockHeight } =
+  await connection.getLatestBlockhash();
 
 const transaction = new Transaction().add(
   SystemProgram.transfer({
@@ -107,7 +108,10 @@ const signature = await connection.sendRawTransaction(
   (signedTransaction as Transaction).serialize()
 );
 
-await connection.confirmTransaction(signature, "confirmed");
+await connection.confirmTransaction(
+  { signature, blockhash, lastValidBlockHeight },
+  "confirmed"
+);
 console.log("Transaction confirmed:", signature);
 ```
 
@@ -120,7 +124,7 @@ For complete usage examples — SOL transfer, batch signing, message signing, an
 **`Blockhash not found` / blockhash expiry**
 Solana blockhashes expire after ~150 slots (~60 seconds). Always fetch a fresh blockhash immediately before signing. Do not reuse blockhashes across retries:
 ```typescript
-const { blockhash } = await connection.getLatestBlockhash();
+const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 transaction.recentBlockhash = blockhash;
 ```
 

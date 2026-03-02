@@ -42,7 +42,8 @@ async function sendSol(to: string, amountSol: number) {
   console.log("Sender:", solanaAddress);
   console.log("Balance:", balance / LAMPORTS_PER_SOL, "SOL");
 
-  const { blockhash } = await connection.getLatestBlockhash();
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash();
 
   const transaction = new Transaction().add(
     SystemProgram.transfer({
@@ -59,7 +60,10 @@ async function sendSol(to: string, amountSol: number) {
     (signedTx as Transaction).serialize()
   );
 
-  await connection.confirmTransaction(signature, "confirmed");
+  await connection.confirmTransaction(
+    { signature, blockhash, lastValidBlockHeight },
+    "confirmed"
+  );
   console.log("Confirmed:", signature);
   return signature;
 }
@@ -108,21 +112,21 @@ const recipients = [
   "Recipient3Base58Address",
 ];
 
-const transactions = await Promise.all(
-  recipients.map(async (recipient) => {
-    const { blockhash } = await connection.getLatestBlockhash();
-    const tx = new Transaction().add(
-      SystemProgram.transfer({
-        fromPubkey: senderPublicKey,
-        toPubkey: new PublicKey(recipient),
-        lamports: Math.round(0.001 * LAMPORTS_PER_SOL),
-      })
-    );
-    tx.recentBlockhash = blockhash;
-    tx.feePayer = senderPublicKey;
-    return tx;
-  })
-);
+const { blockhash, lastValidBlockHeight } =
+  await connection.getLatestBlockhash();
+
+const transactions = recipients.map((recipient) => {
+  const tx = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: senderPublicKey,
+      toPubkey: new PublicKey(recipient),
+      lamports: Math.round(0.001 * LAMPORTS_PER_SOL),
+    })
+  );
+  tx.recentBlockhash = blockhash;
+  tx.feePayer = senderPublicKey;
+  return tx;
+});
 
 // signAllTransactions returns an array of signed transactions
 const signedTransactions = await signer.signAllTransactions(
@@ -137,7 +141,12 @@ const signatures = await Promise.all(
 );
 
 await Promise.all(
-  signatures.map((sig) => connection.confirmTransaction(sig, "confirmed"))
+  signatures.map((sig) =>
+    connection.confirmTransaction(
+      { signature: sig, blockhash, lastValidBlockHeight },
+      "confirmed"
+    )
+  )
 );
 console.log("All confirmed:", signatures);
 ```
@@ -205,7 +214,8 @@ const connection = new Connection(
   "confirmed"
 );
 
-const { blockhash } = await connection.getLatestBlockhash();
+const { blockhash, lastValidBlockHeight } =
+  await connection.getLatestBlockhash();
 
 const instructions = [
   SystemProgram.transfer({
@@ -228,5 +238,8 @@ const signedTx = await signer.signTransaction(versionedTx, solanaAddress);
 const signature = await connection.sendRawTransaction(
   (signedTx as VersionedTransaction).serialize()
 );
-await connection.confirmTransaction(signature, "confirmed");
+await connection.confirmTransaction(
+  { signature, blockhash, lastValidBlockHeight },
+  "confirmed"
+);
 ```

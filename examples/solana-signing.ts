@@ -84,7 +84,8 @@ async function main() {
   }
 
   // Build transaction — always fetch a fresh blockhash immediately before signing
-  const { blockhash } = await connection.getLatestBlockhash();
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash();
 
   const transaction = new Transaction().add(
     SystemProgram.transfer({
@@ -112,7 +113,10 @@ async function main() {
   console.log("Transaction signature:", signature);
   console.log("Waiting for confirmation...");
 
-  await connection.confirmTransaction(signature, "confirmed");
+  await connection.confirmTransaction(
+    { signature, blockhash, lastValidBlockHeight },
+    "confirmed"
+  );
   console.log("Confirmed!");
   console.log(
     "Explorer:          ",

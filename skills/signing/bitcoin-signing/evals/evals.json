@@ -1,0 +1,98 @@
+{
+  "skill_name": "turnkey-bitcoin-signing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Send 10000 satoshis to tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx on Bitcoin testnet using my Turnkey wallet with signTransaction. I have a P2WPKH (SegWit) address.",
+      "expected_output": "Working TypeScript code that initializes Turnkey sdk-server client and bitcoinjs-lib with tiny-secp256k1, fetches UTXOs from a block explorer API, builds a PSBT with P2WPKH inputs (using nonWitnessUtxo and witnessUtxo via bitcoin.payments.p2wpkh), calls client.signTransaction with type TRANSACTION_TYPE_BITCOIN, then finalizes the PSBT with finalizeAllInputs and extracts the transaction.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/signtransaction-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
+        { "type": "calls", "value": "finalizeAllInputs" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Send BTC using my Turnkey wallet with a Taproot (P2TR) address on testnet. Use signTransaction.",
+      "expected_output": "Working TypeScript code that builds a PSBT with P2TR inputs using tapInternalKey (x-only 32-byte key derived from compressed public key) and bitcoin.payments.p2tr for witnessUtxo. Calls client.signTransaction with TRANSACTION_TYPE_BITCOIN, finalizes and extracts.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/signtransaction-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "contains", "value": "tapInternalKey" },
+        { "type": "contains", "value": "p2tr" },
+        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need per-input signing control for my Bitcoin transaction. Sign a P2WPKH PSBT using signRawPayload with a custom signer class.",
+      "expected_output": "Code that defines a TurnkeySigner class with a sign() method that calls client.signRawPayload with HASH_FUNCTION_NO_OP and PAYLOAD_ENCODING_HEXADECIMAL. Builds a PSBT, then signs each input via psbt.signInputAsync(i, signer). Does NOT use signTransaction or TRANSACTION_TYPE_BITCOIN.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/rawpayload-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "calls", "value": "signRawPayload" },
+        { "type": "contains", "value": "HASH_FUNCTION_NO_OP" },
+        { "type": "calls", "value": "signInputAsync" },
+        { "type": "not_contains", "value": "TRANSACTION_TYPE_BITCOIN" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Send 0.001 BTC to tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx using my Turnkey Ethereum signer from @turnkey/ethers.",
+      "expected_output": "The code should use bitcoinjs-lib and the Turnkey signTransaction API, NOT @turnkey/ethers or @turnkey/viem or @turnkey/solana. Even though the user mentioned their 'Ethereum signer', Bitcoin transactions require bitcoinjs-lib with PSBT construction.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/signtransaction-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "not_contains", "value": "from \"@turnkey/ethers\"" },
+        { "type": "not_contains", "value": "from '@turnkey/ethers'" },
+        { "type": "not_contains", "value": "from \"@turnkey/viem\"" },
+        { "type": "not_contains", "value": "from '@turnkey/viem'" },
+        { "type": "not_contains", "value": "from \"@turnkey/solana\"" },
+        { "type": "not_contains", "value": "from '@turnkey/solana'" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Send BTC on Bitcoin mainnet using signTransaction with a P2WPKH address. My address starts with bc1q.",
+      "expected_output": "Code that uses bitcoin.networks.bitcoin (mainnet) instead of testnet. Uses mainnet Blockstream API (blockstream.info/api, not /testnet). The address format should be bc1q... (mainnet P2WPKH). Calls signTransaction with TRANSACTION_TYPE_BITCOIN.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/signtransaction-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "regex", "pattern": "networks\\.bitcoin", "flags": "" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "I don't have a Bitcoin wallet yet. Create a wallet with a Bitcoin SegWit account and then sign a transaction to send 5000 sats to tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx on testnet.",
+      "expected_output": "Code that first calls getWallets to check for existing wallets, then createWallet with CURVE_SECP256K1 accounts for both ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH (or testnet equivalent) and ADDRESS_FORMAT_COMPRESSED. Then proceeds to build and sign a PSBT using the derived address and compressed public key.",
+      "files": [
+        "skills/signing/bitcoin-signing/references/signtransaction-examples.md"
+      ],
+      "assertions": [
+        { "type": "calls", "value": "getWallets" },
+        { "type": "calls", "value": "createWallet" },
+        { "type": "contains", "value": "CURVE_SECP256K1" },
+        { "type": "order", "before": "getWallets", "after": "createWallet" }
+      ]
+    }
+  ]
+}

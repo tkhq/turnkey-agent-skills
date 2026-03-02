@@ -191,3 +191,4 @@ The `walletId` is invalid or belongs to a different organization. Re-run `getWal
 - `skills/core/transaction-signing/SKILL.md` — understand the stamping model before signing
 - `skills/signing/ethereum-evm/SKILL.md` — sign EVM transactions (ethers.js or viem)
 - `skills/signing/solana-signing/SKILL.md` — sign Solana transactions
+- `skills/signing/bitcoin-signing/SKILL.md` — sign Bitcoin transactions (P2WPKH and P2TR)

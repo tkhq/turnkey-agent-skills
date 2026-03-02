@@ -25,6 +25,7 @@ Skills for AI agents that need to manage wallets and sign transactions using [Tu
 |-------|------|-----------|
 | Ethereum / EVM | `skills/signing/ethereum-evm/SKILL.md` | signing or broadcasting on Ethereum, Polygon, Base, Arbitrum, Optimism, or any EVM chain |
 | Solana | `skills/signing/solana-signing/SKILL.md` | signing or broadcasting on Solana |
+| Bitcoin | `skills/signing/bitcoin-signing/SKILL.md` | signing or broadcasting on Bitcoin (P2WPKH SegWit or P2TR Taproot) |
 
 ## Environment Variables
 
@@ -50,6 +51,6 @@ For any signing task, load skills in this order:
 
 1. `skills/core/wallet-management/SKILL.md` — create or retrieve a wallet and get the `SIGN_WITH` address
 2. `skills/core/transaction-signing/SKILL.md` — understand the stamping model; required for raw payload signing
-3. Chain-specific skill — `ethereum-evm` or `solana-signing`
+3. Chain-specific skill — `ethereum-evm`, `solana-signing`, or `bitcoin-signing`
 
 For wallet-only tasks (no signing), only step 1 is needed.

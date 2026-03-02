@@ -23,7 +23,8 @@ Use this skill to:
 **For chain-specific signing, read this skill first, then load the appropriate signing skill:**
 - EVM chains (Ethereum, Polygon, Base, Arbitrum, etc.) → `skills/signing/ethereum-evm/SKILL.md`
 - Solana → `skills/signing/solana-signing/SKILL.md`
-- Other chains (Cosmos, Bitcoin, Aptos, Sui, etc.) → use raw payload signing documented here
+- Bitcoin → `skills/signing/bitcoin-signing/SKILL.md`
+- Other chains (Cosmos, Aptos, Sui, etc.) → use raw payload signing documented here
 
 ## Prerequisites
 
@@ -91,7 +92,7 @@ const client = new TurnkeyClient(
 | EVM (Ethereum, L2s) | `@turnkey/ethers` or `@turnkey/viem` | `skills/signing/ethereum-evm/` |
 | Solana | `@turnkey/solana` | `skills/signing/solana-signing/` |
 | Cosmos / CosmWasm | `@turnkey/cosmjs` | — |
-| Bitcoin | raw payload signing | see below |
+| Bitcoin | `signTransaction` or `signRawPayload` | `skills/signing/bitcoin-signing/` |
 | Aptos, Sui, TON, Tron | raw payload signing | see below |
 
 Chain-specific packages accept any Turnkey client and expose a native signer interface (e.g., an ethers `Signer`, viem `Account`, or Solana `Signer`). Use them when available — they handle transaction serialization and encoding automatically.
@@ -176,3 +177,4 @@ Using `HASH_FUNCTION_KECCAK256` on a pre-hashed payload will double-hash it. Use
 - `skills/core/wallet-management/SKILL.md` — create a wallet and derive addresses before signing
 - `skills/signing/ethereum-evm/SKILL.md` — EVM signing (ethers.js and viem, pick one)
 - `skills/signing/solana-signing/SKILL.md` — Solana signing
+- `skills/signing/bitcoin-signing/SKILL.md` — Bitcoin signing (P2WPKH and P2TR)

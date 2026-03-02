@@ -28,6 +28,9 @@ Use this skill to:
 
 ## Prerequisites
 
+**Load first if you don't have a wallet address:**
+> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` address before signing
+
 ```bash
 # Recommended higher-level client (handles polling automatically)
 npm install @turnkey/sdk-server

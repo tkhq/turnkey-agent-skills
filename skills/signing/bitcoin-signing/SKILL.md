@@ -39,6 +39,9 @@ The wallet account must have been created with `CURVE_SECP256K1`. If you haven't
 
 ## Prerequisites
 
+**Load first if you don't have a wallet address:**
+> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Bitcoin address (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `P2TR`) plus the `BITCOIN_COMPRESSED_PUBLIC_KEY` (`ADDRESS_FORMAT_COMPRESSED` at the same derivation path)
+
 ```bash
 npm install @turnkey/sdk-server bitcoinjs-lib ecpair tiny-secp256k1
 ```

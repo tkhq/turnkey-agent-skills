@@ -20,6 +20,9 @@ The wallet account must have been created with `ADDRESS_FORMAT_SOLANA` and `CURV
 
 ## Prerequisites
 
+**Load first if you don't have a wallet address:**
+> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Solana address (`ADDRESS_FORMAT_SOLANA`)
+
 ```bash
 npm install @turnkey/http @turnkey/api-key-stamper @turnkey/solana @solana/web3.js
 ```

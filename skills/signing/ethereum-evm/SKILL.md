@@ -34,6 +34,9 @@ Both work with the same Turnkey wallet account and the same three environment va
 
 ## Prerequisites
 
+**Load first if you don't have a wallet address:**
+> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Ethereum address (`ADDRESS_FORMAT_ETHEREUM`)
+
 Install only the package for your chosen library:
 
 ```bash

@@ -14,7 +14,8 @@
         { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "createAccount" },
-        { "type": "calls", "value": "sendTransaction" }
+        { "type": "calls", "value": "sendTransaction" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -31,7 +32,8 @@
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "TurnkeySigner" },
         { "type": "calls", "value": "sendTransaction" },
-        { "type": "regex", "pattern": "arbitrum", "flags": "i" }
+        { "type": "regex", "pattern": "arbitrum", "flags": "i" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -47,7 +49,8 @@
         { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "createAccount" },
-        { "type": "calls", "value": "signTypedData" }
+        { "type": "calls", "value": "signTypedData" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -65,7 +68,8 @@
         { "type": "calls", "value": "createAccount" },
         { "type": "calls", "value": "writeContract" },
         { "type": "contains", "value": "transfer" },
-        { "type": "contains", "value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" }
+        { "type": "contains", "value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -83,7 +87,8 @@
         { "type": "calls", "value": "TurnkeySigner" },
         { "type": "regex", "pattern": "new ethers\\.Contract|ethers\\.Contract", "flags": "" },
         { "type": "contains", "value": "transfer" },
-        { "type": "contains", "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7" }
+        { "type": "contains", "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
+        { "type": "compiles" }
       ]
     }
   ]

@@ -15,7 +15,8 @@
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "signTransaction" },
         { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
-        { "type": "calls", "value": "finalizeAllInputs" }
+        { "type": "calls", "value": "finalizeAllInputs" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -31,7 +32,8 @@
         { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "contains", "value": "tapInternalKey" },
         { "type": "contains", "value": "p2tr" },
-        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" }
+        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -46,7 +48,8 @@
         { "type": "calls", "value": "signRawPayload" },
         { "type": "contains", "value": "HASH_FUNCTION_NO_OP" },
         { "type": "calls", "value": "signInputAsync" },
-        { "type": "not_contains", "value": "TRANSACTION_TYPE_BITCOIN" }
+        { "type": "not_contains", "value": "TRANSACTION_TYPE_BITCOIN" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -77,7 +80,8 @@
         { "type": "imports", "value": "bitcoinjs-lib" },
         { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
         { "type": "calls", "value": "signTransaction" },
-        { "type": "regex", "pattern": "networks\\.bitcoin", "flags": "" }
+        { "type": "regex", "pattern": "networks\\.bitcoin", "flags": "" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -91,7 +95,8 @@
         { "type": "calls", "value": "getWallets" },
         { "type": "calls", "value": "createWallet" },
         { "type": "contains", "value": "CURVE_SECP256K1" },
-        { "type": "order", "before": "getWallets", "after": "createWallet" }
+        { "type": "order", "before": "getWallets", "after": "createWallet" },
+        { "type": "compiles" }
       ]
     }
   ]

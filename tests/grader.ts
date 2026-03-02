@@ -9,7 +9,13 @@
  *   not_contains — negative substring match
  *   order        — first match of `before` must precede first match of `after`
  *   regex        — full regex match with optional flags
+ *   compiles     — type-checks the code with the project's tsconfig
  */
+
+import * as ts from "typescript";
+import { writeFileSync, unlinkSync, existsSync } from "fs";
+import { join, dirname } from "path";
+import { tmpdir } from "os";
 
 export type Assertion =
   | { type: "imports"; value: string }
@@ -18,7 +24,8 @@ export type Assertion =
   | { type: "contains"; value: string }
   | { type: "not_contains"; value: string }
   | { type: "order"; before: string; after: string }
-  | { type: "regex"; pattern: string; flags?: string };
+  | { type: "regex"; pattern: string; flags?: string }
+  | { type: "compiles" };
 
 export interface Eval {
   id: number;
@@ -39,11 +46,102 @@ export interface AssertionResult {
   message: string;
 }
 
+/** Project root — used to locate tsconfig.json and node_modules. */
+const PROJECT_ROOT = join(dirname(new URL(import.meta.url).pathname), "..");
+
+/**
+ * Type-check a TypeScript string using the project's tsconfig.
+ * Returns `{ passed: true }` or `{ passed: false, message }` with up to 5 errors.
+ */
+function checkCompiles(
+  code: string,
+  filePath?: string,
+): { passed: true } | { passed: false; message: string } {
+  let tempFile: string | undefined;
+
+  try {
+    // If no filePath, write to a temp file inside the project for correct
+    // node_modules resolution.
+    const targetFile =
+      filePath ??
+      (() => {
+        tempFile = join(PROJECT_ROOT, `.tmp-compiles-${Date.now()}-${Math.random().toString(36).slice(2)}.ts`);
+        writeFileSync(tempFile, code, "utf-8");
+        return tempFile;
+      })();
+
+    // Load the project tsconfig
+    const configPath = ts.findConfigFile(
+      PROJECT_ROOT,
+      ts.sys.fileExists,
+      "tsconfig.json",
+    );
+    if (!configPath) {
+      return { passed: false, message: "type error: tsconfig.json not found" };
+    }
+
+    const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
+    if (configFile.error) {
+      return {
+        passed: false,
+        message: `type error: failed to read tsconfig: ${ts.flattenDiagnosticMessageText(configFile.error.messageText, "\n")}`,
+      };
+    }
+
+    const parsed = ts.parseJsonConfigFileContent(
+      configFile.config,
+      ts.sys,
+      PROJECT_ROOT,
+    );
+
+    // Create a compiler host and program for the single file
+    const host = ts.createCompilerHost(parsed.options);
+    const program = ts.createProgram([targetFile], parsed.options, host);
+    const sourceFile = program.getSourceFile(targetFile);
+
+    if (!sourceFile) {
+      return { passed: false, message: "type error: could not parse source file" };
+    }
+
+    const diagnostics = [
+      ...program.getSyntacticDiagnostics(sourceFile),
+      ...program.getSemanticDiagnostics(sourceFile),
+    ].filter((d) => d.category === ts.DiagnosticCategory.Error);
+
+    if (diagnostics.length === 0) {
+      return { passed: true };
+    }
+
+    const errors = diagnostics.slice(0, 5).map((d) => {
+      const line =
+        d.file && d.start !== undefined
+          ? d.file.getLineAndCharacterOfPosition(d.start).line + 1
+          : "?";
+      const msg = ts.flattenDiagnosticMessageText(d.messageText, " ");
+      return `  line ${line}: ${msg}`;
+    });
+
+    const suffix =
+      diagnostics.length > 5
+        ? `\n  ... and ${diagnostics.length - 5} more error(s)`
+        : "";
+
+    return {
+      passed: false,
+      message: `type error(s):\n${errors.join("\n")}${suffix}`,
+    };
+  } finally {
+    if (tempFile && existsSync(tempFile)) {
+      unlinkSync(tempFile);
+    }
+  }
+}
+
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function runAssertion(code: string, a: Assertion): AssertionResult {
+function runAssertion(code: string, a: Assertion, filePath?: string): AssertionResult {
   switch (a.type) {
     case "imports": {
       const passed =
@@ -132,14 +230,26 @@ function runAssertion(code: string, a: Assertion): AssertionResult {
           : `does not match /${a.pattern}/${a.flags ?? ""}`,
       };
     }
+
+    case "compiles": {
+      const result = checkCompiles(code, filePath);
+      return {
+        passed: result.passed,
+        assertion: a,
+        message: result.passed
+          ? "compiles without type errors"
+          : result.message,
+      };
+    }
   }
 }
 
 export function runAssertions(
   code: string,
-  assertions: Assertion[]
+  assertions: Assertion[],
+  filePath?: string,
 ): AssertionResult[] {
-  return assertions.map((a) => runAssertion(code, a));
+  return assertions.map((a) => runAssertion(code, a, filePath));
 }
 
 /** Human-readable label for an assertion, used as a test name. */
@@ -152,5 +262,6 @@ export function describeAssertion(a: Assertion): string {
     case "not_contains": return `does not contain "${a.value}"`;
     case "order":        return `${a.before} before ${a.after}`;
     case "regex":        return `matches /${a.pattern}/${a.flags ?? ""}`;
+    case "compiles":     return `compiles without type errors`;
   }
 }

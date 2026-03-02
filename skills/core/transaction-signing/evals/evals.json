@@ -16,7 +16,8 @@
         { "type": "contains", "value": "HASH_FUNCTION_NO_OP" },
         { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" },
         { "type": "not_contains", "value": "parameters: {" },
-        { "type": "not_contains", "value": "activity.result" }
+        { "type": "not_contains", "value": "activity.result" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -34,7 +35,8 @@
         { "type": "contains", "value": "HASH_FUNCTION_SHA256" },
         { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" },
         { "type": "not_contains", "value": "parameters: {" },
-        { "type": "not_contains", "value": "activity.result" }
+        { "type": "not_contains", "value": "activity.result" },
+        { "type": "compiles" }
       ]
     },
     {

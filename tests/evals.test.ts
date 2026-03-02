@@ -43,6 +43,19 @@ describe("eval grader", () => {
     expect(results.every((r) => !r.passed)).toBe(true);
   });
 
+  it("compiles assertion passes for valid TypeScript", () => {
+    const code = `const x: number = 42;\nconsole.log(x);\n`;
+    const [result] = runAssertions(code, [{ type: "compiles" }]);
+    expect(result.passed, result.message).toBe(true);
+  });
+
+  it("compiles assertion fails for type errors", () => {
+    const code = `const x: number = "not a number";\n`;
+    const [result] = runAssertions(code, [{ type: "compiles" }]);
+    expect(result.passed).toBe(false);
+    expect(result.message).toContain("type error");
+  });
+
   // ---------------------------------------------------------------------------
   // Per-eval suites — only registered when output files exist in evals-workspace/
   // ---------------------------------------------------------------------------
@@ -72,7 +85,7 @@ describe("eval grader", () => {
       describe(`${evalsData.skill_name} / eval ${evalItem.id}`, () => {
         for (const assertion of evalItem.assertions!) {
           it(describeAssertion(assertion), () => {
-            const [result] = runAssertions(code, [assertion]);
+            const [result] = runAssertions(code, [assertion], outputPath);
             expect(result.passed, result.message).toBe(true);
           });
         }

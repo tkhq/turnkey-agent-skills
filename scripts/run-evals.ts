@@ -484,10 +484,10 @@ async function runSingleEval(
   }
 
   const code = extractCode(response);
-  writeSolution(skillName, evalItem.id, mode, code);
+  const solutionPath = writeSolution(skillName, evalItem.id, mode, code);
 
   const assertions = evalItem.assertions?.length
-    ? runAssertions(code, evalItem.assertions)
+    ? runAssertions(code, evalItem.assertions, solutionPath)
     : [];
 
   const passed = assertions.filter((a) => a.passed).length;

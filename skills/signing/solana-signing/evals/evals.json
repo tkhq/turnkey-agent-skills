@@ -16,7 +16,8 @@
         { "type": "calls", "value": "TurnkeySigner" },
         { "type": "calls", "value": "getLatestBlockhash" },
         { "type": "calls", "value": "signTransaction" },
-        { "type": "calls", "value": "sendRawTransaction" }
+        { "type": "calls", "value": "sendRawTransaction" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -32,7 +33,8 @@
         { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "signAllTransactions" },
-        { "type": "calls", "value": "sendRawTransaction" }
+        { "type": "calls", "value": "sendRawTransaction" },
+        { "type": "compiles" }
       ]
     },
     {
@@ -48,7 +50,8 @@
         { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "env_var", "value": "SIGN_WITH" },
         { "type": "calls", "value": "TextEncoder" },
-        { "type": "calls", "value": "signMessage" }
+        { "type": "calls", "value": "signMessage" },
+        { "type": "compiles" }
       ]
     },
     {

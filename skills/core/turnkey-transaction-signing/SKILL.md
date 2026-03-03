@@ -1,13 +1,14 @@
 ---
 name: turnkey-transaction-signing
-version: "1.0.0"
 description: 'Explains Turnkey''s API stamping model and routes to the correct chain-specific signing skill. Use when signing on Cosmos, Bitcoin, Aptos, Sui, TON, or Tron; when signing a raw byte payload; or when you need to understand how Turnkey authentication works. Also triggers on "sign on [unsupported chain]", "how does Turnkey signing work", "sign arbitrary bytes", or "sign a message without a chain SDK". For EVM chains load turnkey-ethereum-evm. For Solana load turnkey-solana-signing.'
-tags: ["turnkey", "signing", "blockchain", "crypto", "raw-payload", "bitcoin", "cosmos", "aptos", "sui", "stamping"]
 compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Lower-level: @turnkey/http and @turnkey/api-key-stamper. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
-sdk_versions:
-  "@turnkey/sdk-server": "^5.1.0"
-  "@turnkey/http": "^3.17.0"
-  "@turnkey/api-key-stamper": "^0.6.2"
+metadata:
+  version: "1.0.0"
+  tags: ["turnkey", "signing", "blockchain", "crypto", "raw-payload", "bitcoin", "cosmos", "aptos", "sui", "stamping"]
+  sdk_versions:
+    "@turnkey/sdk-server": "^5.1.0"
+    "@turnkey/http": "^3.17.0"
+    "@turnkey/api-key-stamper": "^0.6.2"
 ---
 
 # Turnkey Transaction Signing

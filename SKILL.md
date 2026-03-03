@@ -1,11 +1,11 @@
 ---
 name: turnkey
-version: "1.0.0"
 description: "Wallet infrastructure skills for Turnkey: create HD wallets, derive blockchain addresses, and sign transactions on Ethereum/EVM, Solana, Bitcoin, Cosmos, and other chains. Keys stay in hardware-backed secure enclaves and are never exposed to application code."
-tags: ["turnkey", "wallet", "signing", "blockchain", "ethereum", "evm", "solana", "bitcoin", "cosmos", "crypto", "key-management", "defi", "web3", "ethers", "viem"]
 license: Apache-2.0
 compatibility: "Requires Node.js. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars. Chain-specific skills may also require SIGN_WITH."
 metadata:
+  version: "1.0.0"
+  tags: ["turnkey", "wallet", "signing", "blockchain", "ethereum", "evm", "solana", "bitcoin", "cosmos", "crypto", "key-management", "defi", "web3", "ethers", "viem"]
   author: turnkey
   openclaw:
     requires:

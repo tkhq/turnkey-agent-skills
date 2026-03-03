@@ -279,6 +279,13 @@ function createClaudeProvider(model?: string): Provider {
     delete env.CLAUDE_CODE;
     delete env.CLAUDE_CODE_ENTRY_POINT;
 
+    // Prevent GPG/YubiKey PIN prompts — Claude CLI gathers git context on
+    // startup which can trigger the GPG agent when commit signing is enabled.
+    env.GIT_CONFIG_COUNT = "1";
+    env.GIT_CONFIG_KEY_0 = "commit.gpgsign";
+    env.GIT_CONFIG_VALUE_0 = "false";
+    env.GIT_TERMINAL_PROMPT = "0";
+
     return spawnWithStdin("claude", args, prompt, env);
   };
 }

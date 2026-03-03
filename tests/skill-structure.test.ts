@@ -73,9 +73,10 @@ for (const filePath of skillFiles) {
         expect(parsed.data.description).not.toContain("\n");
       });
 
-      it("has sdk_versions with valid @turnkey/ entries", () => {
-        expect(parsed.data).toHaveProperty("sdk_versions");
-        const versions = parsed.data.sdk_versions;
+      it("has metadata.sdk_versions with valid @turnkey/ entries", () => {
+        expect(parsed.data).toHaveProperty("metadata");
+        expect(parsed.data.metadata).toHaveProperty("sdk_versions");
+        const versions = parsed.data.metadata.sdk_versions;
         expect(typeof versions).toBe("object");
         expect(Array.isArray(versions)).toBe(false);
         for (const [pkg, ver] of Object.entries(versions as Record<string, unknown>)) {
@@ -194,15 +195,17 @@ describe("SKILL.md (root package manifest)", () => {
       expect(rootParsed.data.description).not.toContain("\n");
     });
 
-    it("has a version field", () => {
-      expect(rootParsed.data).toHaveProperty("version");
-      expect(typeof rootParsed.data.version).toBe("string");
+    it("has metadata.version field", () => {
+      expect(rootParsed.data).toHaveProperty("metadata");
+      expect(rootParsed.data.metadata).toHaveProperty("version");
+      expect(typeof rootParsed.data.metadata.version).toBe("string");
     });
 
-    it("has a tags field (array)", () => {
-      expect(rootParsed.data).toHaveProperty("tags");
-      expect(Array.isArray(rootParsed.data.tags)).toBe(true);
-      expect((rootParsed.data.tags as unknown[]).length).toBeGreaterThan(0);
+    it("has metadata.tags field (array)", () => {
+      expect(rootParsed.data).toHaveProperty("metadata");
+      expect(rootParsed.data.metadata).toHaveProperty("tags");
+      expect(Array.isArray(rootParsed.data.metadata.tags)).toBe(true);
+      expect((rootParsed.data.metadata.tags as unknown[]).length).toBeGreaterThan(0);
     });
   });
 });

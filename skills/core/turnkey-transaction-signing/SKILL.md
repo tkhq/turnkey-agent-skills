@@ -21,15 +21,15 @@ Use this skill to:
 - Handle async activity polling for signing operations
 
 **For chain-specific signing, read this skill first, then load the appropriate signing skill:**
-- EVM chains (Ethereum, Polygon, Base, Arbitrum, etc.) → `skills/signing/ethereum-evm/SKILL.md`
-- Solana → `skills/signing/solana-signing/SKILL.md`
-- Bitcoin → `skills/signing/bitcoin-signing/SKILL.md`
+- EVM chains (Ethereum, Polygon, Base, Arbitrum, etc.) → `skills/signing/turnkey-ethereum-evm/SKILL.md`
+- Solana → `skills/signing/turnkey-solana-signing/SKILL.md`
+- Bitcoin → `skills/signing/turnkey-bitcoin-signing/SKILL.md`
 - Other chains (Cosmos, Aptos, Sui, etc.) → use raw payload signing documented here
 
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
-> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` address before signing
+> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` address before signing
 
 ```bash
 # Recommended higher-level client (handles polling automatically)
@@ -92,10 +92,10 @@ const client = new TurnkeyClient(
 
 | Chain | Recommended package | Skill |
 |-------|--------------------|----|
-| EVM (Ethereum, L2s) | `@turnkey/ethers` or `@turnkey/viem` | `skills/signing/ethereum-evm/` |
-| Solana | `@turnkey/solana` | `skills/signing/solana-signing/` |
+| EVM (Ethereum, L2s) | `@turnkey/ethers` or `@turnkey/viem` | `skills/signing/turnkey-ethereum-evm/` |
+| Solana | `@turnkey/solana` | `skills/signing/turnkey-solana-signing/` |
 | Cosmos / CosmWasm | `@turnkey/cosmjs` | — |
-| Bitcoin | `signTransaction` or `signRawPayload` | `skills/signing/bitcoin-signing/` |
+| Bitcoin | `signTransaction` or `signRawPayload` | `skills/signing/turnkey-bitcoin-signing/` |
 | Aptos, Sui, TON, Tron | raw payload signing | see below |
 
 Chain-specific packages accept any Turnkey client and expose a native signer interface (e.g., an ethers `Signer`, viem `Account`, or Solana `Signer`). Use them when available — they handle transaction serialization and encoding automatically.
@@ -177,7 +177,7 @@ Using `HASH_FUNCTION_KECCAK256` on a pre-hashed payload will double-hash it. Use
 
 ## Related Skills
 
-- `skills/core/wallet-management/SKILL.md` — create a wallet and derive addresses before signing
-- `skills/signing/ethereum-evm/SKILL.md` — EVM signing (ethers.js and viem, pick one)
-- `skills/signing/solana-signing/SKILL.md` — Solana signing
-- `skills/signing/bitcoin-signing/SKILL.md` — Bitcoin signing (P2WPKH and P2TR)
+- `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and derive addresses before signing
+- `skills/signing/turnkey-ethereum-evm/SKILL.md` — EVM signing (ethers.js and viem, pick one)
+- `skills/signing/turnkey-solana-signing/SKILL.md` — Solana signing
+- `skills/signing/turnkey-bitcoin-signing/SKILL.md` — Bitcoin signing (P2WPKH and P2TR)

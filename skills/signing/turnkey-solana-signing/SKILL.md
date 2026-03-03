@@ -16,12 +16,12 @@ sdk_versions:
 
 Use this skill to sign and broadcast Solana transactions using `@turnkey/solana`. `TurnkeySigner` wraps a Turnkey client and exposes `signTransaction`, `signAllTransactions`, and `signMessage` methods — each taking the sender's Solana address as a parameter.
 
-The wallet account must have been created with `ADDRESS_FORMAT_SOLANA` and `CURVE_ED25519`. If you haven't created a wallet yet, read `skills/core/wallet-management/SKILL.md` first.
+The wallet account must have been created with `ADDRESS_FORMAT_SOLANA` and `CURVE_ED25519`. If you haven't created a wallet yet, read `skills/core/turnkey-wallet-management/SKILL.md` first.
 
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
-> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Solana address (`ADDRESS_FORMAT_SOLANA`)
+> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Solana address (`ADDRESS_FORMAT_SOLANA`)
 
 ```bash
 npm install @turnkey/http @turnkey/api-key-stamper @turnkey/solana @solana/web3.js
@@ -37,7 +37,7 @@ SIGN_WITH=                 # Solana address of the wallet account (base58)
 SOLANA_RPC=                # Optional. Defaults to devnet public endpoint
 ```
 
-`SIGN_WITH` is the base58 Solana address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_SOLANA"` — see `skills/core/wallet-management/SKILL.md`.
+`SIGN_WITH` is the base58 Solana address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_SOLANA"` — see `skills/core/turnkey-wallet-management/SKILL.md`.
 
 **Note:** Unlike the EVM signers, `TurnkeySigner` from `@turnkey/solana` does not store the address internally. You pass `fromAddress` (the base58 Solana address) as an argument to each signing call. Keep it in a variable.
 
@@ -156,6 +156,6 @@ try {
 
 ## Related Skills
 
-- `skills/core/wallet-management/SKILL.md` — create a Solana wallet account (`ADDRESS_FORMAT_SOLANA`)
-- `skills/core/transaction-signing/SKILL.md` — understand the stamping model
-- `skills/signing/ethereum-evm/SKILL.md` — EVM signing (ethers.js or viem)
+- `skills/core/turnkey-wallet-management/SKILL.md` — create a Solana wallet account (`ADDRESS_FORMAT_SOLANA`)
+- `skills/core/turnkey-transaction-signing/SKILL.md` — understand the stamping model
+- `skills/signing/turnkey-ethereum-evm/SKILL.md` — EVM signing (ethers.js or viem)

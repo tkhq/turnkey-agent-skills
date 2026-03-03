@@ -24,6 +24,7 @@ const SKILL_NAMES = [
   "turnkey-transaction-signing",
   "turnkey-ethereum-evm",
   "turnkey-solana-signing",
+  "turnkey-bitcoin-signing",
 ];
 
 function claudeAvailable(): boolean {
@@ -54,7 +55,7 @@ describe("claude --plugin-dir", () => {
     ).toBe(0);
   });
 
-  it.skipIf(shouldSkip)("all four skill names appear in output (nested path resolution)", () => {
+  it.skipIf(shouldSkip)("all five skill names appear in output (nested path resolution)", () => {
     const result = runPluginDir();
     const output = String(result.stdout ?? "") + String(result.stderr ?? "");
 

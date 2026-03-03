@@ -24,7 +24,7 @@ Get these from the [Turnkey console](https://app.turnkey.com) under **Settings �
 
 **Claude Code** — reference any `SKILL.md` directly in your prompt:
 ```
-Please read skills/core/wallet-management/SKILL.md and create a wallet for me.
+Please read skills/core/turnkey-wallet-management/SKILL.md and create a wallet for me.
 ```
 
 **OpenClaw** — copy skill directories into `~/.openclaw/workspace/skills/` and refresh the gateway. Each `SKILL.md` is automatically indexed.
@@ -37,15 +37,16 @@ Please read skills/core/wallet-management/SKILL.md and create a wallet for me.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| Wallet Management | `skills/core/wallet-management/` | Create wallets, derive addresses, manage accounts |
-| Transaction Signing | `skills/core/transaction-signing/` | Stamping overview; directs to chain-specific skills |
+| Wallet Management | `skills/core/turnkey-wallet-management/` | Create wallets, derive addresses, manage accounts |
+| Transaction Signing | `skills/core/turnkey-transaction-signing/` | Stamping overview; directs to chain-specific skills |
 
 ### Signing
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| Ethereum / EVM | `skills/signing/ethereum-evm/` | EVM signing with ethers.js or viem — pick based on your stack |
-| Solana | `skills/signing/solana-signing/` | Solana signing with `@turnkey/solana` |
+| Ethereum / EVM | `skills/signing/turnkey-ethereum-evm/` | EVM signing with ethers.js or viem — pick based on your stack |
+| Solana | `skills/signing/turnkey-solana-signing/` | Solana signing with `@turnkey/solana` |
+| Bitcoin | `skills/signing/turnkey-bitcoin-signing/` | Bitcoin signing with bitcoinjs-lib (P2WPKH + P2TR) |
 
 ## Running Examples
 
@@ -114,7 +115,7 @@ Eval outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` defini
    ```
 3. Include these sections: **Overview**, **Prerequisites**, **Environment Variables**, **Instructions**, **Code Examples**, **Error Handling**, **Related Skills**
 4. Add a runnable example to `examples/<skill-name>.ts`
-5. If the skill involves signing, add a reference in `skills/core/transaction-signing/SKILL.md`
+5. If the skill involves signing, add a reference in `skills/core/turnkey-transaction-signing/SKILL.md`
 6. Update this README's skill table
 
 ## Project Structure
@@ -124,15 +125,17 @@ turnkey-agent-skills/
 ├── README.md
 ├── skills/
 │   ├── core/
-│   │   ├── wallet-management/
+│   │   ├── turnkey-wallet-management/
 │   │   │   └── SKILL.md          # Create wallets, derive addresses
-│   │   └── transaction-signing/
+│   │   └── turnkey-transaction-signing/
 │   │       └── SKILL.md          # Stamping overview + chain routing
 │   └── signing/
-│       ├── ethereum-evm/
+│       ├── turnkey-ethereum-evm/
 │       │   └── SKILL.md          # EVM signing (ethers.js + viem)
-│       └── solana-signing/
-│           └── SKILL.md          # @turnkey/solana integration
+│       ├── turnkey-solana-signing/
+│       │   └── SKILL.md          # @turnkey/solana integration
+│       └── turnkey-bitcoin-signing/
+│           └── SKILL.md          # Bitcoin signing (P2WPKH + P2TR)
 └── examples/
     ├── wallet-management.ts      # Bootstrap: create wallet, get addresses
     ├── ethereum-ethers.ts        # Send ETH on Sepolia via ethers.js

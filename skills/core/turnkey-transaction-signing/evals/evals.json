@@ -6,7 +6,7 @@
       "prompt": "Sign a raw payload using Turnkey. The payload is already hashed: 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef. Use HASH_FUNCTION_NO_OP.",
       "expected_output": "Working TypeScript code using @turnkey/sdk-server that calls signRawPayload with the provided hex payload, PAYLOAD_ENCODING_HEXADECIMAL, and HASH_FUNCTION_NO_OP. Logs the r, s, v components of the returned signature.",
       "files": [
-        "skills/core/transaction-signing/references/raw-payload-examples.md"
+        "skills/core/turnkey-transaction-signing/references/raw-payload-examples.md"
       ],
       "assertions": [
         { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
@@ -25,7 +25,7 @@
       "prompt": "I need to sign a Cosmos transaction with Turnkey. I have the serialized transaction as raw bytes and want Turnkey to SHA256-hash it before signing.",
       "expected_output": "Code using signRawPayload with PAYLOAD_ENCODING_HEXADECIMAL and HASH_FUNCTION_SHA256. Includes a note that Cosmos uses CURVE_SECP256K1 and that the wallet account must have been derived with ADDRESS_FORMAT_COSMOS. Points to or references wallet-management skill for address setup.",
       "files": [
-        "skills/core/transaction-signing/references/raw-payload-examples.md"
+        "skills/core/turnkey-transaction-signing/references/raw-payload-examples.md"
       ],
       "assertions": [
         { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
@@ -44,7 +44,7 @@
       "prompt": "Which Turnkey signing package should I use for Base? What about for Solana? And what if I'm on Aptos?",
       "expected_output": "A clear routing answer: Base (EVM) → @turnkey/ethers or @turnkey/viem (ethereum-evm skill); Solana → @turnkey/solana (solana-signing skill); Aptos → no dedicated package, use signRawPayload directly. Includes or references the chain routing table.",
       "files": [
-        "skills/core/transaction-signing/SKILL.md"
+        "skills/core/turnkey-transaction-signing/SKILL.md"
       ],
       "assertions": [
         { "type": "regex", "pattern": "@turnkey/(ethers|viem)", "flags": "i" },
@@ -57,7 +57,7 @@
       "prompt": "I want to sign a Solana transaction using @turnkey/ethers. Show me how.",
       "expected_output": "The response should correct the user: @turnkey/ethers is for EVM chains, not Solana. For Solana, use @turnkey/solana. Should mention or reference the solana-signing skill. Should NOT produce code that imports @turnkey/ethers for Solana signing.",
       "files": [
-        "skills/core/transaction-signing/SKILL.md"
+        "skills/core/turnkey-transaction-signing/SKILL.md"
       ],
       "assertions": [
         { "type": "contains", "value": "@turnkey/solana" },

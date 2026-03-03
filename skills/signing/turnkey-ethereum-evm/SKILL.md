@@ -35,7 +35,7 @@ Both work with the same Turnkey wallet account and the same three environment va
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
-> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Ethereum address (`ADDRESS_FORMAT_ETHEREUM`)
+> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Ethereum address (`ADDRESS_FORMAT_ETHEREUM`)
 
 Install only the package for your chosen library:
 
@@ -57,7 +57,7 @@ SIGN_WITH=                 # Ethereum address of the wallet account (0x...)
 ETHEREUM_RPC=              # Optional. Defaults to Sepolia public endpoint
 ```
 
-`SIGN_WITH` is the Ethereum address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_ETHEREUM"` — see `skills/core/wallet-management/SKILL.md`.
+`SIGN_WITH` is the Ethereum address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_ETHEREUM"` — see `skills/core/turnkey-wallet-management/SKILL.md`.
 
 ---
 
@@ -175,6 +175,6 @@ Try a public fallback — Sepolia: `https://rpc.ankr.com/eth_sepolia`, Mainnet: 
 
 ## Related Skills
 
-- `skills/core/wallet-management/SKILL.md` — create a wallet and get your `SIGN_WITH` address
-- `skills/core/transaction-signing/SKILL.md` — understand the stamping model; raw signing for unsupported chains
-- `skills/signing/solana-signing/SKILL.md` — Solana transaction signing
+- `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get your `SIGN_WITH` address
+- `skills/core/turnkey-transaction-signing/SKILL.md` — understand the stamping model; raw signing for unsupported chains
+- `skills/signing/turnkey-solana-signing/SKILL.md` — Solana transaction signing

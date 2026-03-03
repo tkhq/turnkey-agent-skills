@@ -27,7 +27,7 @@ Turnkey provides two Bitcoin signing paths. **Pick one based on your needs:**
 
 Both paths support **P2WPKH** (SegWit, `bc1q…`) and **P2TR** (Taproot, `bc1p…`) address types.
 
-The wallet account must have been created with `CURVE_SECP256K1`. If you haven't created a wallet yet, read `skills/core/wallet-management/SKILL.md` first. Bitcoin wallets require TWO accounts at the same derivation path:
+The wallet account must have been created with `CURVE_SECP256K1`. If you haven't created a wallet yet, read `skills/core/turnkey-wallet-management/SKILL.md` first. Bitcoin wallets require TWO accounts at the same derivation path:
 1. A Bitcoin address account (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR`) — this gives you the `SIGN_WITH` address
 2. A compressed public key account (`ADDRESS_FORMAT_COMPRESSED`) — this gives you `BITCOIN_COMPRESSED_PUBLIC_KEY`, needed for PSBT input construction
 
@@ -40,7 +40,7 @@ The wallet account must have been created with `CURVE_SECP256K1`. If you haven't
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
-> `skills/core/wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Bitcoin address (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `P2TR`) plus the `BITCOIN_COMPRESSED_PUBLIC_KEY` (`ADDRESS_FORMAT_COMPRESSED` at the same derivation path)
+> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Bitcoin address (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `P2TR`) plus the `BITCOIN_COMPRESSED_PUBLIC_KEY` (`ADDRESS_FORMAT_COMPRESSED` at the same derivation path)
 
 ```bash
 npm install @turnkey/sdk-server bitcoinjs-lib ecpair tiny-secp256k1
@@ -56,7 +56,7 @@ SIGN_WITH=                      # Bitcoin bech32 address (bc1q... for P2WPKH, bc
 BITCOIN_COMPRESSED_PUBLIC_KEY=  # Compressed public key (hex, from ADDRESS_FORMAT_COMPRESSED account)
 ```
 
-`SIGN_WITH` is the Bitcoin address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"` (or `P2TR`) — see `skills/core/wallet-management/SKILL.md`.
+`SIGN_WITH` is the Bitcoin address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"` (or `P2TR`) — see `skills/core/turnkey-wallet-management/SKILL.md`.
 
 `BITCOIN_COMPRESSED_PUBLIC_KEY` is the 33-byte compressed public key (hex) from the same wallet at the same derivation path, but with `addressFormat === "ADDRESS_FORMAT_COMPRESSED"`. It is needed to construct `witnessUtxo` payment scripts and (for Taproot) the `tapInternalKey`.
 
@@ -340,7 +340,7 @@ A policy denied the signing operation. Review policies in the Turnkey console un
 
 ## Related Skills
 
-- `skills/core/wallet-management/SKILL.md` — create a Bitcoin wallet and get your `SIGN_WITH` address and compressed public key
-- `skills/core/transaction-signing/SKILL.md` — understand the stamping model; raw signing details
-- `skills/signing/ethereum-evm/SKILL.md` — EVM signing (ethers.js or viem)
-- `skills/signing/solana-signing/SKILL.md` — Solana transaction signing
+- `skills/core/turnkey-wallet-management/SKILL.md` — create a Bitcoin wallet and get your `SIGN_WITH` address and compressed public key
+- `skills/core/turnkey-transaction-signing/SKILL.md` — understand the stamping model; raw signing details
+- `skills/signing/turnkey-ethereum-evm/SKILL.md` — EVM signing (ethers.js or viem)
+- `skills/signing/turnkey-solana-signing/SKILL.md` — Solana transaction signing

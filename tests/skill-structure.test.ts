@@ -9,7 +9,7 @@
  */
 
 import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { join, dirname, basename } from "path";
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
 import { findSkillFiles, findEvalsFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT, ROOT_SKILL_FILE } from "./helpers.js";
@@ -52,6 +52,14 @@ for (const filePath of skillFiles) {
         // Must start with a lowercase letter and contain only lowercase letters,
         // digits, and hyphens. Required by the Anthropic skills spec and OpenClaw indexing.
         expect(parsed.data.name).toMatch(/^[a-z][a-z0-9-]*$/);
+      });
+
+      it("name matches parent directory (Agent Skills spec)", () => {
+        const dirName = basename(dirname(filePath));
+        expect(
+          parsed.data.name,
+          `SKILL.md name "${parsed.data.name}" does not match directory "${dirName}". The Agent Skills spec requires name === directory name.`,
+        ).toBe(dirName);
       });
 
       it("has a description field", () => {

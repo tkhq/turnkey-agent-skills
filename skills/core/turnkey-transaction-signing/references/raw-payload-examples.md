@@ -68,7 +68,8 @@ const turnkey = new Turnkey({
 });
 const client = turnkey.apiClient();
 
-const txBytes = TxRaw.encode(txRaw).finish();
+// Your serialized Cosmos transaction bytes (e.g., from TxRaw.encode(txRaw).finish())
+const txBytes = new Uint8Array([/* serialized tx bytes */]);
 const payload = Buffer.from(txBytes).toString("hex");
 
 const response = await client.signRawPayload({

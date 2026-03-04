@@ -14,8 +14,8 @@
 
 import * as ts from "typescript";
 import { writeFileSync, unlinkSync, existsSync } from "fs";
+import { randomUUID } from "crypto";
 import { join, dirname } from "path";
-import { tmpdir } from "os";
 
 export type Assertion =
   | { type: "imports"; value: string }
@@ -65,7 +65,7 @@ function checkCompiles(
     const targetFile =
       filePath ??
       (() => {
-        tempFile = join(PROJECT_ROOT, `.tmp-compiles-${Date.now()}-${Math.random().toString(36).slice(2)}.ts`);
+        tempFile = join(PROJECT_ROOT, `.tmp-compiles-${randomUUID()}.ts`);
         writeFileSync(tempFile, code, "utf-8");
         return tempFile;
       })();

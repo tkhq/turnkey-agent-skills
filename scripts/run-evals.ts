@@ -20,6 +20,9 @@
  *   --concurrency <n>    Max parallel runs (default: 4)
  *   --dry-run            Print prompts without executing
  *   --verbose            Print full LLM responses
+ *   --no-fail            Exit 0 even when evals fail (default: exit 1 on failure)
+ *   --save-baseline      Save results as the regression baseline (evals-baseline.json)
+ *   --check-baseline     Compare results against saved baseline and report regressions
  */
 
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "fs";
@@ -79,6 +82,9 @@ interface CliOpts {
   concurrency: number;
   dryRun: boolean;
   verbose: boolean;
+  noFail: boolean;
+  saveBaseline: boolean;
+  checkBaseline: boolean;
 }
 
 function parseArgs(): CliOpts {
@@ -89,6 +95,9 @@ function parseArgs(): CliOpts {
     concurrency: 4,
     dryRun: false,
     verbose: false,
+    noFail: false,
+    saveBaseline: false,
+    checkBaseline: false,
   };
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
@@ -124,6 +133,15 @@ function parseArgs(): CliOpts {
         break;
       case "--verbose":
         opts.verbose = true;
+        break;
+      case "--no-fail":
+        opts.noFail = true;
+        break;
+      case "--save-baseline":
+        opts.saveBaseline = true;
+        break;
+      case "--check-baseline":
+        opts.checkBaseline = true;
         break;
       default:
         console.error(`Unknown flag: ${args[i]}`);
@@ -607,6 +625,101 @@ function writeReport(results: TaskResult[]): void {
 }
 
 // ---------------------------------------------------------------------------
+// Baseline comparison
+// ---------------------------------------------------------------------------
+
+interface BaselineEntry {
+  skill: string;
+  evalId: number;
+  mode: string;
+  assertions: { description: string; passed: boolean }[];
+}
+
+interface Baseline {
+  generatedAt: string;
+  provider: string;
+  entries: BaselineEntry[];
+}
+
+const BASELINE_PATH = join(PROJECT_ROOT, "evals-baseline.json");
+
+function saveBaseline(results: TaskResult[], provider: string): void {
+  const baseline: Baseline = {
+    generatedAt: new Date().toISOString(),
+    provider,
+    entries: results
+      .filter((r) => !r.error && r.assertions.length > 0)
+      .map((r) => ({
+        skill: r.skill,
+        evalId: r.evalId,
+        mode: r.mode,
+        assertions: r.assertions.map((a) => ({
+          description: describeAssertion(a.assertion),
+          passed: a.passed,
+        })),
+      })),
+  };
+  writeFileSync(BASELINE_PATH, JSON.stringify(baseline, null, 2), "utf-8");
+  console.log(`\nBaseline saved to ${BASELINE_PATH} (${baseline.entries.length} entries)`);
+}
+
+function checkBaseline(results: TaskResult[]): boolean {
+  if (!existsSync(BASELINE_PATH)) {
+    console.error(`\nNo baseline found at ${BASELINE_PATH}. Run with --save-baseline first.`);
+    return false;
+  }
+
+  const baseline: Baseline = JSON.parse(readFileSync(BASELINE_PATH, "utf-8"));
+  console.log(`\nChecking against baseline from ${baseline.generatedAt} (${baseline.provider})...`);
+
+  let regressions = 0;
+  let improvements = 0;
+
+  for (const entry of baseline.entries) {
+    const result = results.find(
+      (r) => r.skill === entry.skill && r.evalId === entry.evalId && r.mode === entry.mode,
+    );
+
+    if (!result) continue; // eval wasn't run this time (filtered out)
+
+    if (result.error) {
+      // Eval errored — every previously-passing assertion is a regression
+      const prevPassing = entry.assertions.filter((a) => a.passed).length;
+      if (prevPassing > 0) {
+        console.log(`  [REGRESS] ${entry.skill} / eval-${entry.evalId} (${entry.mode}) — errored (was ${prevPassing} passing)`);
+        regressions += prevPassing;
+      }
+      continue;
+    }
+
+    for (let i = 0; i < entry.assertions.length && i < result.assertions.length; i++) {
+      const prev = entry.assertions[i];
+      const curr = result.assertions[i];
+      if (prev.passed && !curr.passed) {
+        console.log(`  [REGRESS] ${entry.skill} / eval-${entry.evalId}: ${prev.description}`);
+        regressions++;
+      } else if (!prev.passed && curr.passed) {
+        console.log(`  [IMPROVED] ${entry.skill} / eval-${entry.evalId}: ${prev.description}`);
+        improvements++;
+      }
+    }
+  }
+
+  console.log(`\nBaseline comparison: ${regressions} regression(s), ${improvements} improvement(s)`);
+  return regressions === 0;
+}
+
+// ---------------------------------------------------------------------------
+// Exit code
+// ---------------------------------------------------------------------------
+
+function hasFailures(results: TaskResult[]): boolean {
+  return results
+    .filter((r) => r.mode === "with_skill")
+    .some((r) => r.error || (r.assertions.length > 0 && r.assertions.some((a) => !a.passed)));
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -674,6 +787,19 @@ async function main(): Promise<void> {
   if (!opts.dryRun) {
     printSummary(results);
     writeReport(results);
+
+    if (opts.saveBaseline) {
+      saveBaseline(results, providerLabel(opts));
+    }
+
+    let baselineOk = true;
+    if (opts.checkBaseline) {
+      baselineOk = checkBaseline(results);
+    }
+
+    if (!opts.noFail && (hasFailures(results) || !baselineOk)) {
+      process.exit(1);
+    }
   }
 }
 

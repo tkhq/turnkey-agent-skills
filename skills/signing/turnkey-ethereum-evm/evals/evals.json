@@ -20,24 +20,6 @@
     },
     {
       "id": 2,
-      "prompt": "Use my Turnkey wallet to send ETH on Arbitrum with ethers.js. I already have the signer set up — just show me how to send the transaction.",
-      "expected_output": "Code using TurnkeySigner from @turnkey/ethers connected to an Arbitrum RPC provider. Calls connectedSigner.sendTransaction with to and value fields. Uses the correct Arbitrum RPC URL or notes that the provider URL should point to Arbitrum. Logs the tx hash.",
-      "files": [
-        "skills/signing/turnkey-ethereum-evm/references/ethers-examples.md"
-      ],
-      "assertions": [
-        { "type": "imports", "value": "@turnkey/ethers" },
-        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
-        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
-        { "type": "env_var", "value": "SIGN_WITH" },
-        { "type": "calls", "value": "TurnkeySigner" },
-        { "type": "calls", "value": "sendTransaction" },
-        { "type": "regex", "pattern": "arbitrum", "flags": "i" },
-        { "type": "compiles" }
-      ]
-    },
-    {
-      "id": 3,
       "prompt": "Sign an EIP-712 typed data message with my Turnkey Ethereum wallet using viem.",
       "expected_output": "Code using walletClient.signTypedData (viem) with a domain, types, and message object. Includes a minimal but complete typed data example (e.g., a simple Transfer type). The account is created via createAccount from @turnkey/viem. Logs the resulting signature.",
       "files": [
@@ -54,7 +36,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "prompt": "Transfer 100 USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48) to 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 on Ethereum using my Turnkey wallet and viem.",
       "expected_output": "Code using @turnkey/viem that sets up a TurnkeyClient and creates an account via createAccount. Uses walletClient.writeContract with the ERC-20 transfer ABI to call the transfer function on the USDC contract address. Uses parseUnits with 6 decimals for USDC. Logs the transaction hash.",
       "files": [
@@ -73,7 +55,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "prompt": "Use ethers.js and my Turnkey wallet to transfer 50 USDT (0xdAC17F958D2ee523a2206206994597C13D831ec7) to 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 on Ethereum mainnet.",
       "expected_output": "Code using @turnkey/ethers that sets up TurnkeyClient and TurnkeySigner. Creates an ethers.Contract instance with the ERC-20 transfer ABI pointing at the USDT contract address. Calls contract.transfer with the recipient and amount (parseUnits with 6 decimals for USDT). Waits for the receipt.",
       "files": [

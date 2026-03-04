@@ -53,7 +53,7 @@ const PROJECT_ROOT = join(dirname(new URL(import.meta.url).pathname), "..");
  * Type-check a TypeScript string using the project's tsconfig.
  * Returns `{ passed: true }` or `{ passed: false, message }` with up to 5 errors.
  */
-function checkCompiles(
+export function checkCompiles(
   code: string,
   filePath?: string,
 ): { passed: true } | { passed: false; message: string } {

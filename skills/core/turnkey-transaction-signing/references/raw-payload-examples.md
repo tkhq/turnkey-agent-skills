@@ -44,6 +44,9 @@ const turnkey = new Turnkey({
 });
 const client = turnkey.apiClient();
 
+// Your RLP-encoded EVM transaction as a hex string
+const rlpEncodedTransactionHex = "0xf86c...";
+
 const response = await client.signRawPayload({
   organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!,

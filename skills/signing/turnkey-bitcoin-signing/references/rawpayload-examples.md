@@ -170,6 +170,10 @@ class TurnkeySigner {
     this.publicKey = compressedPublicKey.slice(1, 33);
   }
 
+  async sign(_hash: Buffer): Promise<Buffer> {
+    throw new Error("P2TR uses Schnorr signatures — use signSchnorr instead");
+  }
+
   async signSchnorr(hash: Buffer): Promise<Buffer> {
     const result = await client.signRawPayload({
       organizationId: process.env.TURNKEY_ORGANIZATION_ID!,

@@ -173,6 +173,112 @@ describe("evals.json skill_name matches SKILL.md name", () => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// evals.json schema validation
+//
+// Validates that every evals.json has well-formed structure, valid assertion
+// types, correct fields per assertion type, unique IDs, and resolvable file
+// paths. Catches typos (e.g., "import" instead of "imports") that would
+// silently pass JSON parsing but break at runtime.
+// ---------------------------------------------------------------------------
+
+const VALID_ASSERTION_TYPES = [
+  "imports",
+  "calls",
+  "env_var",
+  "contains",
+  "not_contains",
+  "order",
+  "regex",
+  "compiles",
+] as const;
+
+/** Fields required for each assertion type (beyond `type`). */
+const ASSERTION_FIELDS: Record<string, string[]> = {
+  imports: ["value"],
+  calls: ["value"],
+  env_var: ["value"],
+  contains: ["value"],
+  not_contains: ["value"],
+  order: ["before", "after"],
+  regex: ["pattern"],
+  compiles: [],
+};
+
+for (const evalsPath of evalsFiles) {
+  const raw = readFileSync(evalsPath, "utf-8");
+  const evalsData = JSON.parse(raw);
+  const label = relativePath(evalsPath);
+
+  describe(`${label} schema`, () => {
+    it("has a non-empty skill_name string", () => {
+      expect(typeof evalsData.skill_name).toBe("string");
+      expect(evalsData.skill_name.length).toBeGreaterThan(0);
+    });
+
+    it("has a non-empty evals array", () => {
+      expect(Array.isArray(evalsData.evals)).toBe(true);
+      expect(evalsData.evals.length).toBeGreaterThan(0);
+    });
+
+    it("eval IDs are unique", () => {
+      const ids = evalsData.evals.map((e: { id: number }) => e.id);
+      expect(new Set(ids).size, `Duplicate eval IDs: ${ids}`).toBe(ids.length);
+    });
+
+    for (const evalItem of evalsData.evals) {
+      describe(`eval ${evalItem.id}`, () => {
+        it("has required fields (id, prompt, expected_output, files)", () => {
+          expect(typeof evalItem.id, "id must be a number").toBe("number");
+          expect(typeof evalItem.prompt, "prompt must be a string").toBe("string");
+          expect(evalItem.prompt.length, "prompt must not be empty").toBeGreaterThan(0);
+          expect(typeof evalItem.expected_output, "expected_output must be a string").toBe("string");
+          expect(evalItem.expected_output.length, "expected_output must not be empty").toBeGreaterThan(0);
+          expect(Array.isArray(evalItem.files), "files must be an array").toBe(true);
+        });
+
+        it("files resolve to existing paths", () => {
+          for (const filePath of evalItem.files) {
+            const absPath = join(PROJECT_ROOT, filePath);
+            expect(
+              existsSync(absPath),
+              `File not found: ${filePath}`,
+            ).toBe(true);
+          }
+        });
+
+        if (evalItem.assertions?.length) {
+          for (let i = 0; i < evalItem.assertions.length; i++) {
+            const assertion = evalItem.assertions[i];
+
+            it(`assertion[${i}] has valid type "${assertion.type}"`, () => {
+              expect(
+                (VALID_ASSERTION_TYPES as readonly string[]).includes(assertion.type),
+                `Unknown assertion type "${assertion.type}". Valid types: ${VALID_ASSERTION_TYPES.join(", ")}`,
+              ).toBe(true);
+            });
+
+            it(`assertion[${i}] has required fields for type "${assertion.type}"`, () => {
+              const requiredFields = ASSERTION_FIELDS[assertion.type];
+              if (!requiredFields) return; // already caught by type check above
+              for (const field of requiredFields) {
+                expect(
+                  assertion[field] !== undefined && assertion[field] !== null,
+                  `Assertion type "${assertion.type}" requires field "${field}"`,
+                ).toBe(true);
+                expect(
+                  typeof assertion[field],
+                  `Assertion field "${field}" must be a string`,
+                ).toBe("string");
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+}
+
 describe("SKILL.md (root package manifest)", () => {
   describe("frontmatter", () => {
     it("has a name field", () => {

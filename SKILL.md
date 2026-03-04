@@ -34,6 +34,12 @@ Skills for AI agents that need to manage wallets and sign transactions using [Tu
 | Solana | `skills/signing/turnkey-solana-signing/SKILL.md` | signing or broadcasting on Solana |
 | Bitcoin | `skills/signing/turnkey-bitcoin-signing/SKILL.md` | signing or broadcasting on Bitcoin (P2WPKH SegWit or P2TR Taproot) |
 
+### Meta
+
+| Skill | Path | Use when… |
+|-------|------|-----------|
+| Skill Making | `skills/meta/turnkey-skill-making/SKILL.md` | creating a new skill for this repo — covers SKILL.md authoring, references, evals, and validation |
+
 ## Environment Variables
 
 All skills share these three variables:

@@ -17,8 +17,7 @@
  *   npx tsx examples/ethereum-viem.ts
  */
 
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { createAccount } from "@turnkey/viem";
 import {
   createWalletClient,
@@ -42,13 +41,13 @@ const AMOUNT_ETH = "0.001";
 // Client setup
 // ---------------------------------------------------------------------------
 
-const turnkeyClient = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const transport = http(
   process.env.ETHEREUM_RPC ?? "https://rpc.ankr.com/eth_sepolia"
@@ -61,7 +60,7 @@ const transport = http(
 async function main() {
   // Create the Turnkey-backed viem account
   const account = await createAccount({
-    client: turnkeyClient,
+    client,
     organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     signWith: process.env.SIGN_WITH!, // Ethereum address
   });

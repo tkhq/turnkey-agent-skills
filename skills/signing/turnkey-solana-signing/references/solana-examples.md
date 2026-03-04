@@ -5,8 +5,7 @@ Each example below is fully self-contained — it includes all imports and setup
 ## Send SOL
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/solana";
 import {
   Connection,
@@ -16,13 +15,13 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,
@@ -74,8 +73,7 @@ sendSol("RecipientBase58Address", 0.001).catch(console.error);
 ## Batch sign multiple transactions
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/solana";
 import {
   Connection,
@@ -85,13 +83,13 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,
@@ -154,17 +152,16 @@ console.log("All confirmed:", signatures);
 ## Sign a message
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/solana";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,
@@ -181,8 +178,7 @@ console.log("Signed message bytes:", signedMessage);
 ## Versioned transactions
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/solana";
 import {
   Connection,
@@ -193,13 +189,13 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,

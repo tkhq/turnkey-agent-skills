@@ -1,13 +1,12 @@
 ---
 name: turnkey-ethereum-evm
 description: 'Signs and broadcasts EVM transactions on Ethereum, Polygon, Base, Arbitrum, Optimism, and any EVM chain using Turnkey. Supports ethers.js and viem. Use when asked to "send ETH", "sign an EVM transaction", "transfer tokens", "call a smart contract", "deploy a contract", "sign a message", "sign typed data", "swap tokens", "interact with a DeFi protocol", or interact with any EVM-compatible network.'
-compatibility: Requires Node.js. Choose @turnkey/ethers + ethers, or @turnkey/viem + viem. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars.
+compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Choose @turnkey/ethers + ethers, or @turnkey/viem + viem. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
 metadata:
   version: "1.0.0"
   tags: ["turnkey", "ethereum", "evm", "signing", "ethers", "viem", "polygon", "base", "arbitrum", "blockchain", "defi"]
   sdk_versions:
-    "@turnkey/http": "^3.17.0"
-    "@turnkey/api-key-stamper": "^0.6.2"
+    "@turnkey/sdk-server": "^5.1.0"
     "@turnkey/ethers": "^1.3.25"
     "@turnkey/viem": "^0.14.25"
 ---
@@ -31,21 +30,21 @@ Both work with the same Turnkey wallet account and the same three environment va
 
 ## Rules
 
-- **Include complete setup unless you can see the user's existing code.** Always include all imports, `TurnkeyClient` initialization, signer/account creation, and provider setup. If the user says setup is "already done" but you cannot see their code, include setup anyway — the user may be mistaken or the code may be incomplete. Only omit setup when the user's existing initialization code is visible in the conversation and you can reference their variables directly.
+- **Include complete setup unless you can see the user's existing code.** Always include all imports, `Turnkey` client initialization, signer/account creation, and provider setup. If the user says setup is "already done" but you cannot see their code, include setup anyway — the user may be mistaken or the code may be incomplete. Only omit setup when the user's existing initialization code is visible in the conversation and you can reference their variables directly.
 
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
 > `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Ethereum address (`ADDRESS_FORMAT_ETHEREUM`)
 
-Install only the package for your chosen library:
+Install `@turnkey/sdk-server` and the package for your chosen library:
 
 ```bash
 # ethers.js
-npm install @turnkey/http @turnkey/api-key-stamper @turnkey/ethers ethers
+npm install @turnkey/sdk-server @turnkey/ethers ethers
 
 # viem
-npm install @turnkey/http @turnkey/api-key-stamper @turnkey/viem viem
+npm install @turnkey/sdk-server @turnkey/viem viem
 ```
 
 ## Environment Variables
@@ -67,18 +66,17 @@ ETHEREUM_RPC=              # Optional. Defaults to Sepolia public endpoint
 ### Setup
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/ethers";
 import { ethers } from "ethers";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,
@@ -102,19 +100,18 @@ For usage examples (send ETH, EIP-191 message signing, EIP-712 typed data, contr
 ### Setup
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { createAccount } from "@turnkey/viem";
 import { createWalletClient, createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 // createAccount is async — it fetches the address from Turnkey if not provided
 const account = await createAccount({

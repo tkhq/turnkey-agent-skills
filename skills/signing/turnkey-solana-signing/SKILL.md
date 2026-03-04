@@ -1,13 +1,12 @@
 ---
 name: turnkey-solana-signing
 description: 'Signs and sends Solana transactions using Turnkey with @turnkey/solana. Covers SOL transfers, batch signing, message signing, and versioned transactions. Use when asked to "send SOL", "sign a Solana transaction", "transfer SPL tokens", "sign a Solana message", "interact with a Solana program", "stake SOL", "batch send to multiple addresses", or build anything on the Solana blockchain.'
-compatibility: Requires Node.js. Install @turnkey/solana and @solana/web3.js. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH (base58 Solana address) env vars.
+compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Install @turnkey/solana and @solana/web3.js. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH (base58 Solana address) env vars."
 metadata:
   version: "1.0.0"
   tags: ["turnkey", "solana", "signing", "blockchain", "sol", "spl-tokens", "crypto", "web3"]
   sdk_versions:
-    "@turnkey/http": "^3.17.0"
-    "@turnkey/api-key-stamper": "^0.6.2"
+    "@turnkey/sdk-server": "^5.1.0"
     "@turnkey/solana": "^1.1.25"
 ---
 
@@ -25,7 +24,7 @@ The wallet account must have been created with `ADDRESS_FORMAT_SOLANA` and `CURV
 > `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Solana address (`ADDRESS_FORMAT_SOLANA`)
 
 ```bash
-npm install @turnkey/http @turnkey/api-key-stamper @turnkey/solana @solana/web3.js
+npm install @turnkey/sdk-server @turnkey/solana @solana/web3.js
 ```
 
 ## Environment Variables
@@ -44,22 +43,21 @@ SOLANA_RPC=                # Optional. Defaults to devnet public endpoint
 
 ## Instructions
 
-### Step 1: Initialize TurnkeyClient and TurnkeySigner
+### Step 1: Initialize Turnkey client and TurnkeySigner
 
-`TurnkeySigner` accepts both `TurnkeyClient` (from `@turnkey/http`) and the `@turnkey/sdk-server` client. If you already have a `@turnkey/sdk-server` client from the wallet-management skill, pass `turnkey.apiClient()` directly and skip installing `@turnkey/http`.
+`TurnkeySigner` accepts any Turnkey client. Use `@turnkey/sdk-server` (recommended) — it handles activity polling automatically. If you already have a client from the wallet-management skill, reuse it directly.
 
 ```typescript
-import { TurnkeyClient } from "@turnkey/http";
-import { ApiKeyStamper } from "@turnkey/api-key-stamper";
+import { Turnkey } from "@turnkey/sdk-server";
 import { TurnkeySigner } from "@turnkey/solana";
 
-const client = new TurnkeyClient(
-  { baseUrl: "https://api.turnkey.com" },
-  new ApiKeyStamper({
-    apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  })
-);
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
 
 const signer = new TurnkeySigner({
   client,

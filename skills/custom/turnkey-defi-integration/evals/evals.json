@@ -1,0 +1,90 @@
+{
+  "skill_name": "turnkey-defi-integration",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a backend service that uses Delegated Access to sign Uniswap V3 swaps on Arbitrum for a user's sub-organization. Use viem.",
+      "expected_output": "Working TypeScript code that initializes @turnkey/sdk-server with the parent org credentials, creates a viem account via createAccount scoped to the user's sub-org and EVM address, creates a WalletClient on Arbitrum, and calls sendTransaction targeting the Uniswap V3 router address. Should use environment variables for credentials.",
+      "files": [
+        "skills/custom/turnkey-defi-integration/references/evm-da-signing-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/viem" },
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "calls", "value": "createAccount" },
+        { "type": "calls", "value": "createWalletClient" },
+        { "type": "calls", "value": "sendTransaction" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write backend code that signs a Jupiter swap transaction on Solana using Turnkey Delegated Access within a user's sub-org.",
+      "expected_output": "Working TypeScript code that initializes @turnkey/sdk-server, creates a TurnkeySigner from @turnkey/solana scoped to the user's sub-org, builds a Transaction with the Jupiter program instruction, sets the fee payer and recent blockhash, signs via TurnkeySigner.signTransaction, and broadcasts with sendRawTransaction.",
+      "files": [
+        "skills/custom/turnkey-defi-integration/references/svm-da-signing-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "calls", "value": "sendRawTransaction" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to sign a swap on Arbitrum from my backend using a Turnkey DA key. I'm using ethers.js, not viem.",
+      "expected_output": "Working TypeScript code using @turnkey/ethers (not @turnkey/viem) that creates a TurnkeySigner scoped to the user's sub-org, connects it to an Arbitrum JSON-RPC provider, and calls sendTransaction. Should not import or use viem.",
+      "files": [
+        "skills/custom/turnkey-defi-integration/references/evm-da-signing-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/ethers" },
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "not_contains", "value": "@turnkey/viem" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "calls", "value": "sendTransaction" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a gasless Solana transaction where my platform pays gas fees for the user's Jupiter swap, using Turnkey for the user's signing.",
+      "expected_output": "Working TypeScript code that uses @turnkey/solana TurnkeySigner, builds a Transaction with feePayer set to the platform's address (not the user's), signs the user's portion via Turnkey, and broadcasts. Should reference a platform fee payer address separate from the user's address.",
+      "files": [
+        "skills/custom/turnkey-defi-integration/references/svm-da-signing-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "contains", "value": "feePayer" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "calls", "value": "sendRawTransaction" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Write code to validate my DA policy configuration by running a positive and negative signing test against a whitelisted Uniswap router using viem and Turnkey.",
+      "expected_output": "Working TypeScript code that sets up a viem WalletClient via @turnkey/viem createAccount, then attempts two sendTransaction calls: one to the whitelisted Uniswap router (expected to succeed) and one to an arbitrary non-whitelisted address (expected to be denied). Both wrapped in try/catch with pass/fail logging.",
+      "files": [
+        "skills/custom/turnkey-defi-integration/references/evm-da-signing-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/viem" },
+        { "type": "calls", "value": "createAccount" },
+        { "type": "calls", "value": "sendTransaction" },
+        { "type": "contains", "value": "PASS" },
+        { "type": "contains", "value": "FAIL" },
+        { "type": "compiles" }
+      ]
+    }
+  ]
+}

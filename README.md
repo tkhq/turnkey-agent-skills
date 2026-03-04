@@ -2,7 +2,7 @@
 
 A collection of AI agent skills for [Turnkey](https://turnkey.com) — the wallet infrastructure platform that manages cryptographic keys in hardware-backed secure enclaves.
 
-These skills enable AI agents to autonomously create wallets, derive addresses, and sign transactions across multiple blockchains. Compatible with **Claude Code**, **OpenClaw**, and **OpenAI** assistants.
+These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenClaw**, and **OpenAI** assistants.
 
 ## What is Turnkey?
 
@@ -48,21 +48,34 @@ Please read skills/core/turnkey-wallet-management/SKILL.md and create a wallet f
 | Solana | `skills/signing/turnkey-solana-signing/` | Solana signing with `@turnkey/solana` |
 | Bitcoin | `skills/signing/turnkey-bitcoin-signing/` | Bitcoin signing with bitcoinjs-lib (P2WPKH + P2TR) |
 
+### Auth
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| OTP Authentication | `skills/auth/turnkey-otp-auth/` | Email OTP login with sub-organization management |
+
+### Meta
+
+| Skill | Path | Description |
+|-------|------|-------------|
+| Skill Making | `skills/meta/turnkey-skill-making/` | Guide for creating new skills — conventions, validation, evals |
+
 ## Running Examples
 
 ```bash
 # Install dependencies
-npm install @turnkey/http @turnkey/api-key-stamper @turnkey/ethers @turnkey/viem @turnkey/solana ethers viem @solana/web3.js
+npm install
 
 # Copy and fill in environment variables
 cp .env.example .env
 # Edit .env with your API_PUBLIC_KEY, API_PRIVATE_KEY, ORGANIZATION_ID
 
-# Run an example (requires ts-node or tsx)
+# Run an example (requires tsx)
 npx tsx examples/wallet-management.ts
-npx tsx examples/ethereum-ethers.ts   # or ethereum-viem.ts
+npx tsx examples/ethereum-ethers.ts
 npx tsx examples/ethereum-viem.ts
 npx tsx examples/solana-signing.ts
+npx tsx examples/bitcoin-signing.ts
 ```
 
 ## Running Evals
@@ -102,43 +115,103 @@ Eval outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` defini
 
 ## Adding New Skills
 
-1. Create `skills/<category>/<skill-name>/SKILL.md`
-2. Start with the standard frontmatter:
+### Option A — Use the skill-making skill (recommended)
+
+If you're using an AI agent (Claude Code, etc.), load the skill-making guide and let it handle the structure for you:
+
+```
+Please read skills/meta/turnkey-skill-making/SKILL.md and create a new skill for <your description>.
+```
+
+The skill-making guide covers the full lifecycle: directory layout, frontmatter rules, required sections, reference examples, evals, and validation. The test suite enforces all conventions automatically.
+
+### Option B — Manual
+
+1. **Choose a category and create the directory:**
+
+   | Category | Path | Use for |
+   |----------|------|---------|
+   | Core | `skills/core/<name>/` | Foundational capabilities (wallets, signing model) |
+   | Signing | `skills/signing/<name>/` | Chain-specific transaction signing |
+   | Auth | `skills/auth/<name>/` | Authentication flows (OTP, OAuth, passkeys) |
+   | Meta | `skills/meta/<name>/` | Tooling and skill-authoring guides |
+
+2. **Create `SKILL.md`** with the required frontmatter:
    ```yaml
    ---
-   name: my-skill-name
-   version: "1.0.0"
-   description: One-sentence description for skill discovery
-   tags: ["turnkey", "relevant-tag", "another-tag"]
-   compatibility: "Runtime requirements and required env vars"
+   name: turnkey-your-skill-name
+   description: 'Single-line description of what this skill does and when to use it.'
+   compatibility: "Runtime requirements and required env vars."
+   depends_on:
+     - turnkey-wallet-management
+   metadata:
+     version: "1.0.0"
+     tags: ["turnkey", "your-tag-here"]
+     sdk_versions:
+       "@turnkey/sdk-server": "^5.1.0"
    ---
    ```
-3. Include these sections: **Overview**, **Prerequisites**, **Environment Variables**, **Instructions**, **Code Examples**, **Error Handling**, **Related Skills**
-4. Add a runnable example to `examples/<skill-name>.ts`
-5. If the skill involves signing, add a reference in `skills/core/turnkey-transaction-signing/SKILL.md`
-6. Update this README's skill table
+   The `name` field must match the directory name exactly.
+
+3. **Include these required sections:** Overview, Prerequisites, Environment Variables, Instructions (or Examples, or Option A/Option B), Troubleshooting, Related Skills.
+
+4. **Add reference examples** in `references/`. Each TypeScript code block must be fully self-contained (all imports and setup) — these are type-checked by the test suite.
+
+5. **Add evals** in `evals/evals.json`. Include `compiles` assertions to catch real type errors. See `skills/meta/turnkey-skill-making/SKILL.md` for the full assertion reference.
+
+6. **Validate:**
+   ```bash
+   npm test        # structure, syntax, type-checking, evals
+   npm run check   # typecheck + tests
+   ```
 
 ## Project Structure
 
 ```
 turnkey-agent-skills/
 ├── README.md
+├── SKILL.md                              # Root skill index
 ├── skills/
 │   ├── core/
 │   │   ├── turnkey-wallet-management/
-│   │   │   └── SKILL.md          # Create wallets, derive addresses
+│   │   │   ├── SKILL.md                  # Create wallets, derive addresses
+│   │   │   ├── references/
+│   │   │   └── evals/
 │   │   └── turnkey-transaction-signing/
-│   │       └── SKILL.md          # Stamping overview + chain routing
-│   └── signing/
-│       ├── turnkey-ethereum-evm/
-│       │   └── SKILL.md          # EVM signing (ethers.js + viem)
-│       ├── turnkey-solana-signing/
-│       │   └── SKILL.md          # @turnkey/solana integration
-│       └── turnkey-bitcoin-signing/
-│           └── SKILL.md          # Bitcoin signing (P2WPKH + P2TR)
-└── examples/
-    ├── wallet-management.ts      # Bootstrap: create wallet, get addresses
-    ├── ethereum-ethers.ts        # Send ETH on Sepolia via ethers.js
-    ├── ethereum-viem.ts          # Send ETH on Sepolia via viem
-    └── solana-signing.ts         # Send SOL on devnet
+│   │       ├── SKILL.md                  # Stamping overview + chain routing
+│   │       ├── references/
+│   │       └── evals/
+│   ├── signing/
+│   │   ├── turnkey-ethereum-evm/
+│   │   │   ├── SKILL.md                  # EVM signing (ethers.js + viem)
+│   │   │   ├── references/
+│   │   │   └── evals/
+│   │   ├── turnkey-solana-signing/
+│   │   │   ├── SKILL.md                  # @turnkey/solana integration
+│   │   │   ├── references/
+│   │   │   └── evals/
+│   │   └── turnkey-bitcoin-signing/
+│   │       ├── SKILL.md                  # Bitcoin signing (P2WPKH + P2TR)
+│   │       ├── references/
+│   │       └── evals/
+│   ├── auth/
+│   │   └── turnkey-otp-auth/
+│   │       ├── SKILL.md                  # Email OTP login + sub-orgs
+│   │       ├── references/
+│   │       └── evals/
+│   └── meta/
+│       └── turnkey-skill-making/
+│           ├── SKILL.md                  # Guide for creating new skills
+│           └── references/
+├── examples/
+│   ├── wallet-management.ts
+│   ├── ethereum-ethers.ts
+│   ├── ethereum-viem.ts
+│   ├── solana-signing.ts
+│   └── bitcoin-signing.ts
+└── tests/
+    ├── skill-structure.test.ts           # Layer 1: frontmatter + sections
+    ├── code-blocks.test.ts               # Layer 2: syntax checking
+    ├── reference-compiles.test.ts        # Layer 3: full type-checking
+    └── evals.test.ts                     # Layer 4: assertion grading
 ```

@@ -48,6 +48,15 @@ TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
 
 These come from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**.
 
+**Production note:** For production code, validate that all required env vars are set at startup before initializing the Turnkey client. A missing var surfaces as an opaque auth failure deep in the API call. Prefer an early, explicit check:
+
+```typescript
+const required = ["TURNKEY_API_PUBLIC_KEY", "TURNKEY_API_PRIVATE_KEY", "TURNKEY_ORGANIZATION_ID"] as const;
+for (const key of required) {
+  if (!process.env[key]) throw new Error(`Missing required env var: ${key}`);
+}
+```
+
 ## Instructions
 
 Follow these steps when an agent needs wallet access:

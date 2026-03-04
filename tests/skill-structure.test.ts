@@ -25,6 +25,11 @@ const REQUIRED_SECTIONS = [
 
 const skillFiles = findSkillFiles(SKILLS_ROOT);
 
+// Collect all skill names upfront for depends_on validation
+const allSkillNames = new Set(
+  skillFiles.map((f) => matter(readFileSync(f, "utf-8")).data.name as string),
+);
+
 // Sanity check: the test suite itself is not vacuously passing
 describe("skill discovery", () => {
   it("finds at least one SKILL.md", () => {
@@ -71,6 +76,24 @@ for (const filePath of skillFiles) {
       it("description fits on one line (no newlines)", () => {
         // Multi-line descriptions break some skill indexers
         expect(parsed.data.description).not.toContain("\n");
+      });
+
+      it("depends_on is a valid array of skill names (if present)", () => {
+        const deps = parsed.data.depends_on;
+        if (deps === undefined) return; // field is optional
+        expect(Array.isArray(deps), "depends_on must be an array").toBe(true);
+        for (const dep of deps as unknown[]) {
+          expect(typeof dep, "depends_on entries must be strings").toBe("string");
+          expect((dep as string).length, "depends_on entries must not be empty").toBeGreaterThan(0);
+          expect(
+            dep !== parsed.data.name,
+            `depends_on must not include self ("${parsed.data.name}")`,
+          ).toBe(true);
+          expect(
+            allSkillNames.has(dep as string),
+            `depends_on entry "${dep}" does not match any skill name. Known skills: ${[...allSkillNames].join(", ")}`,
+          ).toBe(true);
+        }
       });
 
       it("has metadata.sdk_versions with valid @turnkey/ entries", () => {

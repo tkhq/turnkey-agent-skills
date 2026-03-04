@@ -2,6 +2,9 @@
 name: turnkey-ethereum-evm
 description: 'Signs and broadcasts EVM transactions on Ethereum, Polygon, Base, Arbitrum, Optimism, and any EVM chain using Turnkey. Supports ethers.js and viem. Use when asked to "send ETH", "sign an EVM transaction", "transfer tokens", "call a smart contract", "deploy a contract", "sign a message", "sign typed data", "swap tokens", "interact with a DeFi protocol", or interact with any EVM-compatible network.'
 compatibility: "Requires Node.js. Recommended: @turnkey/sdk-server. Choose @turnkey/ethers + ethers, or @turnkey/viem + viem. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
+depends_on:
+  - turnkey-wallet-management
+  - turnkey-transaction-signing
 metadata:
   version: "1.0.0"
   tags: ["turnkey", "ethereum", "evm", "signing", "ethers", "viem", "polygon", "base", "arbitrum", "blockchain", "defi"]

@@ -2,6 +2,9 @@
 name: turnkey-bitcoin-signing
 description: 'Signs and broadcasts Bitcoin transactions using Turnkey with bitcoinjs-lib. Supports P2WPKH (SegWit) and P2TR (Taproot) address types via signTransaction or signRawPayload. Use when asked to "send BTC", "sign a Bitcoin transaction", "create a PSBT", "sign with taproot", "sign with segwit", "transfer bitcoin", or build anything on the Bitcoin blockchain.'
 compatibility: Requires Node.js. Install @turnkey/sdk-server, bitcoinjs-lib, ecpair, and tiny-secp256k1. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH (Bitcoin bech32 address), and BITCOIN_COMPRESSED_PUBLIC_KEY env vars.
+depends_on:
+  - turnkey-wallet-management
+  - turnkey-transaction-signing
 metadata:
   version: "1.0.0"
   tags: ["turnkey", "bitcoin", "signing", "psbt", "taproot", "segwit", "p2wpkh", "p2tr", "blockchain", "utxo"]

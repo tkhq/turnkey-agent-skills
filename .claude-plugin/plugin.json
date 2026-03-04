@@ -1,6 +1,6 @@
 {
   "name": "turnkey",
   "version": "1.0.0",
-  "description": "Reusable AI agent skills for Turnkey wallet operations: wallet management, transaction signing, EVM, and Solana.",
+  "description": "Reusable AI agent skills for Turnkey wallet operations: wallet management, transaction signing, EVM, Solana, and Bitcoin.",
   "skills": "./skills/"
 }

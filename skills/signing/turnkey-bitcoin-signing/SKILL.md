@@ -29,11 +29,13 @@ Turnkey provides two Bitcoin signing paths. **Pick one based on your needs:**
 | **Complexity** | lower — one API call signs the entire transaction | higher — you manage per-input hashing and signature injection |
 | **Recommendation** | **recommended** for most use cases | advanced — only when `signTransaction` doesn't support your use case |
 
-Both paths support **P2WPKH** (SegWit, `bc1q…`) and **P2TR** (Taproot, `bc1p…`) address types.
+Both paths support **P2WPKH** (SegWit) and **P2TR** (Taproot) address types on mainnet (`bc1q…` / `bc1p…`) and testnet (`tb1q…` / `tb1p…`).
 
 The wallet account must have been created with `CURVE_SECP256K1`. If you haven't created a wallet yet, read `skills/core/turnkey-wallet-management/SKILL.md` first. Bitcoin wallets require TWO accounts at the same derivation path:
-1. A Bitcoin address account (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR`) — this gives you the `SIGN_WITH` address
-2. A compressed public key account (`ADDRESS_FORMAT_COMPRESSED`) — this gives you `BITCOIN_COMPRESSED_PUBLIC_KEY`, needed for PSBT input construction
+1. A Bitcoin address account — this gives you the `SIGN_WITH` address
+   - Mainnet: `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` (path `m/84'/0'/0'/0/0`) or `ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR` (path `m/86'/0'/0'/0/0`)
+   - Testnet: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` (path `m/84'/1'/1'/0/0`) or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR` (path `m/86'/1'/1'/0/0`)
+2. A compressed public key account (`ADDRESS_FORMAT_COMPRESSED`) at the **same** path — this gives you `BITCOIN_COMPRESSED_PUBLIC_KEY`, needed for PSBT input construction
 
 ## Rules
 
@@ -44,7 +46,7 @@ The wallet account must have been created with `CURVE_SECP256K1`. If you haven't
 ## Prerequisites
 
 **Load first if you don't have a wallet address:**
-> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Bitcoin address (`ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `P2TR`) plus the `BITCOIN_COMPRESSED_PUBLIC_KEY` (`ADDRESS_FORMAT_COMPRESSED` at the same derivation path)
+> `skills/core/turnkey-wallet-management/SKILL.md` — create a wallet and get the `SIGN_WITH` Bitcoin address (testnet: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `_P2TR`; mainnet: `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` or `_P2TR`) plus the `BITCOIN_COMPRESSED_PUBLIC_KEY` (`ADDRESS_FORMAT_COMPRESSED` at the same derivation path)
 
 ```bash
 npm install @turnkey/sdk-server bitcoinjs-lib ecpair tiny-secp256k1
@@ -56,11 +58,11 @@ npm install @turnkey/sdk-server bitcoinjs-lib ecpair tiny-secp256k1
 TURNKEY_API_PUBLIC_KEY=         # Turnkey API key — public component (hex)
 TURNKEY_API_PRIVATE_KEY=        # Turnkey API key — private component (P-256 hex)
 TURNKEY_ORGANIZATION_ID=        # Turnkey organization UUID
-SIGN_WITH=                      # Bitcoin bech32 address (bc1q... for P2WPKH, bc1p... for P2TR)
+SIGN_WITH=                      # Bitcoin bech32 address (tb1q.../tb1p... testnet, bc1q.../bc1p... mainnet)
 BITCOIN_COMPRESSED_PUBLIC_KEY=  # Compressed public key (hex, from ADDRESS_FORMAT_COMPRESSED account)
 ```
 
-`SIGN_WITH` is the Bitcoin address derived when the wallet was created. Retrieve it using `getWalletAccounts` with `addressFormat === "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"` (or `P2TR`) — see `skills/core/turnkey-wallet-management/SKILL.md`.
+`SIGN_WITH` is the Bitcoin address derived when the wallet was created. Retrieve it using `getWalletAccounts` with the appropriate `addressFormat` (e.g., `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` for testnet SegWit) — see `skills/core/turnkey-wallet-management/SKILL.md`.
 
 `BITCOIN_COMPRESSED_PUBLIC_KEY` is the 33-byte compressed public key (hex) from the same wallet at the same derivation path, but with `addressFormat === "ADDRESS_FORMAT_COMPRESSED"`. It is needed to construct `witnessUtxo` payment scripts and (for Taproot) the `tapInternalKey`.
 

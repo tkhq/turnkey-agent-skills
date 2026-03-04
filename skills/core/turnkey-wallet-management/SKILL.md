@@ -146,9 +146,41 @@ console.log("Created wallet:", walletId, "Addresses:", addresses);
 |-------|---------|--------|-----------------|
 | Ethereum / EVM | `CURVE_SECP256K1` | `m/44'/60'/0'/0/0` | `ADDRESS_FORMAT_ETHEREUM` |
 | Solana | `CURVE_ED25519` | `m/44'/501'/0'/0'` | `ADDRESS_FORMAT_SOLANA` |
-| Bitcoin (SegWit) | `CURVE_SECP256K1` | `m/84'/0'/0'/0/0` | `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` |
-| Bitcoin (Taproot) | `CURVE_SECP256K1` | `m/86'/0'/0'/0/0` | `ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR` |
+| Bitcoin SegWit (mainnet) | `CURVE_SECP256K1` | `m/84'/0'/0'/0/0` | `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH` |
+| Bitcoin SegWit (testnet) | `CURVE_SECP256K1` | `m/84'/1'/1'/0/0` | `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` |
+| Bitcoin Taproot (mainnet) | `CURVE_SECP256K1` | `m/86'/0'/0'/0/0` | `ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR` |
+| Bitcoin Taproot (testnet) | `CURVE_SECP256K1` | `m/86'/1'/1'/0/0` | `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR` |
 | Cosmos | `CURVE_SECP256K1` | `m/44'/118'/0'/0/0` | `ADDRESS_FORMAT_COSMOS` |
+
+**Bitcoin requires two accounts at the same path.** When creating a Bitcoin wallet, you must derive a companion `ADDRESS_FORMAT_COMPRESSED` account at the same derivation path as the Bitcoin address account. This gives you the 33-byte compressed public key needed to construct PSBT inputs (witness scripts, `tapInternalKey`) during signing. Without it, signing will fail.
+
+```typescript
+// Bitcoin wallet creation — two accounts at the same path
+const btcPath = "m/84'/1'/1'/0/0"; // testnet SegWit (use m/84'/0'/0'/0/0 for mainnet)
+const btcAddressFormat = "ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH"; // or MAINNET, or P2TR variants
+
+const createResponse = await client.createWallet({
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  walletName: "Agent Wallet",
+  accounts: [
+    {
+      curve: "CURVE_SECP256K1",
+      pathFormat: "PATH_FORMAT_BIP32",
+      path: btcPath,
+      addressFormat: "ADDRESS_FORMAT_COMPRESSED", // compressed public key
+    },
+    {
+      curve: "CURVE_SECP256K1",
+      pathFormat: "PATH_FORMAT_BIP32",
+      path: btcPath,
+      addressFormat: btcAddressFormat, // Bitcoin address (tb1q... or bc1q...)
+    },
+  ],
+});
+
+const compressedPublicKey = createResponse.addresses[0]; // hex, for PSBT construction
+const bitcoinAddress = createResponse.addresses[1];      // bech32, for SIGN_WITH
+```
 
 ### Step 4: Retrieve wallet accounts
 
@@ -166,16 +198,27 @@ const ethAccount = accounts.find(
 const solanaAccount = accounts.find(
   (a) => a.addressFormat === "ADDRESS_FORMAT_SOLANA"
 );
+const btcAccount = accounts.find(
+  (a) => a.addressFormat === "ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH"
+    || a.addressFormat === "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"
+    || a.addressFormat === "ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR"
+    || a.addressFormat === "ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR"
+);
+const btcCompressedKey = accounts.find(
+  (a) => a.addressFormat === "ADDRESS_FORMAT_COMPRESSED"
+);
 
 console.log("ETH address:", ethAccount?.address);
 console.log("Solana address:", solanaAccount?.address);
+console.log("BTC address:", btcAccount?.address);
+console.log("BTC compressed public key:", btcCompressedKey?.address);
 ```
 
 ## Examples
 
 ### Full bootstrap flow
 
-For the complete end-to-end example (check for existing wallet → create if needed → derive ETH and Solana addresses), see `references/bootstrap-example.ts`.
+For the complete end-to-end example (check for existing wallet → create if needed → derive ETH, Solana, and Bitcoin addresses), see `references/bootstrap-example.ts`.
 
 ## Troubleshooting
 

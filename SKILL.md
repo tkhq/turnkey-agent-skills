@@ -34,6 +34,12 @@ Skills for AI agents that need to manage wallets and sign transactions using [Tu
 | Solana | `skills/signing/turnkey-solana-signing/SKILL.md` | signing or broadcasting on Solana |
 | Bitcoin | `skills/signing/turnkey-bitcoin-signing/SKILL.md` | signing or broadcasting on Bitcoin (P2WPKH SegWit or P2TR Taproot) |
 
+### Auth
+
+| Skill | Path | Use when… |
+|-------|------|-----------|
+| OTP Authentication | `skills/auth/turnkey-otp-auth/SKILL.md` | adding email OTP login, passwordless auth, or sub-organization user management |
+
 ### Meta
 
 | Skill | Path | Use when… |
@@ -60,10 +66,12 @@ Get credentials from the [Turnkey console](https://app.turnkey.com) under **Sett
 
 ## Skill Load Order
 
-For any signing task, load skills in this order:
+For **signing tasks**, load skills in this order:
 
 1. `skills/core/turnkey-wallet-management/SKILL.md` — create or retrieve a wallet and get the `SIGN_WITH` address
 2. `skills/core/turnkey-transaction-signing/SKILL.md` — understand the stamping model; required for raw payload signing
 3. Chain-specific skill — `turnkey-ethereum-evm`, `turnkey-solana-signing`, or `turnkey-bitcoin-signing`
 
-For wallet-only tasks (no signing), only step 1 is needed.
+For **wallet-only tasks** (no signing), only step 1 is needed.
+
+For **authentication tasks**, load `skills/auth/turnkey-otp-auth/SKILL.md` directly — it depends on wallet management internally.

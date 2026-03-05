@@ -22,14 +22,64 @@ Get these from the [Turnkey console](https://app.turnkey.com) under **Settings �
 
 ## Loading Skills
 
-**Claude Code** — reference any `SKILL.md` directly in your prompt:
+Each skill is a `SKILL.md` file — a structured prompt that teaches an AI agent how to perform a Turnkey operation. The root [`SKILL.md`](SKILL.md) is the master index: it lists every skill, explains when to use each one, and defines the load order for multi-step tasks.
+
+### Claude Code
+
+Install as a plugin so all skills are automatically discovered:
 ```
+/plugin marketplace add turnkey/turnkey-agent-skills
+/plugin install turnkey@turnkey-skills
+```
+
+Or reference skills directly in your prompt:
+```
+Please read SKILL.md and help me sign an Ethereum transaction.
 Please read skills/core/turnkey-wallet-management/SKILL.md and create a wallet for me.
 ```
 
-**OpenClaw** — copy skill directories into `~/.openclaw/workspace/skills/` and refresh the gateway. Each `SKILL.md` is automatically indexed.
+Point your agent at the root `SKILL.md` when you're not sure which skill you need — it will route to the right one.
 
-**OpenAI** — paste the contents of a `SKILL.md` into your assistant's system prompt, or upload it as a knowledge file in the Assistants API.
+### Codex
+
+Install all skills from GitHub:
+```
+npx add-skill turnkey/turnkey-agent-skills
+```
+
+Then invoke skills by name:
+```
+$turnkey-wallet-management
+$turnkey-ethereum-evm
+```
+
+### OpenClaw
+
+Install from ClawHub (when published):
+```
+clawhub install turnkey
+```
+
+Or copy skill directories manually:
+```bash
+cp -r skills/ ~/.openclaw/workspace/skills/
+```
+
+Each `SKILL.md` is automatically indexed by the OpenClaw gateway.
+
+### OpenAI Assistants
+
+Paste the contents of a `SKILL.md` into your assistant's system prompt, or upload it as a knowledge file in the Assistants API. For multi-skill tasks, include the root `SKILL.md` as context so the assistant knows the full skill set.
+
+### Skill load order
+
+For multi-step tasks, skills should be loaded in a specific order. The root [`SKILL.md`](SKILL.md) documents this in detail, but the summary is:
+
+- **Signing** — wallet management → transaction signing → chain-specific skill (e.g. `turnkey-ethereum-evm`)
+- **Wallet only** — just `turnkey-wallet-management`
+- **Authentication** — just `turnkey-otp-auth` (it depends on wallet management internally)
+
+Agents that load the root `SKILL.md` first will follow this order automatically.
 
 ## Skills
 

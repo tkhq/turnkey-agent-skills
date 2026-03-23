@@ -1,5 +1,13 @@
 # Solana Examples
 
+Complete examples for signing Solana transactions with `@turnkey/solana`.
+
+## Prerequisites
+
+```bash
+npm install @turnkey/sdk-server @turnkey/solana @solana/web3.js @solana/spl-token
+```
+
 ## SPL Token Transfer
 
 ```typescript

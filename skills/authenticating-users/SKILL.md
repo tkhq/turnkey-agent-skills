@@ -272,5 +272,4 @@ The user must always have at least one auth method. Removing the last method wil
 
 - `creating-wallets` for adding wallets to existing sub-organizations
 - `managing-policies` for access control within sub-organizations
-- `signing-ethereum` for signing transactions after authentication
-- `signing-solana` for Solana transaction signing
+- `signing-transactions` for signing and broadcasting transactions after authentication

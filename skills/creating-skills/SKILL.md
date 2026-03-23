@@ -20,7 +20,8 @@ To create a new skill, follow this workflow: Research, Draft, Validate, Evaluate
 
 Before writing anything, gather context about the Turnkey feature you are building a skill for.
 
-**Using Turnkey Docs MCP** (preferred):
+**Using Turnkey Docs MCP** (preferred, if available):
+Use the `Turnkey Docs:search_turnkey` tool to search Turnkey documentation:
 ```
 search_turnkey("wallets create HD")
 search_turnkey("policy rules allow deny")

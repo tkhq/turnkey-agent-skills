@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+
+# Generated eval artifacts (local output, not source)
+**/evals/trigger-results.json
+**/evals/loop-history.json
+**/evals/description-history.json
+**/evals/report.html

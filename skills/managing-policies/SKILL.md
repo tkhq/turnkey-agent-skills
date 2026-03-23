@@ -179,7 +179,5 @@ For complete, runnable TypeScript examples organized by use case, see [reference
 ## Related Skills
 
 - `creating-wallets` for wallet setup (policies govern wallet operations)
-- `signing-ethereum` for EVM transactions (policies govern signing)
-- `signing-solana` for Solana transactions
-- `signing-bitcoin` for Bitcoin transactions
+- `signing-transactions` for signing and broadcasting transactions (policies govern signing)
 - `authenticating-users` for user and sub-organization management

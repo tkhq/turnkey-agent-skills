@@ -1,0 +1,165 @@
+[
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send 0.01 ETH to 0xabc123 on Sepolia using viem",
+    "expected_behavior": [
+      "Uses @turnkey/viem createAccount",
+      "Creates a walletClient with sepolia chain",
+      "Calls sendTransaction with parseEther"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Transfer 100 USDC to 0xdef456 using ethers",
+    "expected_behavior": [
+      "Uses @turnkey/ethers TurnkeySigner",
+      "Creates ethers Contract with ERC-20 ABI",
+      "References ethers-examples.md or shows inline ethers code"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Sign an EIP-712 typed data message for a DeFi order",
+    "expected_behavior": [
+      "Uses walletClient.signTypedData with viem",
+      "Shows domain, types, and message structure",
+      "Uses correct EIP-712 format"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Sign a personal message with my Turnkey wallet",
+    "expected_behavior": [
+      "Uses signMessage with viem or ethers",
+      "Shows EIP-191 personal message signing",
+      "Mentions verification option"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Use @turnkey/solana to sign an Ethereum transaction",
+    "expected_behavior": [
+      "Corrects the user: @turnkey/solana is for Solana only",
+      "Recommends @turnkey/viem or @turnkey/ethers for Ethereum"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Use @turnkey/ethers to sign a Bitcoin transaction",
+    "expected_behavior": [
+      "Corrects the user: @turnkey/ethers is for EVM chains only",
+      "Recommends signTransaction or signRawPayload for Bitcoin",
+      "References bitcoin-examples.md"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send 10000 satoshis to a Bitcoin testnet address using SegWit",
+    "expected_behavior": [
+      "Uses signTransaction with TRANSACTION_TYPE_BITCOIN",
+      "Shows PSBT construction with bitcoinjs-lib",
+      "Includes UTXO handling and change output"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Sign a Bitcoin transaction using a Taproot address",
+    "expected_behavior": [
+      "Uses signRawPayload with HASH_FUNCTION_NO_OP",
+      "Shows Schnorr signature construction",
+      "Uses tapInternalKey and x-only public key"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send 0.5 SOL to a devnet address",
+    "expected_behavior": [
+      "Uses @turnkey/solana TurnkeySigner",
+      "Passes signing address explicitly to addSignature",
+      "Sets feePayer and recentBlockhash before signing"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Transfer SPL tokens to another wallet on Solana",
+    "expected_behavior": [
+      "Uses @turnkey/solana TurnkeySigner",
+      "Gets associated token addresses for sender and recipient",
+      "Uses createTransferInstruction from @solana/spl-token"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send 100 utia on Celestia testnet using CosmJS",
+    "expected_behavior": [
+      "Uses @turnkey/cosmjs TurnkeyDirectWallet",
+      "Initializes with prefix 'celestia'",
+      "Connects with SigningStargateClient",
+      "Uses sendTokens with denom 'utia'"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Transfer 0.001 SUI to another address on testnet",
+    "expected_behavior": [
+      "Uses signRawPayload with HASH_FUNCTION_NOT_APPLICABLE",
+      "Hashes with blake2b and messageWithIntent",
+      "Serializes ED25519 signature correctly"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send 0.015 TON to a recipient address",
+    "expected_behavior": [
+      "Uses WalletContractV4 from @ton/ton",
+      "Constructs signing message with beginCell",
+      "Signs with signRawPayload and HASH_FUNCTION_NOT_APPLICABLE"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Transfer 1 TRX on TRON testnet",
+    "expected_behavior": [
+      "Uses tronweb transactionBuilder.sendTrx",
+      "Signs with signRawPayload and HASH_FUNCTION_SHA256",
+      "Attaches r+s+v signature and broadcasts with sendRawTransaction"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send USDC on Base without paying gas using Turnkey paymaster",
+    "expected_behavior": [
+      "Uses ethSendTransaction with sponsor: true",
+      "Gets gasStationNonce via getNonces",
+      "Polls transaction status with getSendTransactionStatus"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Send a sponsored SPL token transfer on Solana",
+    "expected_behavior": [
+      "Uses solSendTransaction with sponsor: true",
+      "Builds VersionedTransaction with TransactionMessage",
+      "Serializes to hex and polls for status"
+    ]
+  },
+  {
+    "skills": ["creating-wallets", "signing-transactions"],
+    "query": "Create a Bitcoin wallet and send some BTC on testnet",
+    "expected_behavior": [
+      "Uses creating-wallets skill for wallet creation",
+      "Uses signing-transactions skill for the BTC send",
+      "Shows both wallet creation and signing flow"
+    ]
+  },
+  {
+    "skills": ["signing-transactions"],
+    "query": "Set up x402 payment flow with Turnkey to charge 0.01 USDC",
+    "expected_behavior": [
+      "Uses @turnkey/viem for signing",
+      "Signs EIP-3009 TransferWithAuthorization typed data",
+      "Encodes payment with x402 exact.evm.encodePayment",
+      "References x402-examples.md"
+    ]
+  }
+]

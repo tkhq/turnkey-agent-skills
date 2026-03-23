@@ -137,7 +137,5 @@ For complete examples including multi-chain wallet bootstrap and sub-org pattern
 
 ## Related Skills
 
-- `signing-ethereum` for signing transactions with derived Ethereum addresses
-- `signing-solana` for signing Solana transactions
-- `signing-bitcoin` for signing Bitcoin transactions
+- `signing-transactions` for signing and broadcasting transactions across all supported chains
 - `managing-policies` for setting access control on wallets

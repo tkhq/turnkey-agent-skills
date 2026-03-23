@@ -4,7 +4,7 @@ This walks through the full process of creating a new skill from scratch.
 
 ## Step 1: Study Existing Skills
 
-Read `skills/signing-solana/SKILL.md` since it is the closest pattern (single-chain signing skill). Note the structure: Quick Start, Prerequisites, Environment Variables, Instructions with code patterns, Rules, Related Skills. Note how the SKILL.md keeps code brief and delegates full examples to `references/solana-examples.md`.
+Read `skills/signing-transactions/SKILL.md` since it is the closest pattern (multi-chain signing skill). Note the structure: Quick Start, Prerequisites, Decision Tree, Common Initialization, Default Examples (viem), Quick Reference for Other Chains, Signing Methods Overview, Gotchas, Rules, Related Skills. Note how the SKILL.md keeps chain-specific code brief and delegates full examples to the `references/` directory.
 
 ## Step 2: Research
 

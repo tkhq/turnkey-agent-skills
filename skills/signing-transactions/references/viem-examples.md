@@ -1,5 +1,13 @@
 # viem Examples
 
+Complete examples for signing Ethereum/EVM transactions with `@turnkey/viem`.
+
+## Prerequisites
+
+```bash
+npm install @turnkey/sdk-server @turnkey/viem viem
+```
+
 ## Send ETH
 
 ```typescript
@@ -35,7 +43,7 @@ const hash = await walletClient.sendTransaction({
 console.log("TX hash:", hash);
 ```
 
-## Transfer ERC-20 tokens
+## Transfer ERC-20 Tokens
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -84,7 +92,7 @@ const hash = await walletClient.writeContract({
 console.log("TX hash:", hash);
 ```
 
-## Sign typed data (EIP-712)
+## Sign Typed Data (EIP-712)
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -134,7 +142,7 @@ const signature = await walletClient.signTypedData({
 console.log("EIP-712 signature:", signature);
 ```
 
-## Sign a message (EIP-191)
+## Sign a Message (EIP-191)
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -166,4 +174,27 @@ const signature = await walletClient.signMessage({
 });
 
 console.log("Signature:", signature);
+```
+
+## Handling Consensus (Multi-Party Approval)
+
+When a signing request requires consensus from multiple parties, the initial call throws a `TurnkeyActivityConsensusNeededError`. Poll the activity until it resolves:
+
+```typescript
+import { isTurnkeyActivityConsensusNeededError } from "@turnkey/viem";
+
+try {
+  const hash = await walletClient.sendTransaction({ to, value });
+} catch (error) {
+  if (isTurnkeyActivityConsensusNeededError(error)) {
+    const activityId = error.activityId;
+    // Poll activity status until consensus is reached
+    const activity = await turnkey.apiClient().getActivity({
+      organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+      activityId,
+    });
+    // Extract result once approved
+    const signature = getSignatureFromActivity(activity);
+  }
+}
 ```

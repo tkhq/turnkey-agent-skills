@@ -21,7 +21,7 @@ To create a new skill, follow these steps in order: Study, Research, Draft, Eval
 Before writing anything, read 1-2 existing skills to understand the pattern. Good references:
 
 - `skills/creating-wallets/SKILL.md` is the simplest skill (wallet CRUD)
-- `skills/signing-ethereum/SKILL.md` shows two-library support (ethers + viem)
+- `skills/signing-transactions/SKILL.md` shows multi-chain support with progressive disclosure
 - `skills/authenticating-users/SKILL.md` shows progressive disclosure across multiple auth methods
 
 Read the SKILL.md, one reference file, and the evals for whichever skill is closest to what you are building. This gives you the exact pattern to follow.
@@ -73,7 +73,7 @@ Use `llms-full.txt` only when you need to search across all docs at once (it is 
 mkdir -p skills/your-skill-name/{references,evals}
 ```
 
-Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-ethereum`, `managing-policies`).
+Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-transactions`, `managing-policies`).
 
 **3b. Write the SKILL.md frontmatter:**
 

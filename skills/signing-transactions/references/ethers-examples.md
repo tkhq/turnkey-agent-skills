@@ -1,5 +1,13 @@
 # ethers.js Examples
 
+Complete examples for signing Ethereum/EVM transactions with `@turnkey/ethers`.
+
+## Prerequisites
+
+```bash
+npm install @turnkey/sdk-server @turnkey/ethers ethers
+```
+
 ## Send ETH
 
 ```typescript
@@ -31,7 +39,7 @@ const receipt = await tx.wait();
 console.log("Confirmed in block:", receipt?.blockNumber);
 ```
 
-## Transfer ERC-20 tokens
+## Transfer ERC-20 Tokens
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -60,7 +68,7 @@ const tx = await usdc.transfer("0xRECIPIENT", ethers.parseUnits("10", 6));
 console.log("TX hash:", tx.hash);
 ```
 
-## Sign a message (EIP-191)
+## Sign a Message (EIP-191)
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";

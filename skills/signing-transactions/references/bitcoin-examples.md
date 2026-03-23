@@ -1,5 +1,13 @@
 # Bitcoin Examples
 
+Complete examples for signing Bitcoin transactions with Turnkey.
+
+## Prerequisites
+
+```bash
+npm install @turnkey/sdk-server bitcoinjs-lib ecpair tiny-secp256k1
+```
+
 ## P2WPKH (SegWit) with signTransaction
 
 The simplest approach. Turnkey handles PSBT construction and signing.

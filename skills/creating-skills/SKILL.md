@@ -37,21 +37,34 @@ Gather the specific information you need to write the skill:
 - Common patterns, gotchas, and required ordering of operations
 - What environment variables are needed
 
-**Using Turnkey Docs MCP** (preferred, if available):
-Use the `Turnkey Docs:search_turnkey` tool:
+**Research sources (use in this order):**
+
+**1. Turnkey Docs MCP** (fastest, if available):
+Use the `Turnkey Docs:search_turnkey` tool for targeted searches:
 ```
 search_turnkey("wallets create HD")
 search_turnkey("policy rules allow deny")
+search_turnkey("sign transaction ethereum")
 ```
 
-**Browsing Turnkey documentation directly:**
-- Fetch https://docs.turnkey.com/llms.txt for a full index of doc pages
-- Then fetch individual pages for detailed API reference (e.g., https://docs.turnkey.com/api-reference/activities/create-wallet)
+**2. Turnkey documentation website:**
+- Homepage: https://docs.turnkey.com/home
+- Index of all doc pages (599 lines, links only): https://docs.turnkey.com/llms.txt
+- Full documentation content (98K lines, complete text): https://docs.turnkey.com/llms-full.txt
 
-**Browsing the SDK** (for code examples):
-- Check `~/turnkey/sdk/packages/` for relevant packages
-- Read SDK examples in `~/turnkey/sdk/examples/`
+Start with `llms.txt` to find relevant pages, then fetch individual pages by appending `.md` to the URL path. For example, if `llms.txt` lists `https://docs.turnkey.com/api-reference/activities/create-wallet`, fetch `https://docs.turnkey.com/api-reference/activities/create-wallet.md` for the full content.
+
+Use `llms-full.txt` only when you need to search across all docs at once (it is very large).
+
+**3. Turnkey SDK** (for TypeScript code examples):
 - Public repo: https://github.com/tkhq/sdk
+- Local clone (if available): `~/turnkey/sdk/`
+- Key directories:
+  - `packages/` contains all SDK packages (`sdk-server`, `ethers`, `viem`, `solana`, `cosmjs`, etc.)
+  - `examples/` contains 70+ runnable examples organized by feature
+
+**4. Turnkey docs repo** (for raw documentation source):
+- https://github.com/tkhq/docs
 
 ### Step 3: Draft the Skill
 

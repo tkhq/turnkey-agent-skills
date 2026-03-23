@@ -8,10 +8,20 @@ Read `skills/signing-solana/SKILL.md` since it is the closest pattern (single-ch
 
 ## Step 2: Research
 
-Search Turnkey docs for Cosmos support:
+Search Turnkey docs for Cosmos support using available sources:
+
+**Option A: MCP tool (if available)**
 ```
 search_turnkey("Cosmos signing CosmJS")
 ```
+
+**Option B: Docs website**
+1. Fetch https://docs.turnkey.com/llms.txt and search for "cosmos"
+2. Find the relevant page (e.g., https://docs.turnkey.com/networks/cosmos)
+3. Fetch that page for full details
+
+**Option C: SDK repo**
+Check https://github.com/tkhq/sdk/tree/main/packages/cosmjs for the package source and README.
 
 Key findings from research:
 - Turnkey has a `@turnkey/cosmjs` package that provides a signer

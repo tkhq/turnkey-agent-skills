@@ -1,0 +1,19 @@
+{
+  "name": "turnkey-agent-skills",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent skills for Turnkey wallet infrastructure",
+  "license": "Apache-2.0",
+  "scripts": {
+    "validate": "tsx skills/creating-skills/scripts/validate.ts",
+    "eval": "tsx skills/creating-skills/scripts/eval-triggers.ts",
+    "eval:loop": "tsx skills/creating-skills/scripts/eval-loop.ts",
+    "report": "tsx skills/creating-skills/scripts/generate-report.ts"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

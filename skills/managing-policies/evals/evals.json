@@ -3,7 +3,7 @@
     "skills": ["managing-policies"],
     "query": "Create a policy that only allows ETH transfers to 0xabc and 0xdef",
     "expected_behavior": [
-      "Uses createPolicies API",
+      "Uses createPolicy or createPolicies API",
       "Sets effect to EFFECT_ALLOW",
       "Uses eth.tx.to condition with the specified addresses",
       "Includes a descriptive policyName"
@@ -13,8 +13,8 @@
     "skills": ["managing-policies"],
     "query": "Set up guardrails for my agent wallet so it can only interact with a specific Solana program",
     "expected_behavior": [
-      "Uses Solana-specific policy condition language",
-      "References solana.tx.instructions in the condition",
+      "Uses Solana-specific policy condition language (solana.tx)",
+      "References solana.tx.program_keys or solana.tx.instructions in the condition",
       "Scopes the consensus to the agent user ID"
     ]
   },
@@ -31,9 +31,27 @@
     "skills": ["managing-policies"],
     "query": "Block all transaction signing in my organization",
     "expected_behavior": [
-      "Creates a DENY policy for ACTIVITY_TYPE_SIGN_TRANSACTION",
+      "Creates a DENY policy targeting activity.action == 'SIGN'",
       "Warns about the impact of a blanket deny",
       "Suggests keeping an ALLOW escape path for admin users"
+    ]
+  },
+  {
+    "skills": ["managing-policies"],
+    "query": "Require two admins to approve any wallet export",
+    "expected_behavior": [
+      "Uses consensus with approvers.filter().count() >= 2",
+      "Condition targets activity.action == 'EXPORT'",
+      "Uses EFFECT_ALLOW with the multi-sig consensus"
+    ]
+  },
+  {
+    "skills": ["managing-policies"],
+    "query": "Cap Bitcoin transaction fees at 50000 satoshis",
+    "expected_behavior": [
+      "Creates a DENY policy",
+      "Uses bitcoin.tx.fee > 50000 as condition",
+      "Notes that values are in satoshis"
     ]
   }
 ]

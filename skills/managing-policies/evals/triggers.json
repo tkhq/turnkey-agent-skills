@@ -1,14 +1,29 @@
 {
   "should_trigger": [
-    "Add a spending limit of 1 ETH per day to my agent wallet",
-    "Create a policy that only allows transfers to whitelisted addresses",
+    "Create a policy that only allows ETH transfers to whitelisted addresses",
     "Set up guardrails so my agent can only send to approved addresses",
-    "List all policies in my Turnkey organization"
+    "Add a spending limit of 1 ETH per transaction",
+    "List all policies in my Turnkey organization",
+    "Require two users to approve signing transactions",
+    "Lock down signing to only my agent user",
+    "Block all transaction signing except for testnet",
+    "Set up an address allowlist for my wallet",
+    "Create a deny policy to prevent large transfers",
+    "Write a policy that restricts Bitcoin transaction fees",
+    "I need access control for who can create wallets",
+    "Help me set up multi-sig approval for policies",
+    "Delete a policy from my organization",
+    "Restrict my Solana wallet to only use the SPL Token program",
+    "Create a Turnkey policy to cap gas fees"
   ],
   "should_not_trigger": [
     "Create a wallet for my agent",
-    "Send ETH to this address",
-    "Add Google OAuth login",
-    "Sign a Solana transaction"
+    "Send 0.1 ETH to this address",
+    "Sign a Solana transaction",
+    "Add Google OAuth login to my app",
+    "How do I derive a Bitcoin address?",
+    "Deploy a smart contract on Ethereum",
+    "Set up email authentication for users",
+    "What chains does Turnkey support for wallets?"
   ]
 }

@@ -101,3 +101,10 @@ For complete examples including multi-chain wallet bootstrap, see [references/wa
 - Always specify both `curve` and `addressFormat` for each account
 - Use standard BIP-44 derivation paths for each chain
 - Wallet names should be descriptive and unique within the organization
+
+## Related Skills
+
+- `signing-ethereum` for signing transactions with derived Ethereum addresses
+- `signing-solana` for signing Solana transactions
+- `signing-bitcoin` for signing Bitcoin transactions
+- `managing-policies` for setting access control on wallets

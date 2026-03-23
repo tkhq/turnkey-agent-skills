@@ -1,0 +1,14 @@
+{
+  "should_trigger": [
+    "Add a spending limit of 1 ETH per day to my agent wallet",
+    "Create a policy that only allows transfers to whitelisted addresses",
+    "Set up guardrails so my agent can only send to approved addresses",
+    "List all policies in my Turnkey organization"
+  ],
+  "should_not_trigger": [
+    "Create a wallet for my agent",
+    "Send ETH to this address",
+    "Add Google OAuth login",
+    "Sign a Solana transaction"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "should_trigger": [
+    "Create a wallet that supports Ethereum and Solana",
+    "I need a blockchain address to receive payments",
+    "Set up an HD wallet with Turnkey",
+    "How do I derive a Bitcoin address from my wallet?",
+    "List all my existing wallets"
+  ],
+  "should_not_trigger": [
+    "Sign a transaction on Ethereum",
+    "Add Google OAuth login to my app",
+    "Create a spending limit policy for my wallet",
+    "Send 0.01 ETH to this address"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "should_trigger": [
+    "Add email OTP login to my app using Turnkey",
+    "Set up Google OAuth authentication",
+    "Implement passkey signup with Turnkey",
+    "How do I authenticate users with Turnkey?"
+  ],
+  "should_not_trigger": [
+    "Create a wallet for Ethereum",
+    "Sign a transaction on Solana",
+    "Add a spending limit policy",
+    "What is Turnkey's policy engine?"
+  ]
+}

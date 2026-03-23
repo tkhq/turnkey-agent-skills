@@ -1,0 +1,36 @@
+[
+  {
+    "skills": ["your-skill-name"],
+    "query": "A realistic user request that exercises the happy path",
+    "expected_behavior": [
+      "Uses the correct Turnkey SDK method",
+      "Handles the response correctly",
+      "Follows the documented pattern"
+    ]
+  },
+  {
+    "skills": ["your-skill-name"],
+    "query": "An edge case or unusual but valid request",
+    "expected_behavior": [
+      "Handles the edge case gracefully",
+      "Still produces correct output"
+    ]
+  },
+  {
+    "skills": ["your-skill-name"],
+    "query": "A request using the wrong approach that should be corrected",
+    "expected_behavior": [
+      "Corrects the user's approach",
+      "Recommends the right method",
+      "Explains why"
+    ]
+  },
+  {
+    "skills": ["your-skill-name", "another-skill"],
+    "query": "A request that involves this skill plus another",
+    "expected_behavior": [
+      "Coordinates between both skills correctly",
+      "Produces the expected combined output"
+    ]
+  }
+]

@@ -1,0 +1,49 @@
+[
+  {
+    "skills": ["authenticating-users"],
+    "query": "Add email OTP login to my application using Turnkey",
+    "expected_behavior": [
+      "Uses initOtpAuth to send the OTP",
+      "Uses otpAuth to verify the code",
+      "Includes targetPublicKey for session creation",
+      "Mentions sub-organization creation for new users"
+    ]
+  },
+  {
+    "skills": ["authenticating-users"],
+    "query": "Set up Google OAuth login with Turnkey",
+    "expected_behavior": [
+      "Uses the oauth API method with oidcToken",
+      "Explains that the ID token comes from Google Sign-In",
+      "Handles both new user signup and returning user login"
+    ]
+  },
+  {
+    "skills": ["authenticating-users"],
+    "query": "Implement passkey signup that creates a wallet for the user",
+    "expected_behavior": [
+      "Uses createSubOrganization with authenticators array",
+      "Includes WebAuthn attestation fields",
+      "Creates a wallet as part of sub-org creation",
+      "Mentions the browser WebAuthn API for credential creation"
+    ]
+  },
+  {
+    "skills": ["authenticating-users"],
+    "query": "Use Firebase Auth with Turnkey for login",
+    "expected_behavior": [
+      "Explains that Turnkey has native auth methods (OTP, OAuth, passkeys)",
+      "Recommends using Turnkey's built-in OAuth which accepts standard OIDC tokens",
+      "Shows how Firebase ID tokens can be used with Turnkey's oauth endpoint"
+    ]
+  },
+  {
+    "skills": ["authenticating-users"],
+    "query": "Add both email OTP and Google login to my app, and create a wallet for each user",
+    "expected_behavior": [
+      "Shows both OTP and OAuth flows",
+      "Creates sub-organization with wallet for new users",
+      "Handles the case where a user might use different auth methods"
+    ]
+  }
+]

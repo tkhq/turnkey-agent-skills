@@ -4,12 +4,19 @@
     "I need a blockchain address to receive payments",
     "Set up an HD wallet with Turnkey",
     "How do I derive a Bitcoin address from my wallet?",
-    "List all my existing wallets"
+    "List all my existing wallets",
+    "Make a new wallet for my application",
+    "I want to add a TON address to my existing wallet",
+    "Set up wallets for my users using sub-organizations",
+    "Generate an Ethereum address",
+    "Create a multi-chain wallet with Bitcoin and Cosmos"
   ],
   "should_not_trigger": [
     "Sign a transaction on Ethereum",
     "Add Google OAuth login to my app",
     "Create a spending limit policy for my wallet",
-    "Send 0.01 ETH to this address"
+    "Send 0.01 ETH to this address",
+    "How do I export my wallet's private key?",
+    "Set up email authentication for users"
   ]
 }

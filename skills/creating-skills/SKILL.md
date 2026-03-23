@@ -164,27 +164,107 @@ Fix any errors before proceeding. Warnings are advisory but should be addressed.
 
 ### Step 6: Evaluate Triggers
 
+Ensure `.claude/commands/` exists in the project root:
 ```bash
-npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill your-skill-name
+mkdir -p .claude/commands
 ```
 
-Target: 90%+ accuracy on should_trigger, 0% false positives on should_not_trigger.
+#### 6a. Test individual queries (fast iteration)
 
-If accuracy is below 90%, run the improvement loop:
-
-```bash
-npx tsx skills/creating-skills/scripts/eval-loop.ts --skill your-skill-name --max-iterations 5
-```
-
-This iteratively refines the description using LLM feedback, then re-evaluates.
-
-### Step 7: Generate Report and Finalize
+Use `test-one.py` to test a single query at a time (~5s per run, ~15s for 3 runs). This is the primary tool for iterating on a skill description:
 
 ```bash
-npx tsx skills/creating-skills/scripts/generate-report.ts --skill your-skill-name
+# Test one query, 3 runs with majority vote (~15s)
+python3 skills/creating-skills/scripts/test-one.py "Create a wallet" skills/your-skill-name --expect true
+
+# Quick single run for rapid feedback (~5s)
+python3 skills/creating-skills/scripts/test-one.py "Create a wallet" skills/your-skill-name --expect true --runs 1
+
+# Test a should-not-trigger query
+python3 skills/creating-skills/scripts/test-one.py "Sign a transaction" skills/your-skill-name --expect false
 ```
 
-Review the HTML report. If everything passes, run the checklist below.
+The script creates a temporary slash command, runs `claude -p` with streaming detection, and kills the process as soon as triggering is confirmed. No waiting for the full session to complete.
+
+**Iteration workflow:**
+1. Run a failing query with `--runs 1` to confirm the failure (~5s)
+2. Edit the SKILL.md description
+3. Re-run the same query to check if it passes now
+4. Once it passes at `--runs 1`, confirm with `--runs 3` for stability
+5. Move to the next failing query
+
+#### 6b. Run all triggers at once
+
+Run every query from triggers.json sequentially with `--runs 1` for a full sweep (~5s per query):
+
+```bash
+# should_trigger queries
+python3 skills/creating-skills/scripts/test-one.py "query 1" skills/<name> --expect true --runs 1
+python3 skills/creating-skills/scripts/test-one.py "query 2" skills/<name> --expect true --runs 1
+# ... repeat for each query in triggers.json
+
+# should_not_trigger queries
+python3 skills/creating-skills/scripts/test-one.py "query 1" skills/<name> --expect false --runs 1
+```
+
+should_not_trigger queries that hit the 30s timeout without triggering are working correctly. The timeout is the expected behavior for negative cases.
+
+#### 6c. Full evaluation with Anthropic's eval suite
+
+For a final comprehensive check, use Anthropic's `run_eval.py` with multiple runs per query:
+
+```bash
+# Convert triggers.json to Anthropic eval format
+python3 -c "
+import json
+with open('skills/<name>/evals/triggers.json') as f:
+    data = json.load(f)
+eval_set = []
+for q in data['should_trigger']:
+    eval_set.append({'query': q, 'should_trigger': True})
+for q in data['should_not_trigger']:
+    eval_set.append({'query': q, 'should_trigger': False})
+with open('/tmp/<name>-evalset.json', 'w') as f:
+    json.dump(eval_set, f, indent=2)
+"
+
+# Run full eval (3 runs per query, 2 parallel workers)
+PYTHONPATH=~/turnkey/skills/skills/skill-creator python3 \
+  ~/turnkey/skills/skills/skill-creator/scripts/run_eval.py \
+  --eval-set /tmp/<name>-evalset.json \
+  --skill-path skills/<name> \
+  --num-workers 2 \
+  --timeout 30 \
+  --runs-per-query 3 \
+  --verbose
+```
+
+#### 6d. LLM-powered description improvement
+
+If trigger accuracy is low, generate an improved description from the eval failures:
+
+```bash
+PYTHONPATH=~/turnkey/skills/skills/skill-creator python3 \
+  ~/turnkey/skills/skills/skill-creator/scripts/improve_description.py \
+  --eval-results /tmp/<name>-eval-results.json \
+  --skill-path skills/<name> \
+  --model sonnet \
+  --verbose
+```
+
+Always re-eval after applying the improved description. The LLM suggestion does not always outperform the original. Keep whichever scores higher.
+
+#### Trigger evaluation guidelines
+
+- Start with `test-one.py --runs 1` for fast iteration, then confirm with `--runs 3` once queries pass.
+- Use `--num-workers 2` in the full eval to avoid contention with parallel Claude sessions.
+- Single runs have high variance. A query that fails 1 run may pass the next. Use 3 runs minimum for any final judgment.
+- Explicit trigger phrases in the description ("Use when asked to 'create a wallet'") perform as well or better than abstract phrasing ("Use for any task involving wallet creation").
+- Cross-reference all blockchain network names, address formats, curves, and derivation paths against the official Turnkey docs at `docs/concepts/wallets.mdx` before publishing. The SDK docs table is the source of truth.
+
+### Step 7: Finalize
+
+Review the eval results. If everything passes, run the checklist below.
 
 ## Rules
 
@@ -211,5 +291,6 @@ Before considering a skill complete:
 - [ ] evals/evals.json has 4+ evals (happy path, edge case, adversarial, cross-skill)
 - [ ] evals/triggers.json has 3+ should_trigger and 3+ should_not_trigger
 - [ ] `npx tsx skills/creating-skills/scripts/validate.ts skills/<name>` passes
-- [ ] Trigger accuracy is 90%+
+- [ ] All triggers pass with `test-one.py --runs 3`
+- [ ] No false positives on should_not_trigger queries
 - [ ] No code duplication between SKILL.md and references

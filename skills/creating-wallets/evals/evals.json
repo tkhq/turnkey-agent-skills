@@ -37,5 +37,25 @@
       "Uses CURVE_SECP256K1 with ADDRESS_FORMAT_COSMOS",
       "Uses the correct derivation path m/44'/118'/0'/0/0"
     ]
+  },
+  {
+    "skills": ["creating-wallets"],
+    "query": "Set up wallets for my end users, each user should have their own Ethereum wallet",
+    "expected_behavior": [
+      "Recommends sub-organization model (one sub-org per user)",
+      "Uses createSubOrganization with wallet parameter",
+      "Includes rootUsers configuration",
+      "Uses ADDRESS_FORMAT_ETHEREUM for the wallet accounts"
+    ]
+  },
+  {
+    "skills": ["creating-wallets"],
+    "query": "Create a wallet with a TON and XRP address",
+    "expected_behavior": [
+      "Checks for existing wallets first",
+      "Uses CURVE_ED25519 with ADDRESS_FORMAT_TON_V4R2 for TON",
+      "Uses CURVE_SECP256K1 with ADDRESS_FORMAT_XRP for XRP",
+      "Uses correct derivation paths for both chains"
+    ]
   }
 ]

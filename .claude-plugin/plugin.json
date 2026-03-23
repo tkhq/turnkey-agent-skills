@@ -1,0 +1,5 @@
+{
+  "name": "turnkey-skills",
+  "description": "Agent skills for Turnkey wallet infrastructure: create wallets, sign transactions, manage policies, and authenticate users across Ethereum, Solana, Bitcoin, and more.",
+  "version": "1.0.0"
+}

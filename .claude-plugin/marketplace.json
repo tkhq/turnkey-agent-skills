@@ -1,0 +1,20 @@
+{
+  "name": "turnkey-agent-skills",
+  "owner": {
+    "name": "Turnkey",
+    "email": "support@turnkey.com"
+  },
+  "metadata": {
+    "description": "Agent skills for Turnkey wallet infrastructure"
+  },
+  "plugins": [
+    {
+      "name": "turnkey-skills",
+      "source": ".",
+      "description": "Agent skills for Turnkey wallet infrastructure: create wallets, sign transactions, manage policies, and authenticate users across Ethereum, Solana, Bitcoin, and more.",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "keywords": ["turnkey", "wallet", "blockchain", "signing", "web3", "ethereum", "solana", "bitcoin", "authentication", "policy"]
+    }
+  ]
+}

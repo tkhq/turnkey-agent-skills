@@ -1,10 +1,6 @@
 ---
-# REQUIRED: kebab-case, max 64 chars, must match directory name
 name: your-skill-name
-# REQUIRED: third person, max 1024 chars
-# Structure: [What it does] + [When to use it] + [Trigger phrases]
-description: "Describe what this skill does using Turnkey's APIs. Use when asked to 'trigger phrase 1', 'trigger phrase 2', or 'trigger phrase 3'."
-# OPTIONAL
+description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
 compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
 metadata:
@@ -16,7 +12,7 @@ metadata:
 
 ## Quick Start
 
-One paragraph: the simplest way to accomplish this skill's task.
+One sentence: the simplest way to accomplish this skill's task.
 
 ## Prerequisites
 
@@ -34,7 +30,7 @@ TURNKEY_ORGANIZATION_ID=   # required
 
 ## Instructions
 
-### Step 1: Set up the Turnkey client
+### Step 1: Initialize the Turnkey client
 
 ```typescript
 import { Turnkey } from "@turnkey/sdk-server";
@@ -45,11 +41,13 @@ const turnkey = new Turnkey({
   apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
   defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
+
+const client = turnkey.apiClient();
 ```
 
 ### Step 2: Perform the action
 
-Brief code pattern here. Delegate full examples to references.
+Brief code pattern here (10-15 lines max). Delegate full examples to references.
 
 For complete examples, see [references/examples.md](references/examples.md).
 

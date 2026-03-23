@@ -1,0 +1,14 @@
+{
+  "should_trigger": [
+    "Send 10000 satoshis to a Bitcoin testnet address",
+    "Sign a Bitcoin PSBT using Taproot",
+    "Build a P2WPKH SegWit transaction with Turnkey",
+    "Transfer bitcoin to this address"
+  ],
+  "should_not_trigger": [
+    "Send ETH on Ethereum",
+    "Create a Bitcoin wallet",
+    "Transfer SOL on Solana",
+    "Set up a Bitcoin spending policy"
+  ]
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "skills": ["signing-bitcoin"],
+    "query": "Send 10000 satoshis to a Bitcoin testnet address using SegWit",
+    "expected_behavior": [
+      "Uses signTransaction API for the simple P2WPKH path",
+      "Builds a PSBT with proper UTXO inputs",
+      "Includes change output back to sender",
+      "Accounts for transaction fees"
+    ]
+  },
+  {
+    "skills": ["signing-bitcoin"],
+    "query": "Sign a Bitcoin transaction using a Taproot address",
+    "expected_behavior": [
+      "Uses signRawPayload for P2TR Taproot signing",
+      "Initializes ecc library with bitcoin.initEccLib",
+      "Uses the internal public key (x-only, 32 bytes)",
+      "Produces a Schnorr signature"
+    ]
+  },
+  {
+    "skills": ["signing-bitcoin"],
+    "query": "Use @turnkey/ethers to sign a Bitcoin transaction",
+    "expected_behavior": [
+      "Corrects the user: @turnkey/ethers is for Ethereum, not Bitcoin",
+      "Recommends using @turnkey/sdk-server signTransaction or signRawPayload",
+      "Provides the correct Bitcoin signing pattern"
+    ]
+  },
+  {
+    "skills": ["creating-wallets", "signing-bitcoin"],
+    "query": "Create a Bitcoin wallet and send some BTC on testnet",
+    "expected_behavior": [
+      "Creates a wallet with ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH",
+      "Uses the derived address as SIGN_WITH",
+      "Signs and broadcasts a testnet transaction"
+    ]
+  }
+]

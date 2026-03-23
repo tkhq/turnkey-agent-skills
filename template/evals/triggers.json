@@ -1,0 +1,12 @@
+{
+  "should_trigger": [
+    "Direct request using primary keywords for this skill",
+    "Paraphrased request using synonyms",
+    "Domain-specific request with technical terms"
+  ],
+  "should_not_trigger": [
+    "Request for a completely different domain",
+    "Request that belongs to a different Turnkey skill",
+    "Generic programming question unrelated to Turnkey"
+  ]
+}

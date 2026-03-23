@@ -1,0 +1,39 @@
+[
+  {
+    "skills": ["managing-policies"],
+    "query": "Create a policy that only allows ETH transfers to 0xabc and 0xdef",
+    "expected_behavior": [
+      "Uses createPolicies API",
+      "Sets effect to EFFECT_ALLOW",
+      "Uses eth.tx.to condition with the specified addresses",
+      "Includes a descriptive policyName"
+    ]
+  },
+  {
+    "skills": ["managing-policies"],
+    "query": "Set up guardrails for my agent wallet so it can only interact with a specific Solana program",
+    "expected_behavior": [
+      "Uses Solana-specific policy condition language",
+      "References solana.tx.instructions in the condition",
+      "Scopes the consensus to the agent user ID"
+    ]
+  },
+  {
+    "skills": ["managing-policies"],
+    "query": "List all policies in my organization and delete the one named test-policy",
+    "expected_behavior": [
+      "Calls getPolicies to list policies",
+      "Finds the policy by name",
+      "Calls deletePolicy with the correct policyId"
+    ]
+  },
+  {
+    "skills": ["managing-policies"],
+    "query": "Block all transaction signing in my organization",
+    "expected_behavior": [
+      "Creates a DENY policy for ACTIVITY_TYPE_SIGN_TRANSACTION",
+      "Warns about the impact of a blanket deny",
+      "Suggests keeping an ALLOW escape path for admin users"
+    ]
+  }
+]

@@ -78,17 +78,22 @@ function testTrigger(
         "--output-format", "stream-json",
         "--verbose",
       ],
-      { stdio: ["pipe", "pipe", "ignore"] }
+      { stdio: ["pipe", "pipe", "pipe"] }
     );
 
     let found = false;
     let buffer = "";
+    let stderrOutput = "";
     const timeout = setTimeout(() => {
       if (!found) {
         proc.kill("SIGTERM");
         resolve(false);
       }
     }, 30000);
+
+    proc.stderr.on("data", (chunk: Buffer) => {
+      stderrOutput += chunk.toString();
+    });
 
     proc.stdout.on("data", (chunk: Buffer) => {
       if (found) return;
@@ -100,6 +105,15 @@ function testTrigger(
         if (!line.trim()) continue;
         try {
           const event = JSON.parse(line);
+          // Detect authentication errors early
+          if (event.error === "authentication_failed" || event.is_error) {
+            console.error(`Auth error for query "${query}": ${event.result || event.error}`);
+            found = false;
+            clearTimeout(timeout);
+            proc.kill("SIGTERM");
+            resolve(false);
+            return;
+          }
           if (event.type === "assistant" && event.message?.content) {
             const content = Array.isArray(event.message.content)
               ? event.message.content
@@ -125,16 +139,20 @@ function testTrigger(
       }
     });
 
-    proc.on("close", () => {
+    proc.on("close", (code) => {
       if (!found) {
         clearTimeout(timeout);
+        if (stderrOutput.trim()) {
+          console.error(`stderr for query "${query}": ${stderrOutput.trim().substring(0, 200)}`);
+        }
         resolve(false);
       }
     });
 
-    proc.on("error", () => {
+    proc.on("error", (err) => {
       if (!found) {
         clearTimeout(timeout);
+        console.error(`Process error for query "${query}": ${err.message}`);
         resolve(false);
       }
     });

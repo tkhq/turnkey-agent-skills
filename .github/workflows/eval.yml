@@ -44,11 +44,20 @@ jobs:
         with:
           node-version: "20"
       - run: npm ci
+      - name: Check API key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY secret is not set. Add it in repo Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: Install Claude CLI
         run: npm install -g @anthropic-ai/claude-code
       - name: Run trigger eval
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISABLE_INTERACTIVITY: "1"
         run: npm run eval -- --skill ${{ matrix.skill }} --threshold 90 --concurrency 4
       - name: Upload results
         if: always()

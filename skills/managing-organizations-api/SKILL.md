@@ -25,7 +25,7 @@ The parent organization can create and delete sub-orgs, but cannot access resour
 
 ## Instructions
 
-### Step 1: Check current organization config
+### Check current organization config
 
 Before modifying quorum or features, always check the current state.
 
@@ -41,7 +41,7 @@ POST https://api.turnkey.com/public/v1/query/get_configs
 
 Returns the current quorum settings (threshold, user IDs) and enabled features.
 
-### Step 2: Create a sub-organization
+### Create a sub-organization
 
 Creates a sub-org with root users and optional wallets in a single atomic call.
 
@@ -74,7 +74,7 @@ POST https://api.turnkey.com/public/v1/submit/create_sub_organization
 
 You can also include a `wallet` field to atomically create a wallet with the sub-org. See [references/sub-organization-examples.md](references/sub-organization-examples.md) for wallet creation and multi-root-user patterns.
 
-### Step 3: List sub-organizations
+### List sub-organizations
 
 ```
 POST https://api.turnkey.com/public/v1/query/get_sub_organizations
@@ -107,7 +107,7 @@ POST https://api.turnkey.com/public/v1/query/get_verified_sub_organizations
 }
 ```
 
-### Step 4: Update organization name
+### Update organization name
 
 ```
 POST https://api.turnkey.com/public/v1/submit/update_organization_name
@@ -124,7 +124,7 @@ POST https://api.turnkey.com/public/v1/submit/update_organization_name
 }
 ```
 
-### Step 5: Delete a sub-organization
+### Delete a sub-organization
 
 ```
 POST https://api.turnkey.com/public/v1/submit/delete_sub_organization
@@ -143,7 +143,7 @@ POST https://api.turnkey.com/public/v1/submit/delete_sub_organization
 
 Set `deleteWithoutExport` to `true` to force deletion even if wallets/private keys have not been exported. Defaults to `false` (deletion blocked until export).
 
-### Step 6: Manage root quorum (HIGH STAKES)
+### Manage root quorum (HIGH STAKES)
 
 The root quorum defines which users can perform root-level operations and how many must approve. Root quorum users bypass all policies.
 
@@ -165,7 +165,7 @@ POST https://api.turnkey.com/public/v1/submit/update_root_quorum
 
 CRITICAL: Always ensure `threshold` is less than or equal to the number of `userIds`. Setting threshold higher than the number of root users locks you out permanently.
 
-### Step 7: Set or remove organization features
+### Set or remove organization features
 
 Organization features enable capabilities like email auth, OTP, webhooks, and WebAuthn origins. Setting or removing features requires root quorum approval.
 

@@ -43,7 +43,7 @@ Requires API credentials configured via the managing-users-api skill. All reques
 
 ## Instructions
 
-### Step 1: Check for existing private keys
+### List private keys
 
 ```
 POST /public/v1/query/list_private_keys
@@ -55,7 +55,7 @@ POST /public/v1/query/list_private_keys
 
 Returns a `privateKeys` array. Each entry includes `privateKeyId`, `privateKeyName`, `curve`, `addresses`, `privateKeyTags`, and timestamps.
 
-### Step 2: Create private keys
+### Create private keys
 
 Create one or more standalone keys in a single call:
 
@@ -100,7 +100,7 @@ For testnet Bitcoin, use `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `ADDRESS_FOR
 For TON variants, options include `ADDRESS_FORMAT_TON_V3R2` and `ADDRESS_FORMAT_TON_V5R1`.
 You can specify multiple `addressFormats` per key to get addresses in multiple formats from the same key.
 
-### Step 3: Get a single private key
+### Get a single private key
 
 ```
 POST /public/v1/query/get_private_key
@@ -112,7 +112,7 @@ POST /public/v1/query/get_private_key
 }
 ```
 
-### Step 4: Delete private keys
+### Delete private keys
 
 ```
 POST /public/v1/submit/delete_private_keys
@@ -127,7 +127,7 @@ POST /public/v1/submit/delete_private_keys
 
 Set `deleteWithoutExport` to `true` to delete keys that have not been exported. If the key has already been exported, this field is ignored.
 
-### Step 5: Export a private key
+### Export a private key
 
 Export uses an encrypted channel so the key material never leaves the secure enclave unencrypted.
 
@@ -148,7 +148,7 @@ The response contains an encrypted `exportBundle`.
 
 **2. Client-side: decrypt the export bundle using HPKE with your local private key.** The decrypted result is the raw private key material in hexadecimal format. For Solana keys, the format is a 64-byte array containing both private and public key bytes.
 
-### Step 6: Import a private key
+### Import a private key
 
 Import encrypts the key client-side before sending it to the secure enclave.
 
@@ -184,7 +184,7 @@ POST /public/v1/submit/import_private_key
 }
 ```
 
-### Step 7: Manage private key tags
+### Manage private key tags
 
 Tags group private keys for policy targeting. Tags let you write policies like `private_key.tags.contains('hot-wallet')` to control which keys can sign what. Without tags, you must reference keys by individual ID in every policy rule.
 

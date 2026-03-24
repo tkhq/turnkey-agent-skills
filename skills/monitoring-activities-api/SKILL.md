@@ -49,7 +49,7 @@ If you retry a request with identical parameters, Turnkey returns the existing a
 
 ## Instructions
 
-### Step 1: Get activity details
+### Get activity details
 
 ```
 POST https://api.turnkey.com/public/v1/query/get_activity
@@ -64,7 +64,7 @@ POST https://api.turnkey.com/public/v1/query/get_activity
 
 Returns the full activity object including status, type, intent, result, votes, and timestamps.
 
-### Step 2: List activities
+### List activities
 
 ```
 POST https://api.turnkey.com/public/v1/query/list_activities
@@ -85,7 +85,7 @@ POST https://api.turnkey.com/public/v1/query/list_activities
 
 All filter fields are optional. `filterByStatus` and `filterByType` accept arrays.
 
-### Step 3: Approve a pending activity
+### Approve a pending activity
 
 ```
 POST https://api.turnkey.com/public/v1/submit/approve_activity
@@ -104,7 +104,7 @@ POST https://api.turnkey.com/public/v1/submit/approve_activity
 
 The `fingerprint` is the fingerprint of the original activity that needs approval, not a new fingerprint. You can find it in the activity object returned by `get_activity` or `list_activities`.
 
-### Step 4: Reject a pending activity
+### Reject a pending activity
 
 ```
 POST https://api.turnkey.com/public/v1/submit/reject_activity
@@ -123,7 +123,7 @@ POST https://api.turnkey.com/public/v1/submit/reject_activity
 
 Rejection is permanent. Once rejected, the activity cannot be approved.
 
-### Step 5: List app proofs for audit
+### List app proofs for audit
 
 ```
 POST https://api.turnkey.com/public/v1/query/list_app_proofs

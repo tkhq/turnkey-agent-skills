@@ -70,7 +70,7 @@ DENY always wins over ALLOW.
 
 ## Instructions
 
-### Step 1: Create a policy
+### Create a policy
 
 ```
 POST https://api.turnkey.com/public/v1/submit/create_policy
@@ -101,7 +101,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
 }
 ```
 
-### Step 2: List policies
+### List policies
 
 ```
 POST https://api.turnkey.com/public/v1/query/list_policies
@@ -111,7 +111,7 @@ POST https://api.turnkey.com/public/v1/query/list_policies
 {}
 ```
 
-### Step 3: Get policy details
+### Get policy details
 
 ```
 POST https://api.turnkey.com/public/v1/query/get_policy
@@ -123,7 +123,7 @@ POST https://api.turnkey.com/public/v1/query/get_policy
 }
 ```
 
-### Step 4: Update a policy
+### Update a policy
 
 ```
 POST https://api.turnkey.com/public/v1/submit/update_policy
@@ -140,7 +140,7 @@ POST https://api.turnkey.com/public/v1/submit/update_policy
 }
 ```
 
-### Step 5: Delete a policy
+### Delete a policy
 
 ```
 POST https://api.turnkey.com/public/v1/submit/delete_policy
@@ -164,7 +164,7 @@ POST https://api.turnkey.com/public/v1/submit/delete_policies
 }
 ```
 
-### Step 6: Debug denied transactions with policy evaluations
+### Debug denied transactions with policy evaluations
 
 When a signing request is denied, use this endpoint to see exactly which policy denied it and why. Pass the activity ID from the denied request to get the evaluation trace.
 

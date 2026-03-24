@@ -4,11 +4,47 @@ Agent skills that teach AI assistants how to use [Turnkey](https://turnkey.com) 
 
 For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
 
-## Prerequisites
+## Before You Start
 
-- **Node.js >= 18** (for eval tooling)
-- **Turnkey account** with API credentials from the [Turnkey Dashboard](https://app.turnkey.com)
-- **Turnkey API credentials** (P-256 key pair, see managing-users-api skill)
+Check your environment variables. If `TURNKEY_API_PUBLIC_KEY` is unset, start with the `setup-account-workflow` skill to bootstrap your organization, generate API keys, and create your first wallet.
+
+## How These Skills Get Used
+
+### AI-assisted administrator
+
+A human using Claude Code with their own API key to manage a Turnkey organization.
+
+- Root key is fine here, the human owns the org
+- The assistant should confirm before destructive operations (policy deletion, quorum changes, user removal)
+- The assistant should explain what an action will do before executing it
+
+### Autonomous agent
+
+An agent operating with a scoped API key inside a sub-organization.
+
+- Should not have a root key
+- Permissions come from policies (deny-by-default)
+- Use `wallet-governance-workflow` to set up scoped access, policies, and hardened quorum before giving an agent access
+
+## Skill Routing
+
+| User asks about... | Skill to load |
+|---|---|
+| Getting started, no API key yet | `setup-account-workflow` |
+| Setting up agent wallets with governance | `wallet-governance-workflow` |
+| Creating or managing HD wallets | `managing-wallets-api` |
+| Standalone private keys or key tags | `managing-private-keys-api` |
+| Signing or broadcasting transactions | `signing-transactions-api` |
+| Checking balances or nonces | `signing-transactions-api` |
+| Sponsored or gasless transactions | `signing-transactions-api` |
+| Access control, spending limits, allowlists | `managing-policies-api` |
+| Smart contract ABIs for policy engine | `managing-policies-api` |
+| Why a transaction was denied | `managing-policies-api` |
+| Pending approvals, activity status | `monitoring-activities-api` |
+| Creating users, API keys, key rotation | `managing-users-api` |
+| Sub-organizations, multi-tenancy | `managing-organizations-api` |
+| Root quorum or org feature flags | `managing-organizations-api` |
+| Building a new skill for this repo | `creating-skills` |
 
 ## Quick Start
 
@@ -32,28 +68,28 @@ cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skil
 
 ## Skills
 
-### API Skills (Turnkey HTTP API)
+### Primitives (Turnkey HTTP API)
 
-Call the Turnkey HTTP API directly at `https://api.turnkey.com`.
+7 skills covering 78 endpoints at `https://api.turnkey.com`.
 
-| Skill | Description |
-|-------|-------------|
-| `managing-wallets-api` | HD wallet creation, account derivation, import/export via API |
-| `managing-private-keys-api` | Standalone private key management, tags for policy targeting |
-| `signing-transactions-api` | Transaction signing, sponsored broadcasts, balance/nonce queries |
-| `managing-policies-api` | Policy CRUD, smart contract interfaces, policy evaluation debugging |
-| `monitoring-activities-api` | Activity monitoring, consensus approval workflows, audit trails |
-| `managing-users-api` | User lifecycle, API key management, user tags |
-| `managing-organizations-api` | Sub-organization management, root quorum, org features |
+| Skill | Endpoints | Description |
+|-------|-----------|-------------|
+| `managing-wallets-api` | 13 | HD wallet creation, account derivation, import/export |
+| `managing-private-keys-api` | 11 | Standalone private keys, tags for policy targeting |
+| `signing-transactions-api` | 10 | Signing, sponsored broadcasts, balance/nonce queries |
+| `managing-policies-api` | 12 | Policy CRUD, smart contract interfaces, evaluation debugging |
+| `monitoring-activities-api` | 5 | Activity lifecycle, consensus approval, audit trails |
+| `managing-users-api` | 18 | User lifecycle, API keys, user tags |
+| `managing-organizations-api` | 9 | Sub-orgs, root quorum, org features |
 
-### Workflow Skills (multi-step orchestration)
+### Workflows (multi-step orchestration)
 
-End-to-end guides that compose multiple primitive skills.
+Compose multiple primitives into end-to-end guides.
 
 | Skill | Description |
 |-------|-------------|
 | `setup-account-workflow` | Bootstrap a Turnkey org from zero: API keys, wallets, first signature |
-| `wallet-governance-workflow` | Add governance, policies, scoped users, and root quorum hardening for production |
+| `wallet-governance-workflow` | Add governance, policies, scoped users, and root quorum hardening |
 
 ### Meta
 

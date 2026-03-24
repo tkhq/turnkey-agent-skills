@@ -65,7 +65,7 @@ Use these for end-to-end guides that compose multiple primitive skills.
 | `setup-account-workflow` | Bootstrap a Turnkey org from zero: CLI install, API keys, wallets, first signature |
 | `embedded-wallets-workflow` | Build a React app with user auth, wallets, signing, and policies (sub-org model) |
 | `server-wallets-workflow` | Build a Node.js backend with server wallets, signing, and policies (parent org model) |
-| `secure-wallets-workflow` | Add governance, policies, and access control to existing wallets for production |
+| `wallet-governance-workflow` | Add governance, policies, scoped users, and root quorum hardening for production |
 
 ### Meta
 
@@ -147,7 +147,7 @@ turnkey-agent-skills/
     setup-account-workflow/       # Organization bootstrapping
     embedded-wallets-workflow/    # React embedded wallet guide
     server-wallets-workflow/      # Node.js server wallet guide
-    secure-wallets-workflow/      # Production security hardening
+    wallet-governance-workflow/      # Governance, policies, and access control
     creating-skills/              # Meta skill for contributors
   template/                       # Skeleton for new skills
 ```

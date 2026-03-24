@@ -26,7 +26,7 @@
       "Follows the full setup workflow through phases 1-3",
       "Includes Phase 4 team member onboarding with create_users",
       "Generates separate API key pairs per team member",
-      "Mentions policies or secure-wallets-workflow for access control"
+      "Mentions policies or wallet-governance-workflow for access control"
     ]
   },
   {
@@ -34,7 +34,7 @@
     "query": "Set up Turnkey from scratch and add spending limits",
     "expected_behavior": [
       "Follows the setup workflow for initial bootstrapping",
-      "References secure-wallets-workflow for policy/governance setup",
+      "References wallet-governance-workflow for policy/governance setup",
       "Does not try to implement policies inline within the setup flow"
     ]
   },

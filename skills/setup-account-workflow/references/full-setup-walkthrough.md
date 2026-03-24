@@ -135,7 +135,7 @@ At this point you have:
 - Fund the addresses on testnet (use a faucet for Sepolia ETH or Devnet SOL)
 - Sign real transactions (see `signing-transactions-api` for chain-specific methods)
 - Add team members (see Phase 4 in the main SKILL.md)
-- Add policies for production (see `secure-wallets-workflow`)
+- Add policies for production (see `wallet-governance-workflow`)
 
 ## Variations
 

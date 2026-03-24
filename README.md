@@ -38,10 +38,13 @@ Call the Turnkey HTTP API directly at `https://api.turnkey.com`.
 
 | Skill | Description |
 |-------|-------------|
-| `managing-users-api` | API key generation, authentication, user provisioning, sub-organization setup |
-| `managing-wallets-api` | Wallet creation and address derivation via API |
-| `signing-transactions-api` | Transaction signing and broadcasting via API |
-| `managing-policies-api` | Policy CRUD and governance via API |
+| `managing-wallets-api` | HD wallet creation, account derivation, import/export via API |
+| `managing-private-keys-api` | Standalone private key management, tags for policy targeting |
+| `signing-transactions-api` | Transaction signing, sponsored broadcasts, balance/nonce queries |
+| `managing-policies-api` | Policy CRUD, smart contract interfaces, policy evaluation debugging |
+| `monitoring-activities-api` | Activity monitoring, consensus approval workflows, audit trails |
+| `managing-users-api` | User lifecycle, API key management, user tags |
+| `managing-organizations-api` | Sub-organization management, root quorum, org features |
 
 ### Workflow Skills (multi-step orchestration)
 
@@ -115,12 +118,15 @@ npm run report -- --skill managing-wallets-api
 ```
 turnkey-agent-skills/
   skills/
-    managing-wallets-api/         # Wallet creation via API
-    signing-transactions-api/     # Transaction signing via API
-    managing-policies-api/        # Policy management via API
-    managing-users-api/     # API keys, auth, users, sub-orgs
+    managing-wallets-api/         # HD wallets and accounts (13 endpoints)
+    managing-private-keys-api/    # Standalone keys and tags (11 endpoints)
+    signing-transactions-api/     # Signing, broadcasting, queries (10 endpoints)
+    managing-policies-api/        # Policies and smart contracts (12 endpoints)
+    monitoring-activities-api/    # Activity lifecycle and consensus (5 endpoints)
+    managing-users-api/           # Users, API keys, user tags (18 endpoints)
+    managing-organizations-api/   # Orgs, sub-orgs, quorum (9 endpoints)
     setup-account-workflow/       # Organization bootstrapping
-    wallet-governance-workflow/   # Governance, policies, and access control
+    wallet-governance-workflow/   # Governance and access control
     creating-skills/              # Meta skill for contributors
   template/                       # Skeleton for new skills
 ```

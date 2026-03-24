@@ -145,3 +145,4 @@ For gasless/sponsored transactions (paymaster), see [references/sponsored-transa
 - `creating-wallets-api` for wallet setup and address derivation.
 - `managing-policies-api` for transaction governance and spending limits.
 - `managing-credentials-api` for API key setup.
+- `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature).

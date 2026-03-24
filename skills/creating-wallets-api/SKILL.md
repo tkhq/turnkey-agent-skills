@@ -156,3 +156,4 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 - `managing-credentials-api` for API key setup (required before wallet operations)
 - `signing-transactions-api` for signing transactions with wallet addresses
 - `managing-policies-api` for access control on wallets
+- `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)

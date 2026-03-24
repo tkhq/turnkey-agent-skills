@@ -1,6 +1,6 @@
 ---
 name: creating-skills
-description: "Creates, evaluates, and improves Turnkey agent skills. Walks through research, SKILL.md authoring, reference file creation, eval writing, and iterative quality improvement. Use when asked to 'create a new skill', 'add a skill for X', 'build a Turnkey skill', 'write a SKILL.md', 'improve a skill description', or 'evaluate a skill'."
+description: "Creates, evaluates, and improves Turnkey agent skills. Walks through research, SKILL.md authoring, reference file creation, eval writing, and iterative quality improvement. Use when asked to 'create a new skill', 'add a skill for X', 'build a Turnkey skill', 'write a SKILL.md', 'improve a skill description', 'improve skill triggers', 'make my skill trigger better', 'evaluate a skill', 'run skill evals', or 'iterate on skill quality'."
 license: Apache-2.0
 compatibility: "Requires Node.js and tsx. Run npm install in the repo root."
 metadata:

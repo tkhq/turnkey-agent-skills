@@ -99,7 +99,7 @@ Test that the skill works alongside related skills:
 
 ```json
 {
-  "skills": ["creating-wallets-api", "signing-transactions-api"],
+  "skills": ["managing-wallets-api", "signing-transactions-api"],
   "query": "Create a wallet and send 0.01 ETH to 0xabc...",
   "expected_behavior": [
     "Creates a wallet first using POST /public/v1/submit/create_wallet",

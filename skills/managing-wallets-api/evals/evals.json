@@ -1,0 +1,121 @@
+[
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Create an HD wallet with Ethereum and Solana using the Turnkey API",
+    "expected_behavior": [
+      "Checks for existing wallets first with POST /public/v1/query/list_wallets",
+      "Shows the POST /public/v1/submit/create_wallet endpoint with correct JSON body",
+      "Uses correct address formats and derivation paths for both chains",
+      "Uses CURVE_SECP256K1 for Ethereum and CURVE_ED25519 for Solana"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "List all wallet accounts for my wallet via the API",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/list_wallet_accounts",
+      "Includes walletId in the request body",
+      "Does NOT create a new wallet"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Add a Bitcoin Taproot address to my existing wallet",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/create_wallet_accounts endpoint",
+      "Uses ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR with CURVE_SECP256K1",
+      "Uses BIP-86 derivation path m/86'/0'/0'/0/0"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Export my wallet mnemonic using the Turnkey API",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/export_wallet with walletId and targetPublicKey",
+      "Describes client-side HPKE decryption of the export bundle",
+      "Mentions HPKE key pair prerequisite"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Create a wallet with addresses for Bitcoin, Ethereum, and Cosmos via the API",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/create_wallet",
+      "Includes all three chains with correct curves, paths, and address formats",
+      "Uses ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH or P2TR for Bitcoin",
+      "Shows complete JSON body with the accounts array"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Get details about a specific wallet by its ID using the Turnkey API",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/get_wallet",
+      "Includes walletId in the request body",
+      "Does NOT use list_wallets when only one wallet is needed"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Rename my wallet to 'production-hot-wallet' using the API",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/update_wallet with walletId and new walletName",
+      "Shows the new wallet name in the request body",
+      "Returns an activity response with ACTIVITY_TYPE_UPDATE_WALLET"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Delete two wallets from my organization via the Turnkey API",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/delete_wallets",
+      "Shows walletIds as an array in the request body",
+      "Mentions that deletion is permanent"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Get a specific wallet account by its address",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/get_wallet_account",
+      "Includes address in the request body",
+      "Does NOT use list_wallet_accounts when only one account is needed"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Export a single Ethereum account's private key from my wallet, not the whole mnemonic",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/export_wallet_account with address and targetPublicKey",
+      "Explains the difference between export_wallet (mnemonic) and export_wallet_account (single key)",
+      "Describes HPKE decryption of the export bundle on the client side"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Remove specific accounts from my wallet",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/delete_wallet_accounts",
+      "Shows walletAccountIds as an array in the request body",
+      "Mentions that deletion is permanent"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Rename my wallet and then delete an old wallet I no longer need",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/update_wallet with walletId and new walletName",
+      "Uses POST /public/v1/submit/delete_wallets with walletIds array",
+      "Mentions that deletion is permanent"
+    ]
+  },
+  {
+    "skills": ["managing-wallets-api"],
+    "query": "Get details about a specific wallet account and then delete it",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/get_wallet_account with address parameter",
+      "Uses POST /public/v1/submit/delete_wallet_accounts with walletAccountIds array",
+      "Does not confuse get_wallet_account with get_wallet or list_wallet_accounts"
+    ]
+  }
+]

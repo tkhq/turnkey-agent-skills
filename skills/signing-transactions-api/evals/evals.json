@@ -43,5 +43,79 @@
       "Explains signRawPayload is low-level and chain-agnostic",
       "Lists which chains support signTransaction vs requiring signRawPayload"
     ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "I need to batch sign multiple raw payloads with the same key using Turnkey",
+    "expected_behavior": [
+      "Shows POST /public/v1/submit/sign_raw_payloads endpoint",
+      "Shows the payloads field as an array of strings",
+      "Explains the response returns an array of signatures in the same order as input"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "Send a sponsored gasless transaction on Base using the Turnkey API",
+    "expected_behavior": [
+      "Shows POST /public/v1/submit/eth_send_transaction",
+      "Sets sponsor to true and caip2 to eip155:8453",
+      "Explains that Turnkey handles gas estimation and broadcasting",
+      "Mentions polling get_send_transaction_status for the result"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "How do I send a sponsored Solana transaction via Turnkey?",
+    "expected_behavior": [
+      "Shows POST /public/v1/submit/sol_send_transaction",
+      "Sets sponsor to true with the Solana CAIP-2 identifier",
+      "Explains the client must construct the unsigned transaction",
+      "Mentions polling get_send_transaction_status for the result"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "Check the balance of my Ethereum address using the Turnkey API",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_balances",
+      "Includes address and caip2 in the request body",
+      "Notes this is a beta feature"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "How do I get the nonce for a sponsored transaction on Turnkey?",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_nonces",
+      "Sets gasStationNonce to true",
+      "Explains the gas station nonce is used for replay protection with sponsored transactions"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "How do I check my organization's gas sponsorship usage on Turnkey?",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_gas_usage",
+      "Explains the response includes windowLimitUsd and usageUsd",
+      "Recommends checking before sending large batches of sponsored transactions"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "How do I poll the status of a sponsored transaction on Turnkey?",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_send_transaction_status",
+      "Lists the status values: INITIALIZED, BROADCASTING, INCLUDED, FAILED",
+      "Explains to poll every 2 seconds until INCLUDED or FAILED"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "What tokens are supported on Base for balance queries via Turnkey?",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/list_supported_assets",
+      "Sets caip2 to eip155:8453",
+      "Notes this is a beta feature"
+    ]
   }
 ]

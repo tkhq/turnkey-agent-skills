@@ -479,6 +479,145 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
 
 ---
 
+## Batch Operations
+
+### Batch delete policies
+
+```
+POST https://api.turnkey.com/public/v1/submit/delete_policies
+```
+
+```json
+{
+  "policyIds": ["<POLICY_ID_1>", "<POLICY_ID_2>", "<POLICY_ID_3>"]
+}
+```
+
+Use this when cleaning up multiple policies at once, such as replacing an entire policy set during a governance migration.
+
+---
+
+## Debugging Denied Transactions
+
+### Get policy evaluations for a denied activity
+
+When a transaction is denied and you need to understand why, use the policy evaluations endpoint with the activity ID from the failed request.
+
+```
+POST https://api.turnkey.com/public/v1/query/get_policy_evaluations
+```
+
+```json
+{
+  "activityId": "<DENIED_ACTIVITY_ID>"
+}
+```
+
+The response shows each policy that was evaluated, whether its condition matched, and the final outcome. Common debugging scenarios:
+
+1. **DENY policy matched unexpectedly**: Check the condition expression. A broad DENY (e.g., on all signing) may be catching transactions you intended to allow.
+2. **No ALLOW policy matched**: The implicit deny kicked in. Verify that the user, wallet, and transaction details match an existing ALLOW policy's consensus and condition.
+3. **Policy condition errored**: The policy engine does not short-circuit. If a condition references both `wallet.id` and `private_key.id`, one side will always error. Split into separate policies.
+
+---
+
+## Smart Contract Interface Examples
+
+### Upload an ERC-20 ABI for function-level policy control
+
+Without an ABI, the policy engine sees contract calls as raw hex in `eth.tx.data`. After uploading the ABI, you can write policies against `eth.tx.function_name` and `eth.tx.contract_call_args`.
+
+```
+POST https://api.turnkey.com/public/v1/submit/create_smart_contract_interface
+```
+
+```json
+{
+  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+  "abi": "[{\"type\":\"function\",\"name\":\"transfer\",\"inputs\":[{\"name\":\"to\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"approve\",\"inputs\":[{\"name\":\"spender\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}]}]",
+  "type": "SMART_CONTRACT_INTERFACE_TYPE_ETHEREUM",
+  "label": "USDC ERC-20",
+  "notes": "USDC contract on Ethereum mainnet for function-level policies"
+}
+```
+
+### Policy using uploaded ABI: restrict to transfer() only
+
+After uploading the USDC ABI above, this policy restricts an agent to only calling `transfer()`:
+
+```
+POST https://api.turnkey.com/public/v1/submit/create_policy
+```
+
+```json
+{
+  "policyName": "agent-usdc-transfer-only",
+  "effect": "EFFECT_ALLOW",
+  "condition": "eth.tx.to == '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' && eth.tx.function_name == 'transfer'",
+  "consensus": "approvers.any(user, user.id == '<AGENT_USER_ID>')",
+  "notes": "Agent can only call transfer() on USDC, not approve() or other functions"
+}
+```
+
+### Policy using uploaded ABI: deny approve() calls
+
+Block all `approve()` calls on a contract to prevent token allowance exploits:
+
+```
+POST https://api.turnkey.com/public/v1/submit/create_policy
+```
+
+```json
+{
+  "policyName": "deny-approve-on-usdc",
+  "effect": "EFFECT_DENY",
+  "condition": "eth.tx.to == '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' && eth.tx.function_name == 'approve'",
+  "notes": "Block approve() calls on USDC to prevent allowance exploits"
+}
+```
+
+### Upload a Solana Program IDL
+
+```
+POST https://api.turnkey.com/public/v1/submit/create_smart_contract_interface
+```
+
+```json
+{
+  "address": "<PROGRAM_ID>",
+  "abi": "<IDL_JSON_STRING>",
+  "type": "SMART_CONTRACT_INTERFACE_TYPE_SOLANA",
+  "label": "My Solana Program",
+  "notes": "IDL for function-level policy control on Solana"
+}
+```
+
+After uploading, Solana instruction data is parsed via `solana.tx.instructions[].parsed_instruction_data`, enabling policies that match on decoded instruction fields rather than raw hex.
+
+### List and clean up smart contract interfaces
+
+```
+POST https://api.turnkey.com/public/v1/query/list_smart_contract_interfaces
+```
+
+```json
+{}
+```
+
+To remove an interface that is no longer needed:
+
+```
+POST https://api.turnkey.com/public/v1/submit/delete_smart_contract_interface
+```
+
+```json
+{
+  "smartContractInterfaceId": "<SMART_CONTRACT_INTERFACE_ID>"
+}
+```
+
+---
+
 ## Agent Wallet Scoping (Complete Example)
 
 A common pattern: give an agent permission to sign transactions to specific addresses and read wallet info, but nothing else.

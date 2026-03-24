@@ -1,6 +1,6 @@
-# Sponsored Transaction Examples (Gasless via Paymaster)
+# Sponsored Transaction Examples
 
-Turnkey can sponsor gas fees so users pay nothing. Unlike signTransaction and signRawPayload, these endpoints handle transaction construction, signing, and broadcasting in one call.
+Turnkey can sponsor gas fees so users pay nothing. Unlike sign_transaction and sign_raw_payload, these endpoints handle transaction construction, signing, and broadcasting in one call.
 
 **Base URL:** `https://api.turnkey.com`
 
@@ -8,7 +8,29 @@ Turnkey can sponsor gas fees so users pay nothing. Unlike signTransaction and si
 
 Turnkey handles gas estimation, nonce management, signing, and broadcasting.
 
-**Step 1: Get gas station nonce (optional, for replay protection)**
+**Step 1: Check gas usage (recommended before large batches)**
+
+`POST /public/v1/query/get_gas_usage`
+
+```json
+{
+  "organizationId": "<ORG_ID>"
+}
+```
+
+Response:
+
+```json
+{
+  "windowDurationMinutes": 1440,
+  "windowLimitUsd": "100.00",
+  "usageUsd": "12.34"
+}
+```
+
+Verify `usageUsd` is well below `windowLimitUsd` before sending sponsored transactions. If close to the limit, wait for the window to reset or contact support to increase limits.
+
+**Step 2: Get gas station nonce (optional, for replay protection)**
 
 `POST /public/v1/query/get_nonces`
 
@@ -23,7 +45,7 @@ Turnkey handles gas estimation, nonce management, signing, and broadcasting.
 
 Response: `{ "gasStationNonce": "42" }`
 
-**Step 2: Send sponsored transaction**
+**Step 3: Send sponsored transaction**
 
 `POST /public/v1/submit/eth_send_transaction`
 
@@ -57,7 +79,7 @@ Response:
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `from` | Yes | Sender wallet address |
+| `from` | Yes | Sender wallet address (not private key ID) |
 | `to` | Yes | Recipient or contract address |
 | `caip2` | Yes | Chain identifier (see table below) |
 | `sponsor` | No | Set `true` for gasless. Default `false` |
@@ -107,7 +129,7 @@ Response:
 | Field | Required | Description |
 |-------|----------|-------------|
 | `unsignedTransaction` | Yes | Base64-encoded serialized unsigned transaction |
-| `signWith` | Yes | Solana wallet address or private key address |
+| `signWith` | Yes | Solana wallet address (not private key ID) |
 | `caip2` | Yes | Chain identifier (see table below) |
 | `sponsor` | No | Set `true` for gasless. Default `false` |
 | `recentBlockhash` | No | For deadline control. Turnkey provides one if omitted |
@@ -116,7 +138,7 @@ Response:
 
 ## Poll Transaction Status
 
-Sponsored transactions are async. After submitting, poll until confirmed or failed.
+Sponsored transactions are async. After submitting, poll until confirmed or failed. This applies to both EVM and Solana.
 
 `POST /public/v1/query/get_send_transaction_status`
 
@@ -127,13 +149,47 @@ Sponsored transactions are async. After submitting, poll until confirmed or fail
 }
 ```
 
-Response:
+### EVM Success Response
 
 ```json
 {
   "txStatus": "INCLUDED",
   "eth": {
     "txHash": "0xabc123..."
+  }
+}
+```
+
+### Solana Success Response
+
+```json
+{
+  "txStatus": "INCLUDED",
+  "solana": {
+    "signature": "5KtPn1..."
+  }
+}
+```
+
+### Failed Response (EVM example with decoded revert)
+
+```json
+{
+  "txStatus": "FAILED",
+  "txError": "execution reverted",
+  "error": {
+    "message": "Transaction reverted",
+    "revertChain": [
+      {
+        "address": "0xCONTRACT_ADDRESS",
+        "errorType": "custom",
+        "displayMessage": "InsufficientBalance(required: 1000000, actual: 0)",
+        "custom": {
+          "errorName": "InsufficientBalance",
+          "paramsJson": "{\"required\":\"1000000\",\"actual\":\"0\"}"
+        }
+      }
+    ]
   }
 }
 ```
@@ -147,31 +203,39 @@ Response:
 | `INCLUDED` | Transaction confirmed on-chain |
 | `FAILED` | Transaction failed (check `txError` and `error` fields) |
 
-Poll every 2 seconds until status is `INCLUDED` or `FAILED`. The `error` field contains detailed revert information for failed EVM transactions, including decoded custom errors and panic codes.
+Poll every 2 seconds until status is `INCLUDED` or `FAILED`. The `error` field contains detailed revert information for failed EVM transactions, including decoded custom errors and panic codes. For Solana failures, the `error.solana` field includes program logs and RPC error details.
+
+### Polling Pattern
+
+1. Call eth_send_transaction or sol_send_transaction, extract `sendTransactionStatusId`.
+2. Call get_send_transaction_status with the status ID.
+3. If `txStatus` is `INITIALIZED` or `BROADCASTING`, wait 2 seconds and retry step 2.
+4. If `txStatus` is `INCLUDED`, the transaction is confirmed. Extract the hash/signature.
+5. If `txStatus` is `FAILED`, read `error` for diagnostics.
 
 ---
 
-## Check Gas Usage
+## Non-Sponsored EVM Transaction
 
-Monitor your organization's gas sponsorship usage.
+You can also use eth_send_transaction without sponsorship. You provide the gas parameters.
 
-`POST /public/v1/query/get_gas_usage`
-
-```json
-{
-  "organizationId": "<ORG_ID>"
-}
-```
-
-Response:
+`POST /public/v1/submit/eth_send_transaction`
 
 ```json
 {
-  "windowDurationMinutes": 1440,
-  "windowLimitUsd": "100.00",
-  "usageUsd": "12.34"
+  "from": "0xSENDER_ADDRESS",
+  "to": "0xRECIPIENT_ADDRESS",
+  "caip2": "eip155:1",
+  "sponsor": false,
+  "value": "1000000000000000000",
+  "nonce": "5",
+  "gasLimit": "21000",
+  "maxFeePerGas": "30000000000",
+  "maxPriorityFeePerGas": "2000000000"
 }
 ```
+
+For non-sponsored transactions, you must provide `nonce`, `gasLimit`, `maxFeePerGas`, and `maxPriorityFeePerGas`. Use get_nonces with `nonce: true` to fetch the current on-chain nonce.
 
 ---
 
@@ -205,4 +269,4 @@ Response:
 | Transaction construction | Turnkey handles it (just provide to, data, value) | Client must serialize the unsigned transaction |
 | Nonce management | Turnkey handles it (gasStationNonce optional for extra security) | Turnkey provides recentBlockhash if omitted |
 | Gas estimation | Turnkey handles it | N/A (Solana fees are fixed) |
-| Status response | `eth.txHash` | `sol.signature` (when available) |
+| Status response | `eth.txHash` | `solana.signature` (when available) |

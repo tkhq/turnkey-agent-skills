@@ -1,0 +1,23 @@
+{
+  "should_trigger": [
+    "Create a standalone private key for Ethereum using the Turnkey API",
+    "List all private keys in my organization via the API",
+    "How do I manage private key tags for policy targeting?",
+    "Import an existing private key into Turnkey using the API",
+    "Export a private key from Turnkey with HPKE encryption",
+    "Create a standalone Solana signing key with the Turnkey API",
+    "Delete a private key using the Turnkey API",
+    "Tag my private keys as hot-wallet for use in a spending policy",
+    "How do I get details for a specific private key via the Turnkey API?",
+    "Update a private key tag to add and remove keys"
+  ],
+  "should_not_trigger": [
+    "Create an HD wallet with Ethereum and Solana addresses",
+    "Derive a new address from my existing wallet using BIP-44",
+    "Sign a transaction on Ethereum using my Turnkey wallet",
+    "Create a spending limit policy for my organization",
+    "Add a new user to my Turnkey organization",
+    "Generate an API key for authenticating with Turnkey",
+    "Export my wallet mnemonic seed phrase"
+  ]
+}

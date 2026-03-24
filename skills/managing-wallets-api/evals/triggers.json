@@ -6,18 +6,27 @@
     "Add a Bitcoin account to my existing wallet via the API",
     "Export my wallet mnemonic using the Turnkey API",
     "Import a wallet seed phrase into Turnkey via the API",
-    "Create a standalone private key with the Turnkey API",
     "List all wallet accounts using the list_wallet_accounts endpoint",
     "How do I create a Bitcoin wallet using the Turnkey API endpoint?",
     "Use the Turnkey API to list all my wallet accounts",
-    "I want to create a private key for Solana using the Turnkey API",
-    "Show me how to derive a Cosmos address via create_wallet_accounts"
+    "Show me how to derive a Cosmos address via create_wallet_accounts",
+    "Get details about a specific wallet using the Turnkey API",
+    "Update the name of my wallet via the API",
+    "Delete a wallet using the Turnkey API",
+    "How do I get a single wallet account by address?",
+    "Export a single wallet account private key via the API",
+    "Delete specific wallet accounts using the Turnkey API",
+    "Rename my Turnkey wallet via the update_wallet endpoint"
   ],
   "should_not_trigger": [
     "Sign a transaction on Ethereum",
     "Create a spending limit policy for my wallet",
     "Add Google OAuth login to my React app",
     "Generate an API key for my organization",
-    "How do I send Bitcoin from my Turnkey wallet?"
+    "How do I send Bitcoin from my Turnkey wallet?",
+    "Create a standalone private key with the Turnkey API",
+    "List all private keys in my organization",
+    "Import a private key into Turnkey",
+    "Create a private key for Solana using the Turnkey API"
   ]
 }

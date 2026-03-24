@@ -1,0 +1,57 @@
+[
+  {
+    "skills": ["managing-users-api"],
+    "query": "Create a new user with an API key in my Turnkey organization",
+    "expected_behavior": [
+      "Shows POST /public/v1/submit/create_users with ACTIVITY_TYPE_CREATE_USERS_V2",
+      "Includes userName, userEmail, and apiKeys array in the parameters",
+      "Specifies curveType for the API key (API_KEY_CURVE_P256 or other supported curve)"
+    ]
+  },
+  {
+    "skills": ["managing-users-api"],
+    "query": "Rotate my API keys: create a new one and delete the old one safely",
+    "expected_behavior": [
+      "Describes the four-step rotation pattern: generate, register, verify, delete",
+      "Shows create_api_keys to register the new key",
+      "Shows delete_api_keys to remove the old key after verification",
+      "Recommends verifying the new key works (e.g., via whoami) before deleting the old one"
+    ]
+  },
+  {
+    "skills": ["managing-users-api"],
+    "query": "Create a user tag called 'trader' and assign it to two users for policy targeting",
+    "expected_behavior": [
+      "Shows POST /public/v1/submit/create_user_tag with ACTIVITY_TYPE_CREATE_USER_TAG",
+      "Includes userTagName and userIds array in the parameters",
+      "Explains that tags can be used in policy expressions for approval requirements"
+    ]
+  },
+  {
+    "skills": ["managing-users-api"],
+    "query": "Check who I am and which organization I belong to via the Turnkey API",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/whoami endpoint",
+      "Includes organizationId in the request body",
+      "Notes the response returns userId, username, and organizationId"
+    ]
+  },
+  {
+    "skills": ["managing-users-api"],
+    "query": "Update a user's email and name in my Turnkey organization",
+    "expected_behavior": [
+      "Shows update_user or update_user_email and update_user_name endpoints",
+      "Uses the correct activity types",
+      "Includes userId and the new values in the parameters"
+    ]
+  },
+  {
+    "skills": ["managing-users-api"],
+    "query": "List all API keys for a specific user and get details about one of them",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_api_keys with userId",
+      "Shows POST /public/v1/query/get_api_key with apiKeyId",
+      "Includes organizationId in both request bodies"
+    ]
+  }
+]

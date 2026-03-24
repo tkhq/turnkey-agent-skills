@@ -21,9 +21,9 @@ To create a new skill, follow these steps in order: Study, Research, Draft, Eval
 
 Before writing anything, read 1-2 existing skills to understand the pattern. Good references:
 
-- `skills/creating-wallets-api/SKILL.md` is the simplest skill (wallet CRUD)
+- `skills/managing-wallets-api/SKILL.md` is the simplest skill (wallet CRUD)
 - `skills/signing-transactions-api/SKILL.md` shows multi-chain support with progressive disclosure
-- `skills/managing-credentials-api/SKILL.md` shows credential management and user provisioning
+- `skills/managing-users-api/SKILL.md` shows credential management and user provisioning
 
 Read the SKILL.md, one reference file, and the evals for whichever skill is closest to what you are building. This gives you the exact pattern to follow.
 
@@ -76,7 +76,7 @@ Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-transactions`, 
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["relevant", "tags"]
@@ -102,7 +102,7 @@ metadata:
 **Body rules:**
 - Under 300 lines preferred, 500 max
 - Only include context the LLM does not already know (Turnkey-specific APIs, gotchas, required ordering)
-- Every skill starts with a reference to managing-credentials-api for authentication
+- Every skill starts with a reference to managing-users-api for authentication
 - Keep code in SKILL.md to brief patterns (10-15 lines max per block)
 - Delegate full, self-contained examples to `references/` files
 
@@ -269,7 +269,7 @@ Review the eval results. If everything passes, run the checklist below.
 - Reference files MUST be one level deep from SKILL.md (no nested references)
 - Do not duplicate code between SKILL.md and reference files
 - All code examples in references MUST be complete and self-contained
-- Every skill MUST reference managing-credentials-api for authentication setup
+- Every skill MUST reference managing-users-api for authentication setup
 - Use consistent environment variable names: TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH
 
 ## Checklist

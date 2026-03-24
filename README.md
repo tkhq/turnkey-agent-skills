@@ -8,7 +8,7 @@ For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
 
 - **Node.js >= 18** (for eval tooling)
 - **Turnkey account** with API credentials from the [Turnkey Dashboard](https://app.turnkey.com)
-- **Turnkey API credentials** (P-256 key pair, see managing-credentials-api skill)
+- **Turnkey API credentials** (P-256 key pair, see managing-users-api skill)
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ Then start Claude Code from the repo directory. Skills are automatically discove
 Copy the skill folders you need into your project's `.claude/skills/` directory:
 
 ```bash
-cp -r turnkey-agent-skills/skills/creating-wallets-api your-project/.claude/skills/
+cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skills/
 ```
 
 ## Skills
@@ -38,8 +38,8 @@ Call the Turnkey HTTP API directly at `https://api.turnkey.com`.
 
 | Skill | Description |
 |-------|-------------|
-| `managing-credentials-api` | API key generation, authentication, user provisioning, sub-organization setup |
-| `creating-wallets-api` | Wallet creation and address derivation via API |
+| `managing-users-api` | API key generation, authentication, user provisioning, sub-organization setup |
+| `managing-wallets-api` | Wallet creation and address derivation via API |
 | `signing-transactions-api` | Transaction signing and broadcasting via API |
 | `managing-policies-api` | Policy CRUD and governance via API |
 
@@ -101,13 +101,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 npm run validate
 
 # Test trigger accuracy for a skill
-npm run eval -- --skill creating-wallets-api
+npm run eval -- --skill managing-wallets-api
 
 # Run improvement loop
-npm run eval:loop -- --skill creating-wallets-api
+npm run eval:loop -- --skill managing-wallets-api
 
 # Generate HTML report
-npm run report -- --skill creating-wallets-api
+npm run report -- --skill managing-wallets-api
 ```
 
 ## Project Structure
@@ -115,10 +115,10 @@ npm run report -- --skill creating-wallets-api
 ```
 turnkey-agent-skills/
   skills/
-    creating-wallets-api/         # Wallet creation via API
+    managing-wallets-api/         # Wallet creation via API
     signing-transactions-api/     # Transaction signing via API
     managing-policies-api/        # Policy management via API
-    managing-credentials-api/     # API keys, auth, users, sub-orgs
+    managing-users-api/     # API keys, auth, users, sub-orgs
     setup-account-workflow/       # Organization bootstrapping
     wallet-governance-workflow/   # Governance, policies, and access control
     creating-skills/              # Meta skill for contributors

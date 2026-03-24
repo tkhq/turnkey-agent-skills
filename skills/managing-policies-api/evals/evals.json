@@ -43,5 +43,42 @@
       "Uses solana.tx.program_keys.all() condition",
       "References the System Program address 11111111111111111111111111111111"
     ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Upload an ERC-20 ABI so I can write policies that restrict to specific contract functions",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/submit/create_smart_contract_interface",
+      "JSON body includes address, abi (JSON string), type SMART_CONTRACT_INTERFACE_TYPE_ETHEREUM, and label",
+      "Explains that after upload, eth.tx.function_name and eth.tx.contract_call_args become available in policy conditions",
+      "Shows example policy using eth.tx.function_name"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "My signing request was denied and I don't know why. How do I debug which policy blocked it?",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/query/get_policy_evaluations with the activity ID",
+      "Explains that the response shows each policy evaluated, whether condition matched, and the final outcome",
+      "Mentions common scenarios: unexpected DENY match, no ALLOW matched (implicit deny), condition evaluation error"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Delete multiple policies at once and also batch create replacements via the API",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/submit/delete_policies with policyIds array",
+      "Uses POST https://api.turnkey.com/public/v1/submit/create_policies with policies array",
+      "Shows both batch endpoints in a sequential workflow"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Set up function-level access control so my agent can only call transfer() on the USDC contract",
+    "expected_behavior": [
+      "First uploads the ABI via POST https://api.turnkey.com/public/v1/submit/create_smart_contract_interface",
+      "Then creates a policy with condition using eth.tx.function_name == 'transfer' and eth.tx.to matching the USDC contract address",
+      "Explains the two-step process: upload ABI first, then write function-level policy"
+    ]
   }
 ]

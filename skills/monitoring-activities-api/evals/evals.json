@@ -1,0 +1,48 @@
+[
+  {
+    "skills": ["monitoring-activities-api"],
+    "query": "List all activities that need consensus approval in my organization",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/query/list_activities",
+      "JSON body includes filterByStatus with ACTIVITY_STATUS_CONSENSUS_NEEDED",
+      "Includes organizationId in the request"
+    ]
+  },
+  {
+    "skills": ["monitoring-activities-api"],
+    "query": "A signing activity is stuck in CONSENSUS_NEEDED. Approve it so it can complete.",
+    "expected_behavior": [
+      "First calls POST https://api.turnkey.com/public/v1/query/get_activity to retrieve the activity and its fingerprint",
+      "Then calls POST https://api.turnkey.com/public/v1/submit/approve_activity with the activity fingerprint",
+      "Request body includes type ACTIVITY_TYPE_APPROVE_ACTIVITY and timestampMs",
+      "Optionally calls get_activity again to verify status moved to COMPLETED"
+    ]
+  },
+  {
+    "skills": ["monitoring-activities-api"],
+    "query": "Check the status of activity abc-123 and tell me if it completed",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/query/get_activity",
+      "JSON body includes the activityId and organizationId",
+      "Inspects activity.status field to determine completion"
+    ]
+  },
+  {
+    "skills": ["monitoring-activities-api"],
+    "query": "Get cryptographic app proofs for a completed activity for our compliance audit",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/query/list_app_proofs",
+      "JSON body includes activityId and organizationId",
+      "Mentions that generateAppProofs must have been true when the activity was created"
+    ]
+  },
+  {
+    "skills": ["monitoring-activities-api"],
+    "query": "Reject a pending wallet export activity that looks suspicious",
+    "expected_behavior": [
+      "Uses POST https://api.turnkey.com/public/v1/submit/reject_activity",
+      "Request body includes type ACTIVITY_TYPE_REJECT_ACTIVITY and the activity fingerprint",
+      "Warns that rejection is permanent and cannot be undone"
+    ]
+  }
+]

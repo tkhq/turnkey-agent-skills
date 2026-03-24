@@ -11,13 +11,32 @@
     "How do I sign a message using Turnkey signRawPayload?",
     "Sign a transaction via the Turnkey API for my Bitcoin wallet",
     "What payload encoding should I use with signRawPayload?",
-    "I need to use the Turnkey API to sign a transaction for broadcasting"
+    "I need to use the Turnkey API to sign a transaction for broadcasting",
+    "Batch sign multiple payloads using the Turnkey API",
+    "How do I use sign_raw_payloads to sign multiple messages at once?",
+    "Send a sponsored transaction on Base using the Turnkey API",
+    "How do I send a gasless transaction with Turnkey?",
+    "Broadcast a sponsored EVM transaction via the Turnkey API",
+    "Send a gasless Solana transaction using Turnkey",
+    "How do I use eth_send_transaction with Turnkey?",
+    "Send a sponsored Solana transaction via sol_send_transaction",
+    "Check the balance of my wallet address using the Turnkey API",
+    "How do I get balances for an Ethereum address via Turnkey?",
+    "Get the nonce for my address using the Turnkey API",
+    "How do I check gas usage for sponsored transactions on Turnkey?",
+    "List supported assets on Base using the Turnkey API",
+    "Poll the status of a sponsored transaction on Turnkey",
+    "How do I check if my sponsored transaction was confirmed?",
+    "What is the gas station nonce and how do I get it from Turnkey?"
   ],
   "should_not_trigger": [
     "Create a new wallet with the Turnkey API",
     "Set up a policy to restrict signing",
     "Generate an API key for Turnkey",
     "List my wallets using the Turnkey API",
-    "How do I create a wallet with the Turnkey API?"
+    "How do I create a wallet with the Turnkey API?",
+    "Create a new user in my Turnkey organization",
+    "How do I set up a sub-organization?",
+    "Delete a private key using the Turnkey API"
   ]
 }

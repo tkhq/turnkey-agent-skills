@@ -1,0 +1,23 @@
+{
+  "should_trigger": [
+    "Create a sub-organization for a new customer using the Turnkey API",
+    "How do I manage organization settings via the Turnkey API?",
+    "Update the root quorum threshold to require 2 approvals",
+    "Enable email authentication as an organization feature",
+    "Set up multi-tenant architecture with Turnkey sub-organizations",
+    "List all sub-organizations under my parent org",
+    "Delete a sub-organization via the Turnkey API",
+    "How do I configure WebAuthn origins for my organization?",
+    "Get current organization config and quorum settings",
+    "Create a sub-org with a wallet for each end user"
+  ],
+  "should_not_trigger": [
+    "Create a new user with an API key",
+    "Create an HD wallet with Ethereum addresses",
+    "Sign an Ethereum transaction using the Turnkey API",
+    "Set up a spending limit policy for my wallet",
+    "List all activities for my organization",
+    "Rotate my API keys using the Turnkey API",
+    "Export my wallet mnemonic"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "should_trigger": [
+    "Check the status of an activity using the Turnkey API",
+    "List all pending activities in my organization",
+    "Approve a pending activity via the Turnkey API",
+    "Why is my transaction stuck in pending status?",
+    "Get the audit trail for a specific activity",
+    "Reject an activity that is waiting for consensus approval",
+    "How do I poll for activity completion with Turnkey?",
+    "List all activities that need consensus approval",
+    "Get app proofs for a completed activity",
+    "What does CONSENSUS_NEEDED status mean for my activity?"
+  ],
+  "should_not_trigger": [
+    "Create a new wallet using the Turnkey API",
+    "Sign a transaction with Turnkey",
+    "Create a policy for address allowlisting",
+    "Add a new user to my organization",
+    "Create a sub-organization via the Turnkey API",
+    "Generate an API key pair for authentication"
+  ]
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "skills": ["managing-organizations-api"],
+    "query": "Create a sub-organization with a root user and an Ethereum wallet for a new customer",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/create_sub_organization",
+      "Includes rootUsers array with at least one root user with API key or authenticator",
+      "Includes wallet field with Ethereum account configuration",
+      "Sets rootQuorumThreshold to 1 or appropriate value",
+      "Uses ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V7"
+    ]
+  },
+  {
+    "skills": ["managing-organizations-api"],
+    "query": "Update the root quorum to require 2 out of 3 approvals",
+    "expected_behavior": [
+      "Recommends calling GET /public/v1/query/get_configs first to check current quorum",
+      "Uses POST /public/v1/submit/update_root_quorum",
+      "Sets threshold to 2 with 3 userIds",
+      "Warns that threshold must not exceed the number of root users",
+      "Uses ACTIVITY_TYPE_UPDATE_ROOT_QUORUM"
+    ]
+  },
+  {
+    "skills": ["managing-organizations-api"],
+    "query": "Enable email auth and configure WebAuthn origins for my organization",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/set_organization_feature for each feature",
+      "Uses FEATURE_NAME_EMAIL_AUTH with value 'true'",
+      "Uses FEATURE_NAME_WEBAUTHN_ORIGINS with a JSON-encoded list of origins",
+      "Mentions that set/remove feature requires root quorum approval"
+    ]
+  },
+  {
+    "skills": ["managing-organizations-api"],
+    "query": "List all sub-organizations and filter by a specific customer email",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/get_sub_organizations",
+      "Shows filterType EMAIL with the email as filterValue",
+      "Mentions get_verified_sub_organizations as alternative for verified-only results",
+      "Shows pagination options"
+    ]
+  },
+  {
+    "skills": ["managing-organizations-api"],
+    "query": "Delete a sub-organization that still has unexported wallets",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/delete_sub_organization",
+      "Explains deleteWithoutExport parameter and its default (false)",
+      "Warns that deletion is blocked by default until wallets are exported",
+      "Uses ACTIVITY_TYPE_DELETE_SUB_ORGANIZATION"
+    ]
+  }
+]

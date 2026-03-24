@@ -133,6 +133,53 @@ POST https://api.turnkey.com/public/v1/submit/create_sub_organization
 
 This creates a sub-organization with a wallet that has both Ethereum and Solana addresses in a single API call. The wallet is fully isolated within the sub-organization.
 
-## Note on listing sub-organizations
+## Create a sub-organization with OAuth root user
 
-The Turnkey API does not currently provide a dedicated endpoint for listing sub-organizations. To track sub-organizations, maintain a mapping in your application database between your customer identifiers and the sub-organization IDs returned from the creation response.
+For consumer applications using social login:
+
+```
+POST https://api.turnkey.com/public/v1/submit/create_sub_organization
+```
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V7",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<ORGANIZATION_ID>",
+  "parameters": {
+    "subOrganizationName": "oauth-user-abc",
+    "rootUsers": [{
+      "userName": "google-user",
+      "userEmail": "user@gmail.com",
+      "apiKeys": [],
+      "authenticators": [],
+      "oauthProviders": [{
+        "providerName": "google",
+        "oidcToken": "<OIDC_TOKEN_FROM_GOOGLE>"
+      }]
+    }],
+    "rootQuorumThreshold": 1
+  }
+}
+```
+
+## Delete a sub-organization
+
+Sub-organization deletion is blocked by default until all wallets and private keys are exported. Use `deleteWithoutExport` to override.
+
+```
+POST https://api.turnkey.com/public/v1/submit/delete_sub_organization
+```
+
+```json
+{
+  "type": "ACTIVITY_TYPE_DELETE_SUB_ORGANIZATION",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<SUB_ORGANIZATION_ID>",
+  "parameters": {
+    "deleteWithoutExport": true
+  }
+}
+```
+
+Note: the `organizationId` here is the sub-organization's own ID, not the parent's.

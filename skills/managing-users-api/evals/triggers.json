@@ -1,0 +1,23 @@
+{
+  "should_trigger": [
+    "Create a new user with an API key in my Turnkey organization",
+    "How do I generate and register an API key using the Turnkey API?",
+    "I need to rotate my Turnkey API keys",
+    "Create a user tag for my engineering team",
+    "Who am I? Check my current Turnkey identity",
+    "List all users in my Turnkey organization",
+    "Update a user's email address via the Turnkey API",
+    "How do I delete API keys from a user?",
+    "Get details about a specific user in my organization",
+    "Tag users as traders for policy-based approval"
+  ],
+  "should_not_trigger": [
+    "Create a sub-organization for a new customer",
+    "Create an Ethereum wallet with Turnkey",
+    "Sign a transaction using the Turnkey API",
+    "Set up a spending limit policy on my wallet",
+    "Monitor the status of a pending activity",
+    "How do I set up a sub-org with its own wallet?",
+    "Deploy a smart contract using Turnkey"
+  ]
+}

@@ -11,13 +11,22 @@
     "How do I restrict ETH transfers to specific addresses via the Turnkey API?",
     "Use the Turnkey API to add a spending cap policy",
     "I need to create a multi-signature approval policy via the API",
-    "List my current policies using the Turnkey API"
+    "List my current policies using the Turnkey API",
+    "How do I set up a smart contract policy to restrict function calls?",
+    "Upload an ABI to the Turnkey policy engine for function-level control",
+    "My transaction was denied, how do I debug which policy blocked it?",
+    "Get policy evaluations for a denied signing request via the API",
+    "Create a smart contract interface for an ERC-20 token via the API",
+    "Delete multiple policies at once using the Turnkey API"
   ],
   "should_not_trigger": [
     "Create a wallet using the Turnkey API",
     "Sign a transaction with Turnkey",
     "Generate an API key pair",
     "Add email login to my React app",
-    "How do I create an Ethereum wallet with Turnkey?"
+    "How do I create an Ethereum wallet with Turnkey?",
+    "List all users in my organization",
+    "Monitor activity status via the Turnkey API",
+    "Create a new sub-organization via the API"
   ]
 }

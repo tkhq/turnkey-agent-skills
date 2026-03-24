@@ -4,7 +4,7 @@
     "query": "Walk me through setting up Turnkey from scratch for Ethereum",
     "expected_behavior": [
       "Follows a phased workflow: generate API key pair, register via create_api_keys, create wallet, test signature",
-      "References managing-credentials-api for key generation details",
+      "References managing-users-api for key generation details",
       "Creates a wallet with an Ethereum account using ADDRESS_FORMAT_ETHEREUM",
       "Verifies with a test signature using POST /public/v1/submit/sign_raw_payload"
     ]

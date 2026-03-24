@@ -35,6 +35,28 @@ POST /public/v1/submit/create_wallet
 }
 ```
 
+Example activity response:
+
+```json
+{
+  "activity": {
+    "id": "act_...",
+    "status": "COMPLETED",
+    "type": "ACTIVITY_TYPE_CREATE_WALLET",
+    "result": {
+      "createWalletResult": {
+        "walletId": "wlt_...",
+        "addresses": [
+          "0x1234...abcd",
+          "7nYB...3kPo",
+          "bc1q...xyz"
+        ]
+      }
+    }
+  }
+}
+```
+
 ## Create a wallet with all 13 supported chains
 
 ```
@@ -138,7 +160,26 @@ POST /public/v1/query/list_wallets
 {}
 ```
 
+Example response:
+
+```json
+{
+  "wallets": [
+    {
+      "walletId": "wlt_...",
+      "walletName": "multi-chain-wallet",
+      "createdAt": { "seconds": "1700000000", "nanos": "0" },
+      "updatedAt": { "seconds": "1700000000", "nanos": "0" },
+      "exported": false,
+      "imported": false
+    }
+  ]
+}
+```
+
 ## Get wallet details
+
+Fetch a single wallet by ID to check its properties without listing all wallets.
 
 ```
 POST /public/v1/query/get_wallet
@@ -146,7 +187,95 @@ POST /public/v1/query/get_wallet
 
 ```json
 {
-  "walletId": "<WALLET_ID>"
+  "walletId": "wlt_..."
+}
+```
+
+Example response:
+
+```json
+{
+  "wallet": {
+    "walletId": "wlt_...",
+    "walletName": "multi-chain-wallet",
+    "createdAt": { "seconds": "1700000000", "nanos": "0" },
+    "updatedAt": { "seconds": "1700000000", "nanos": "0" },
+    "exported": false,
+    "imported": false,
+    "accounts": [
+      {
+        "walletAccountId": "wac_...",
+        "address": "0x1234...abcd",
+        "path": "m/44'/60'/0'/0/0",
+        "curve": "CURVE_SECP256K1",
+        "addressFormat": "ADDRESS_FORMAT_ETHEREUM",
+        "createdAt": { "seconds": "1700000000", "nanos": "0" }
+      }
+    ]
+  }
+}
+```
+
+## Update a wallet
+
+Rename a wallet:
+
+```
+POST /public/v1/submit/update_wallet
+```
+
+```json
+{
+  "walletId": "wlt_...",
+  "walletName": "production-hot-wallet"
+}
+```
+
+Example activity response:
+
+```json
+{
+  "activity": {
+    "id": "act_...",
+    "status": "COMPLETED",
+    "type": "ACTIVITY_TYPE_UPDATE_WALLET",
+    "result": {
+      "updateWalletResult": {
+        "walletId": "wlt_..."
+      }
+    }
+  }
+}
+```
+
+## Delete wallets
+
+Delete one or more wallets permanently. All derived accounts are also deleted.
+
+```
+POST /public/v1/submit/delete_wallets
+```
+
+```json
+{
+  "walletIds": ["wlt_abc123", "wlt_def456"]
+}
+```
+
+Example activity response:
+
+```json
+{
+  "activity": {
+    "id": "act_...",
+    "status": "COMPLETED",
+    "type": "ACTIVITY_TYPE_DELETE_WALLETS",
+    "result": {
+      "deleteWalletsResult": {
+        "walletIds": ["wlt_abc123", "wlt_def456"]
+      }
+    }
+  }
 }
 ```
 
@@ -160,7 +289,7 @@ POST /public/v1/submit/create_wallet_accounts
 
 ```json
 {
-  "walletId": "<WALLET_ID>",
+  "walletId": "wlt_...",
   "accounts": [
     {
       "curve": "CURVE_SECP256K1",
@@ -178,30 +307,83 @@ POST /public/v1/submit/create_wallet_accounts
 }
 ```
 
-## Create a standalone private key
+## Get a single wallet account
 
-Standalone private keys are not derived from an HD wallet. They are useful for raw signing operations or when you need a single-purpose key.
+Inspect one account by address or ID:
 
 ```
-POST /public/v1/submit/create_private_keys
+POST /public/v1/query/get_wallet_account
 ```
 
 ```json
 {
-  "privateKeys": [{
-    "privateKeyName": "my-signing-key",
-    "curve": "CURVE_SECP256K1",
-    "addressFormats": ["ADDRESS_FORMAT_ETHEREUM"]
-  }]
+  "address": "0x1234...abcd"
 }
 ```
 
-## List private keys
+Or by wallet account ID:
+
+```json
+{
+  "walletAccountId": "wac_..."
+}
+```
+
+Example response:
+
+```json
+{
+  "account": {
+    "walletAccountId": "wac_...",
+    "walletId": "wlt_...",
+    "address": "0x1234...abcd",
+    "path": "m/44'/60'/0'/0/0",
+    "curve": "CURVE_SECP256K1",
+    "addressFormat": "ADDRESS_FORMAT_ETHEREUM",
+    "createdAt": { "seconds": "1700000000", "nanos": "0" }
+  }
+}
+```
+
+## List wallet accounts
 
 ```
-POST /public/v1/query/list_private_keys
+POST /public/v1/query/list_wallet_accounts
 ```
 
 ```json
-{}
+{
+  "walletId": "wlt_..."
+}
+```
+
+## Delete wallet accounts
+
+Remove specific accounts from a wallet permanently:
+
+```
+POST /public/v1/submit/delete_wallet_accounts
+```
+
+```json
+{
+  "walletAccountIds": ["wac_abc123", "wac_def456"]
+}
+```
+
+Example activity response:
+
+```json
+{
+  "activity": {
+    "id": "act_...",
+    "status": "COMPLETED",
+    "type": "ACTIVITY_TYPE_DELETE_WALLET_ACCOUNTS",
+    "result": {
+      "deleteWalletAccountsResult": {
+        "walletAccountIds": ["wac_abc123", "wac_def456"]
+      }
+    }
+  }
+}
 ```

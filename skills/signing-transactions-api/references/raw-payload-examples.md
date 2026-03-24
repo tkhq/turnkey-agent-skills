@@ -1,6 +1,6 @@
 # Raw Payload Signing Examples
 
-Complete HTTP API examples for signing raw payloads. Use signRawPayload when you need chain-agnostic signing or when the target chain does not have a dedicated transaction type.
+Complete HTTP API examples for signing raw payloads. Use sign_raw_payload when you need chain-agnostic signing or when the target chain does not have a dedicated transaction type. Use sign_raw_payloads to batch-sign multiple payloads with the same key in a single request.
 
 **Base URL:** `https://api.turnkey.com`
 
@@ -120,10 +120,88 @@ For Cosmos chains, hash the SignDoc bytes with SHA-256 by setting HASH_FUNCTION_
 }
 ```
 
+## Batch Signing: sign_raw_payloads
+
+When you need to sign multiple payloads with the same key and parameters, use sign_raw_payloads instead of making multiple sign_raw_payload calls. This is more efficient and uses a single activity.
+
+`POST /public/v1/submit/sign_raw_payloads`
+
+### Batch Ethereum Messages
+
+Sign multiple Ethereum messages in one request:
+
+```json
+{
+  "signWith": "0x1234abcd5678ef901234abcd5678ef901234abcd",
+  "payloads": [
+    "48656c6c6f2c20576f726c6421",
+    "5369676e207468697320746f6f",
+    "416e64207468697320617320776565"
+  ],
+  "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
+  "hashFunction": "HASH_FUNCTION_KECCAK256"
+}
+```
+
+**Response format:**
+
+```json
+{
+  "activity": {
+    "result": {
+      "signRawPayloadsResult": {
+        "signatures": [
+          { "r": "a1b2c3...", "s": "d4e5f6...", "v": "00" },
+          { "r": "f7e8d9...", "s": "c0b1a2...", "v": "01" },
+          { "r": "112233...", "s": "445566...", "v": "00" }
+        ]
+      }
+    }
+  }
+}
+```
+
+Signatures are returned in the same order as the input payloads. Each signature has the same `{r, s, v}` structure as a single sign_raw_payload response.
+
+### Batch Cosmos Signing
+
+Sign multiple Cosmos transactions with the same key:
+
+```json
+{
+  "signWith": "cosmos1abc123def456...",
+  "payloads": [
+    "0a93010a90010a1c2f636f736d6f732e62616e6b2e763162657461312e4d736753656e64...",
+    "0a94010a91010a1c2f636f736d6f732e62616e6b2e763162657461312e4d736753656e64..."
+  ],
+  "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
+  "hashFunction": "HASH_FUNCTION_SHA256"
+}
+```
+
+### When to Use Batch Signing
+
+- Signing multiple messages or transactions with the same key in a workflow
+- Processing a queue of pending signatures
+- Multi-message protocols that require several signatures from one key
+- Any scenario where you would otherwise loop over sign_raw_payload
+
+The batch endpoint uses a single activity, so it counts as one operation for rate limiting and activity tracking purposes.
+
+## Supported Encodings
+
+| Encoding | Value | Description |
+|----------|-------|-------------|
+| UTF-8 text | PAYLOAD_ENCODING_TEXT_UTF8 | Human-readable string payloads |
+| Hexadecimal | PAYLOAD_ENCODING_HEXADECIMAL | Pre-serialized binary data in hex |
+| EIP-712 | PAYLOAD_ENCODING_EIP712 | Typed structured data (Ethereum EIP-712) |
+| EIP-7702 | PAYLOAD_ENCODING_EIP7702_AUTHORIZATION | EIP-7702 authorization tuples |
+
 ## Notes
 
 - The `signWith` value can be a wallet account address, a private key address, or a private key ID.
 - For Ed25519 keys (Solana, Sui, TON), always use HASH_FUNCTION_NOT_APPLICABLE.
 - For Schnorr keys (Bitcoin Taproot), always use HASH_FUNCTION_NO_OP and pre-hash externally.
-- The response for signRawPayload returns (r, s, v) components. For Ed25519, the signature is returned as a single concatenated value in the `r` and `s` fields.
+- The response for sign_raw_payload returns (r, s, v) components. For Ed25519, the signature is returned as a single concatenated value in the `r` and `s` fields.
+- The response for sign_raw_payloads returns an array of (r, s, v) objects in the `signatures` field.
 - Reassemble the signature components into the format expected by the target chain before broadcasting.

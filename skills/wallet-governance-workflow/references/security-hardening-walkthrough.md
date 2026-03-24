@@ -62,7 +62,7 @@ Expected: empty (no policies yet).
 
 ## Step 2: Create Scoped Bot User
 
-Generate a P-256 key pair locally for the bot. See `managing-credentials-api` for key generation details.
+Generate a P-256 key pair locally for the bot. See `managing-users-api` for key generation details.
 
 Register the key by creating the bot user. First, create tags (the API requires tag IDs, not names):
 

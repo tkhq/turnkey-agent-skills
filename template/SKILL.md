@@ -2,7 +2,7 @@
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["your-tags-here"]
@@ -16,7 +16,7 @@ One sentence: the simplest way to accomplish this skill's task.
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-credentials-api skill. All requests must be signed with your P-256 key pair using Turnkey's X-Stamp authentication.
+Requires API credentials configured via the managing-users-api skill. All requests must be signed with your P-256 key pair using Turnkey's X-Stamp authentication.
 
 ## Instructions
 
@@ -43,5 +43,5 @@ For complete examples, see [references/examples.md](references/examples.md).
 
 ## Related Skills
 
-- `creating-wallets-api` for wallet setup
+- `managing-wallets-api` for wallet setup
 - `signing-transactions-api` for transaction signing

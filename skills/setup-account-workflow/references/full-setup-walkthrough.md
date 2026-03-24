@@ -1,6 +1,6 @@
 # Full Setup Walkthrough: EVM + Solana
 
-This walkthrough shows the most common setup path: a single wallet with Ethereum and Solana accounts. Adapt for your target chains using the address format table in `creating-wallets-api`.
+This walkthrough shows the most common setup path: a single wallet with Ethereum and Solana accounts. Adapt for your target chains using the address format table in `managing-wallets-api`.
 
 **Base URL:** `https://api.turnkey.com`
 
@@ -53,7 +53,7 @@ Expected response:
 }
 ```
 
-An empty list is correct for a new organization. If you get an authentication error, verify that your key pair is correctly generated and the X-Stamp header is properly constructed (see managing-credentials-api).
+An empty list is correct for a new organization. If you get an authentication error, verify that your key pair is correctly generated and the X-Stamp header is properly constructed (see managing-users-api).
 
 ## Step 4: Create Wallet with EVM + Solana Accounts
 
@@ -234,7 +234,7 @@ Add a Bitcoin account to your existing wallet after creation:
 }
 ```
 
-For the full list of supported chains and address formats, see the table in `creating-wallets-api`.
+For the full list of supported chains and address formats, see the table in `managing-wallets-api`.
 
 ### Adding a Second Team Member
 
@@ -267,4 +267,4 @@ Generate a P-256 key pair for the new team member locally, then create the user:
 }
 ```
 
-See `managing-credentials-api` for user provisioning details, sub-organization patterns, and key rotation.
+See `managing-users-api` for user provisioning details, sub-organization patterns, and key rotation.

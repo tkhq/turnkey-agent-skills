@@ -1,8 +1,8 @@
 ---
 name: setup-account-workflow
-description: "Bootstraps a Turnkey organization from zero to operational using the API. Walks through API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey from scratch', 'bootstrap my Turnkey organization via the API', 'set up Turnkey from scratch using the API', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use creating-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-credentials-api), or adding policies (use wallet-governance-workflow or managing-policies-api)."
+description: "Bootstraps a Turnkey organization from zero to operational using the API. Walks through API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey from scratch', 'bootstrap my Turnkey organization via the API', 'set up Turnkey from scratch using the API', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use managing-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-users-api), or adding policies (use wallet-governance-workflow or managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -20,14 +20,14 @@ Bootstrap a Turnkey organization from zero to "I can sign transactions" by follo
 ## Prerequisites
 
 - An organization ID from the Turnkey dashboard (app.turnkey.com)
-- A P-256 key pair for authenticating API requests (see managing-credentials-api for details)
+- A P-256 key pair for authenticating API requests (see managing-users-api for details)
 
 ## Building Blocks
 
 This workflow composes three primitive skills in order. Each phase below tells you WHAT to do and HOW to verify. For detailed endpoint variations, consult the corresponding skill.
 
-1. **managing-credentials-api** - API key generation, user provisioning
-2. **creating-wallets-api** - Wallet creation, address derivation for target chains
+1. **managing-users-api** - API key generation, user provisioning
+2. **managing-wallets-api** - Wallet creation, address derivation for target chains
 3. **signing-transactions-api** - Test signing to verify everything works end-to-end
 
 ## Instructions
@@ -59,7 +59,7 @@ Get your organization ID from the Turnkey dashboard at app.turnkey.com, then gen
 **Verify:**
 - The response includes `apiKeyIds` confirming registration
 
-See `managing-credentials-api` for key curves, authentication header construction, and key rotation patterns.
+See `managing-users-api` for key curves, authentication header construction, and key rotation patterns.
 
 ### Decision Gate: Choose Your Chain Strategy
 
@@ -139,7 +139,7 @@ Confirm the new wallet appears. Then list accounts:
 
 Record the addresses. You will need them for funding and signing.
 
-For EVM-only, remove the Solana account. For other chains (Bitcoin, Cosmos, Sui, etc.), see the full address format table in `creating-wallets-api`.
+For EVM-only, remove the Solana account. For other chains (Bitcoin, Cosmos, Sui, etc.), see the full address format table in `managing-wallets-api`.
 
 ### Phase 3: Verify with a Test Signature
 
@@ -205,7 +205,7 @@ For teams, generate a P-256 key pair for each new team member locally, then crea
 | 2-5 members | Create named users. Root quorum is sufficient for now. |
 | 5+ members | Create users with tags, then add policies (see `wallet-governance-workflow`). |
 
-See `managing-credentials-api` for detailed user provisioning and sub-organization patterns.
+See `managing-users-api` for detailed user provisioning and sub-organization patterns.
 
 ### Phase 5: (Optional) Harden for Production
 
@@ -231,8 +231,8 @@ After completing phases 1-3, confirm:
 
 ## Related Skills
 
-- `managing-credentials-api` for detailed API key and user management
-- `creating-wallets-api` for all supported chains, derivation paths, and import/export
+- `managing-users-api` for detailed API key and user management
+- `managing-wallets-api` for all supported chains, derivation paths, and import/export
 - `signing-transactions-api` for chain-specific signing methods and broadcasting
 - `wallet-governance-workflow` for adding governance, policies, and access control
 

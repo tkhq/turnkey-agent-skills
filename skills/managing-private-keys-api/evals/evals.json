@@ -1,0 +1,52 @@
+[
+  {
+    "skills": ["managing-private-keys-api"],
+    "query": "Create a standalone Ethereum private key using the Turnkey API",
+    "expected_behavior": [
+      "Checks for existing keys first with POST /public/v1/query/list_private_keys",
+      "Uses POST /public/v1/submit/create_private_keys with correct JSON body",
+      "Specifies CURVE_SECP256K1 and ADDRESS_FORMAT_ETHEREUM",
+      "Includes privateKeyTags field (even if empty array)"
+    ]
+  },
+  {
+    "skills": ["managing-private-keys-api"],
+    "query": "Tag my private keys as 'treasury' so I can write a policy that controls signing for all treasury keys",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/create_private_key_tag",
+      "Includes privateKeyTagName and privateKeyIds in the request body",
+      "Explains how the tag can be used in policy conditions with private_key.tags.contains('treasury')",
+      "Does NOT attempt to create a policy (that is the managing-policies-api skill)"
+    ]
+  },
+  {
+    "skills": ["managing-private-keys-api"],
+    "query": "Import an existing Solana private key into Turnkey",
+    "expected_behavior": [
+      "Describes the three-step HPKE import flow: init, client-side encrypt, import",
+      "Uses POST /public/v1/submit/init_import_private_key with userId",
+      "Uses POST /public/v1/submit/import_private_key with CURVE_ED25519 and ADDRESS_FORMAT_SOLANA",
+      "Mentions that the plaintext key never leaves the client machine"
+    ]
+  },
+  {
+    "skills": ["managing-private-keys-api"],
+    "query": "Export a private key from Turnkey for backup",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/export_private_key with privateKeyId and targetPublicKey",
+      "Explains the HPKE encryption requirement (client-side key pair)",
+      "Mentions client-side decryption of the export bundle",
+      "Notes hex output format for most keys and 64-byte format for Solana"
+    ]
+  },
+  {
+    "skills": ["managing-private-keys-api"],
+    "query": "Delete private keys that have not been exported yet",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/delete_private_keys",
+      "Includes deleteWithoutExport set to true in the request body",
+      "Warns that deletion is permanent and cannot be undone",
+      "Includes privateKeyIds array in the request"
+    ]
+  }
+]

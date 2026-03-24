@@ -26,11 +26,14 @@ jobs:
       matrix:
         skill:
           - creating-skills
-          - creating-wallets-api
-          - managing-credentials-api
-          - managing-policies-api
-          - setup-account-workflow
+          - managing-wallets-api
+          - managing-private-keys-api
           - signing-transactions-api
+          - managing-policies-api
+          - monitoring-activities-api
+          - managing-users-api
+          - managing-organizations-api
+          - setup-account-workflow
           - wallet-governance-workflow
     steps:
       - uses: actions/checkout@v4

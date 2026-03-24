@@ -1,8 +1,8 @@
 ---
 name: wallet-governance-workflow
-description: "Adds governance, policies, and access control to existing Turnkey wallets for production readiness. Walks through auditing current state, choosing a governance strategy, creating scoped API users, implementing policies (allowlists, spending limits, consensus requirements), testing enforcement, and hardening root quorum. Use when asked to 'secure my Turnkey wallets', 'harden Turnkey for production', 'set up governance for my organization', 'lock down my wallets', 'production-ready Turnkey setup', 'add access control to Turnkey', 'prepare Turnkey for mainnet', 'implement least privilege on Turnkey', or 'what policies should I add to my wallets'. Do NOT use for creating wallets (use creating-wallets-api), initial account setup (use setup-account-workflow), signing transactions (use signing-transactions-api), or individual policy CRUD (use managing-policies-api)."
+description: "Adds governance, policies, and access control to existing Turnkey wallets for production readiness. Walks through auditing current state, choosing a governance strategy, creating scoped API users, implementing policies (allowlists, spending limits, consensus requirements), testing enforcement, and hardening root quorum. Use when asked to 'secure my Turnkey wallets', 'harden Turnkey for production', 'set up governance for my organization', 'lock down my wallets', 'production-ready Turnkey setup', 'add access control to Turnkey', 'prepare Turnkey for mainnet', 'implement least privilege on Turnkey', or 'what policies should I add to my wallets'. Do NOT use for creating wallets (use managing-wallets-api), initial account setup (use setup-account-workflow), signing transactions (use signing-transactions-api), or individual policy CRUD (use managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup. Requires existing wallets and API keys."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup. Requires existing wallets and API keys."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -17,7 +17,7 @@ Add governance and access control to existing Turnkey wallets by auditing curren
 
 ## Prerequisites
 
-- Turnkey API credentials (P-256 key pair). See `managing-credentials-api` for authentication setup.
+- Turnkey API credentials (P-256 key pair). See `managing-users-api` for authentication setup.
 - Existing wallets and API keys (complete `setup-account-workflow` first if starting fresh)
 - Root quorum access for policy changes
 
@@ -26,7 +26,7 @@ Add governance and access control to existing Turnkey wallets by auditing curren
 This workflow composes two primitive skills:
 
 1. **managing-policies-api** - Policy creation, updating, deletion, and the policy expression language
-2. **managing-credentials-api** - Scoped user creation, API key generation, key rotation
+2. **managing-users-api** - Scoped user creation, API key generation, key rotation
 
 Each phase tells you WHAT to do and HOW to verify. For detailed commands and policy language syntax, consult the corresponding skill.
 
@@ -96,7 +96,7 @@ Pick the tier that matches your environment and follow the corresponding phases 
 
 Stop using root keys for day-to-day operations. Create purpose-built users with descriptive names and tags.
 
-Generate a P-256 key pair locally, then register it via the API. See `managing-credentials-api` for key generation details.
+Generate a P-256 key pair locally, then register it via the API. See `managing-users-api` for key generation details.
 
 Create tags first (the API requires tag IDs, not names):
 
@@ -151,7 +151,7 @@ Create the user with tag IDs:
 
 **Verify:** Call `POST /public/v1/query/list_users` and confirm the new users appear with correct tags.
 
-See `managing-credentials-api` for detailed user provisioning and sub-organization patterns.
+See `managing-users-api` for detailed user provisioning and sub-organization patterns.
 
 ### Phase 3: Implement Policies
 
@@ -301,9 +301,9 @@ This should return a policy denial error because the DENY policy blocks transfer
 ## Related Skills
 
 - `managing-policies-api` for individual policy CRUD, expression language, and all chain-specific policy keywords
-- `managing-credentials-api` for user provisioning, key generation, and sub-organization management
+- `managing-users-api` for user provisioning, key generation, and sub-organization management
 - `setup-account-workflow` for initial organization bootstrapping (if you have not set up yet)
-- `creating-wallets-api` for wallet and address management
+- `managing-wallets-api` for wallet and address management
 - `signing-transactions-api` for transaction signing methods
 
 For a complete end-to-end security hardening walkthrough, see [references/security-hardening-walkthrough.md](references/security-hardening-walkthrough.md).

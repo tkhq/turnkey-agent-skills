@@ -40,7 +40,7 @@ mkdir -p skills/signing-cosmos/{references,evals}
 name: signing-cosmos
 description: "Signs and broadcasts Cosmos ecosystem transactions using Turnkey with CosmJS. Covers ATOM transfers, IBC transfers, and staking operations. Use when asked to 'send ATOM', 'sign a Cosmos transaction', 'stake ATOM', 'do an IBC transfer', or 'interact with a Cosmos chain'."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["cosmos", "signing", "cosmjs", "atom", "ibc"]
@@ -72,7 +72,7 @@ Use the Turnkey API to sign Cosmos transactions via `POST /public/v1/submit/sign
 
 ## Related Skills
 
-- `creating-wallets-api` for Cosmos address derivation
+- `managing-wallets-api` for Cosmos address derivation
 - `managing-policies-api` for Cosmos-specific policies
 ```
 
@@ -124,7 +124,7 @@ Full, self-contained API examples for:
     ]
   },
   {
-    "skills": ["creating-wallets-api", "signing-cosmos"],
+    "skills": ["managing-wallets-api", "signing-cosmos"],
     "query": "Create a Cosmos wallet and send ATOM",
     "expected_behavior": [
       "Creates wallet with ADDRESS_FORMAT_COSMOS",

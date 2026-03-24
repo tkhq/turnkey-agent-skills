@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "I want to build a backend service that signs Ethereum transactions with Turnkey",
+    "Walk me through setting up server-side Turnkey wallets from scratch",
+    "Build a payment service that automates crypto payouts using Turnkey",
+    "I need to set up company wallets with Turnkey for my treasury operations",
+    "How do I build a sweeper that moves funds between wallets using Turnkey?",
+    "Set up a trading bot that uses Turnkey for signing with policy constraints",
+    "Create a Node.js service that creates wallets and signs transactions server-side",
+    "I want to automate staking operations using Turnkey server wallets",
+    "Help me build a rebalancer service with multi-party approval using Turnkey",
+    "Walk me through the full server-side Turnkey integration end to end"
+  ],
+  "should_not_trigger": [
+    "Create a wallet using the Turnkey SDK",
+    "Sign a transaction with viem and Turnkey",
+    "Add a spending limit policy to my Turnkey organization",
+    "Build a React app where users get embedded wallets",
+    "Add email login to my Turnkey-powered app",
+    "How do I use the Turnkey CLI to sign a transaction?",
+    "Set up Google OAuth with Turnkey for my users",
+    "What chains does Turnkey support for signing?",
+    "I want my users to sign in with passkeys and get wallets",
+    "How do I derive a Bitcoin address with the SDK?"
+  ]
+}

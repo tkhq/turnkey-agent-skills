@@ -140,5 +140,7 @@ For complete import and export workflows (wallet mnemonic backup, private key ex
 
 ## Related Skills
 
+- `embedded-wallets-workflow` for the full end-to-end flow: auth, wallets, signing, and policies in React apps
+- `server-wallets-workflow` for the full end-to-end flow: wallets, signing, and policies in backend services
 - `signing-transactions-sdk` for signing and broadcasting transactions across all supported chains
 - `managing-policies-sdk` for setting access control on wallets

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "I want to build a React app where each user gets their own crypto wallet",
+    "Walk me through setting up Turnkey embedded wallets from scratch",
+    "Build a Next.js app with user authentication and wallet creation using Turnkey",
+    "I need to integrate Turnkey into my React app with email login and wallets",
+    "Set up a non-custodial wallet app for my users",
+    "How do I build a dapp where users can sign in and have their own wallets?",
+    "Create a full embedded wallet experience with login, wallets, and signing",
+    "I want to build a crypto app with Google login and embedded wallets",
+    "Walk me through the full Turnkey React integration end to end",
+    "Help me build an app where users sign up and get Ethereum and Solana wallets"
+  ],
+  "should_not_trigger": [
+    "Create a wallet using the Turnkey SDK",
+    "Sign a transaction with viem and Turnkey",
+    "Add email OTP login to my existing Turnkey app",
+    "Set up a spending limit policy on my Turnkey wallet",
+    "Build a backend service that signs transactions with Turnkey",
+    "I need to automate payouts using Turnkey server-side",
+    "How do I use the Turnkey CLI to create a wallet?",
+    "Add passkey auth to my React app",
+    "What chains does Turnkey support?",
+    "Set up server-side signing for my trading bot"
+  ]
+}

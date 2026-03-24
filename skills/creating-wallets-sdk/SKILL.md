@@ -1,9 +1,10 @@
 ---
-name: creating-wallets
-description: "Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, TON, XRP, Stellar, and other chains using Turnkey's secure enclave infrastructure. Use when asked to 'create a wallet', 'set up a wallet', 'generate an address', 'derive an address', 'check if I have a wallet', 'list my wallets', 'make a new wallet', 'get a blockchain address', 'add a chain to my wallet', 'create a sub-organization with a wallet', or 'set up wallets for users'. Do NOT use for signing transactions, sending funds, or setting wallet policies."
+name: creating-wallets-sdk
+description: "Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, TON, XRP, Stellar, and other chains using Turnkey's secure enclave infrastructure. Use when asked to 'create a wallet', 'set up a wallet', 'generate an address', 'derive an address', 'check if I have a wallet', 'list my wallets', 'make a new wallet', 'get a blockchain address', 'add a chain to my wallet', 'create a sub-organization with a wallet', or 'set up wallets for users'. Do NOT use for signing transactions, sending funds, setting wallet policies, or CLI/API-based wallet operations using the turnkey command line tool or turnkey request (use creating-wallets-api instead)."
 license: Apache-2.0
 compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
 metadata:
+  author: turnkey
   version: "1.1.0"
   tags: ["wallet", "blockchain", "address-derivation", "hd-wallet", "sub-organization"]
 ---
@@ -126,6 +127,8 @@ const subOrg = await client.createSubOrganization({
 
 For complete examples including multi-chain wallet bootstrap and sub-org patterns, see [references/wallet-examples.md](references/wallet-examples.md).
 
+For complete import and export workflows (wallet mnemonic backup, private key export, import from seed phrase), see [references/import-export-examples.md](references/import-export-examples.md).
+
 ## Rules
 
 - NEVER call `createWallet` without first calling `getWallets` to check for existing wallets
@@ -137,5 +140,5 @@ For complete examples including multi-chain wallet bootstrap and sub-org pattern
 
 ## Related Skills
 
-- `signing-transactions` for signing and broadcasting transactions across all supported chains
-- `managing-policies` for setting access control on wallets
+- `signing-transactions-sdk` for signing and broadcasting transactions across all supported chains
+- `managing-policies-sdk` for setting access control on wallets

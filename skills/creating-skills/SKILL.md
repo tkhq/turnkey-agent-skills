@@ -4,6 +4,7 @@ description: "Creates, evaluates, and improves Turnkey agent skills. Walks throu
 license: Apache-2.0
 compatibility: "Requires Node.js and tsx. Run npm install in the repo root."
 metadata:
+  author: turnkey
   version: "1.0.0"
   tags: ["meta", "skill-authoring", "evaluation"]
 ---
@@ -20,9 +21,9 @@ To create a new skill, follow these steps in order: Study, Research, Draft, Eval
 
 Before writing anything, read 1-2 existing skills to understand the pattern. Good references:
 
-- `skills/creating-wallets/SKILL.md` is the simplest skill (wallet CRUD)
-- `skills/signing-transactions/SKILL.md` shows multi-chain support with progressive disclosure
-- `skills/authenticating-users/SKILL.md` shows progressive disclosure across multiple auth methods
+- `skills/creating-wallets-sdk/SKILL.md` is the simplest skill (wallet CRUD)
+- `skills/signing-transactions-sdk/SKILL.md` shows multi-chain support with progressive disclosure
+- `skills/authenticating-users-sdk/SKILL.md` shows progressive disclosure across multiple auth methods
 
 Read the SKILL.md, one reference file, and the evals for whichever skill is closest to what you are building. This gives you the exact pattern to follow.
 

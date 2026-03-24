@@ -1,9 +1,10 @@
 ---
-name: signing-transactions
-description: "Signs and broadcasts blockchain transactions using Turnkey. Supports Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS), Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via paymaster. Use when asked to 'send ETH', 'send BTC', 'send SOL', 'sign a transaction', 'transfer tokens', 'sign a message', 'sign typed data', 'deploy a contract', 'swap on Uniswap', 'send a Cosmos transaction', 'sign on Sui', 'send TON', 'send TRX', 'pay with x402', 'use sponsored transactions', 'gasless transaction', 'sign a PSBT', 'sign with taproot', 'transfer ERC-20', 'transfer SPL tokens', 'sign EIP-712', or 'broadcast a transaction'. Do NOT use for creating wallets (use creating-wallets), managing policies (use managing-policies), or authenticating users (use authenticating-users)."
+name: signing-transactions-sdk
+description: "Signs and broadcasts blockchain transactions using Turnkey. Supports Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS), Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via paymaster. Use when asked to 'send ETH', 'send BTC', 'send SOL', 'sign a transaction', 'transfer tokens', 'sign a message', 'sign typed data', 'deploy a contract', 'swap on Uniswap', 'send a Cosmos transaction', 'sign on Sui', 'send TON', 'send TRX', 'pay with x402', 'use sponsored transactions', 'gasless transaction', 'sign a PSBT', 'sign with taproot', 'transfer ERC-20', 'transfer SPL tokens', 'sign EIP-712', or 'broadcast a transaction'. Do NOT use for creating wallets (use creating-wallets-sdk), managing policies (use managing-policies-sdk), authenticating users (use authenticating-users-sdk), or CLI/API-based signing using the turnkey command line tool (use signing-transactions-api instead)."
 license: Apache-2.0
 compatibility: "Requires Node.js and TypeScript. Install @turnkey/sdk-server plus chain-specific packages. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
 metadata:
+  author: turnkey
   version: "1.0.0"
   tags: ["signing", "transactions", "ethereum", "bitcoin", "solana", "viem", "ethers", "cosmos", "sui", "ton", "tron", "uniswap", "x402", "paymaster", "multichain"]
 ---
@@ -257,7 +258,7 @@ Turnkey offers several signing approaches depending on the chain and use case:
 - **TRON uses SHA256.** Set `hashFunction: "HASH_FUNCTION_SHA256"` in `signRawPayload`.
 - **TON requires BOC construction.** Build the signing message with `WalletContractV4` and `beginCell()` before signing with `signRawPayload`.
 - **Paymaster transactions are async.** After calling `ethSendTransaction` or `solSendTransaction` with `sponsor: true`, poll `getSendTransactionStatus()` until the transaction is confirmed.
-- **SIGN_WITH must be a derived address** from a Turnkey wallet, not an arbitrary address. Use the `creating-wallets` skill to set up wallets first.
+- **SIGN_WITH must be a derived address** from a Turnkey wallet, not an arbitrary address. Use the `creating-wallets-sdk` skill to set up wallets first.
 - **Chain-specific units:** wei (ETH), lamports (SOL), satoshis (BTC), SUN (TRX), utia (Celestia).
 - **signRawPayload hash functions** vary by chain: `HASH_FUNCTION_NO_OP` (Bitcoin Taproot, pre-hashed), `HASH_FUNCTION_NOT_APPLICABLE` (Sui, TON, pre-hashed), `HASH_FUNCTION_SHA256` (TRON).
 
@@ -272,6 +273,6 @@ Turnkey offers several signing approaches depending on the chain and use case:
 
 ## Related Skills
 
-- `creating-wallets` for wallet setup and address derivation
-- `managing-policies` for transaction governance and spending limits
-- `authenticating-users` for user management and auth flows
+- `creating-wallets-sdk` for wallet setup and address derivation
+- `managing-policies-sdk` for transaction governance and spending limits
+- `authenticating-users-sdk` for user management and auth flows

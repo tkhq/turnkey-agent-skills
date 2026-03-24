@@ -1,0 +1,25 @@
+{
+  "should_trigger": [
+    "Sign an Ethereum transaction using the turnkey CLI",
+    "How do I sign a raw payload via the Turnkey API?",
+    "Sign a Bitcoin transaction using turnkey request",
+    "Use turnkey ethereum transaction to sign a transfer",
+    "Sign a Solana transaction via the Turnkey API endpoint",
+    "How do I use turnkey raw sign for a custom payload?",
+    "Sign a Tron transaction using the Turnkey API",
+    "I need to sign a raw payload using the turnkey CLI tool",
+    "How do I sign a message using turnkey raw sign?",
+    "Sign a transaction via turnkey request for my Bitcoin wallet",
+    "What payload encoding should I use with turnkey raw sign?",
+    "I need to use the turnkey API to sign a transaction for broadcasting"
+  ],
+  "should_not_trigger": [
+    "Create a new wallet with Turnkey CLI",
+    "Set up a policy to restrict signing",
+    "Generate an API key for Turnkey",
+    "Send ETH using viem and @turnkey/viem",
+    "List my wallets using the turnkey command",
+    "Sign a transaction using @turnkey/viem in my React app",
+    "How do I create a wallet with the turnkey CLI?"
+  ]
+}

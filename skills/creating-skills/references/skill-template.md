@@ -24,10 +24,10 @@ The description is the most critical field. It controls when the skill gets load
 
 ### Good descriptions (from existing skills):
 
-**creating-wallets:**
+**creating-wallets-sdk:**
 "Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, and other chains using Turnkey's secure enclave infrastructure. Use when asked to 'create a wallet', 'set up a wallet', 'get a blockchain address', 'derive an address', 'check if I have a wallet', or 'list my wallets'."
 
-**signing-transactions:**
+**signing-transactions-sdk:**
 "Signs and broadcasts blockchain transactions using Turnkey. Supports Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS), Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via paymaster. Use when asked to 'send ETH', 'send BTC', 'send SOL', 'sign a transaction', 'transfer tokens', 'sign a message', or 'broadcast a transaction'."
 
 ### What makes these good:
@@ -73,9 +73,9 @@ Subsequent steps show the key API call pattern, then link to references for full
 
 ### Rules
 Mandatory guardrails specific to THIS feature. Examples:
-- "NEVER call createWallet without first calling getWallets" (creating-wallets)
-- "Always pass the signing address explicitly to addSignature" (signing-transactions)
-- "DENY always takes precedence over ALLOW" (managing-policies)
+- "NEVER call createWallet without first calling getWallets" (creating-wallets-sdk)
+- "Always pass the signing address explicitly to addSignature" (signing-transactions-sdk)
+- "DENY always takes precedence over ALLOW" (managing-policies-sdk)
 
 ### Related Skills
 Cross-references to skills that are commonly used together.

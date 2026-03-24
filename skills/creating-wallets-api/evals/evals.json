@@ -1,0 +1,56 @@
+[
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "Create an HD wallet with Ethereum and Solana using the turnkey CLI",
+    "expected_behavior": [
+      "Checks for existing wallets first with turnkey wallets list",
+      "Shows both CLI shortcut and API endpoint forms",
+      "Uses correct address formats and derivation paths for both chains"
+    ]
+  },
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "List all wallet accounts for my wallet via the API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/query/list_wallet_accounts",
+      "Includes walletId in the request body",
+      "Does NOT create a new wallet"
+    ]
+  },
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "Add a Bitcoin Taproot address to my existing wallet",
+    "expected_behavior": [
+      "Uses create_wallet_accounts endpoint or turnkey wallets accounts create",
+      "Uses ADDRESS_FORMAT_BITCOIN_MAINNET_P2TR with CURVE_SECP256K1",
+      "Uses BIP-86 derivation path m/86'/0'/0'/0/0"
+    ]
+  },
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "Export my wallet mnemonic using the turnkey CLI",
+    "expected_behavior": [
+      "Uses turnkey wallets export with --name and --export-bundle-output",
+      "Shows decrypt step with turnkey decrypt",
+      "Mentions encryption key prerequisite"
+    ]
+  },
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "Create a standalone private key for raw signing",
+    "expected_behavior": [
+      "Uses turnkey private-keys create or the API endpoint",
+      "Specifies curve and address-format",
+      "Explains difference between standalone private keys and HD wallet-derived keys"
+    ]
+  },
+  {
+    "skills": ["creating-wallets-api"],
+    "query": "Create a wallet with addresses for Bitcoin, Ethereum, and Cosmos via the API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_wallet",
+      "Includes all three chains with correct curves, paths, and address formats",
+      "Shows complete JSON body with the accounts array"
+    ]
+  }
+]

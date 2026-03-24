@@ -1,0 +1,47 @@
+[
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "Sign an Ethereum transaction using the turnkey CLI",
+    "expected_behavior": [
+      "Uses turnkey ethereum transaction --signer and --payload",
+      "Also shows the API alternative with turnkey request",
+      "Explains that the payload must be a serialized unsigned transaction hex"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "Sign a raw payload with SHA256 hashing via the API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/sign_raw_payload",
+      "Sets hashFunction to HASH_FUNCTION_SHA256",
+      "Sets encoding to PAYLOAD_ENCODING_HEXADECIMAL or PAYLOAD_ENCODING_TEXT_UTF8"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "Sign a Solana transaction via the Turnkey API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/sign_transaction",
+      "Sets type to TRANSACTION_TYPE_SOLANA",
+      "Explains the response contains the signed transaction"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "I want to sign on Sui, what hash function do I use with turnkey?",
+    "expected_behavior": [
+      "Recommends HASH_FUNCTION_NOT_APPLICABLE for Ed25519",
+      "Shows signRawPayload API call",
+      "Mentions blake2b hashing must be done before passing to Turnkey"
+    ]
+  },
+  {
+    "skills": ["signing-transactions-api"],
+    "query": "What is the difference between signTransaction and signRawPayload in the Turnkey API?",
+    "expected_behavior": [
+      "Explains signTransaction is chain-aware and enables policy engine inspection",
+      "Explains signRawPayload is low-level and chain-agnostic",
+      "Lists which chains support signTransaction vs requiring signRawPayload"
+    ]
+  }
+]

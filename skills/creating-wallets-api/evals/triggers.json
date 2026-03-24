@@ -1,0 +1,25 @@
+{
+  "should_trigger": [
+    "Create a wallet using the turnkey CLI",
+    "How do I list wallets via the Turnkey API?",
+    "Derive a Solana address using turnkey request",
+    "Add a Bitcoin account to my existing wallet via CLI",
+    "Export my wallet mnemonic using the turnkey command",
+    "Import a wallet seed phrase into Turnkey via the API",
+    "Create a standalone private key with turnkey",
+    "List all wallet accounts using turnkey wallets accounts list",
+    "How do I create a Bitcoin wallet using the turnkey API endpoint?",
+    "Use turnkey request to list all my wallet accounts",
+    "I want to create a private key for Solana using the turnkey CLI",
+    "Show me how to derive a Cosmos address via turnkey wallets accounts create"
+  ],
+  "should_not_trigger": [
+    "Sign a transaction on Ethereum",
+    "Create a spending limit policy for my wallet",
+    "Add Google OAuth login to my React app",
+    "Generate an API key for my organization",
+    "Create a wallet using @turnkey/sdk-server",
+    "Create a wallet using @turnkey/sdk-server in TypeScript",
+    "How do I send Bitcoin from my Turnkey wallet?"
+  ]
+}

@@ -4,7 +4,7 @@ This walks through the full process of creating a new skill from scratch.
 
 ## Step 1: Study Existing Skills
 
-Read `skills/signing-transactions/SKILL.md` since it is the closest pattern (multi-chain signing skill). Note the structure: Quick Start, Prerequisites, Decision Tree, Common Initialization, Default Examples (viem), Quick Reference for Other Chains, Signing Methods Overview, Gotchas, Rules, Related Skills. Note how the SKILL.md keeps chain-specific code brief and delegates full examples to the `references/` directory.
+Read `skills/signing-transactions-sdk/SKILL.md` since it is the closest pattern (multi-chain signing skill). Note the structure: Quick Start, Prerequisites, Decision Tree, Common Initialization, Default Examples (viem), Quick Reference for Other Chains, Signing Methods Overview, Gotchas, Rules, Related Skills. Note how the SKILL.md keeps chain-specific code brief and delegates full examples to the `references/` directory.
 
 ## Step 2: Research
 
@@ -76,8 +76,8 @@ Use `@turnkey/cosmjs` to sign Cosmos transactions. The Turnkey signer implements
 
 ## Related Skills
 
-- `creating-wallets` for Cosmos address derivation
-- `managing-policies` for Cosmos-specific policies
+- `creating-wallets-sdk` for Cosmos address derivation
+- `managing-policies-sdk` for Cosmos-specific policies
 ```
 
 ### 3c. Write references/cosmos-examples.md
@@ -128,7 +128,7 @@ Full, self-contained TypeScript examples for:
     ]
   },
   {
-    "skills": ["creating-wallets", "signing-cosmos"],
+    "skills": ["creating-wallets-sdk", "signing-cosmos"],
     "query": "Create a Cosmos wallet and send ATOM",
     "expected_behavior": [
       "Creates wallet with ADDRESS_FORMAT_COSMOS",

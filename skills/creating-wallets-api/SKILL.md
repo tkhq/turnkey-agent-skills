@@ -1,6 +1,6 @@
 ---
 name: creating-wallets-api
-description: "Creates HD wallets and derives blockchain addresses using the Turnkey CLI and API endpoints. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, and other chains. Covers wallet creation, account derivation, listing, import, and export operations. Use when asked to 'create a wallet with turnkey CLI', 'turnkey wallets create', 'list wallets via API', 'derive an address using turnkey request', 'export wallet mnemonic via CLI', 'import a wallet with turnkey', 'create a private key using turnkey CLI', 'add a chain to my wallet via the API', or 'list wallet accounts using turnkey'. Do NOT use for signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), generating API keys (use managing-credentials-api), or SDK-based wallet creation with @turnkey/sdk-server (use creating-wallets-sdk)."
+description: "Creates HD wallets and derives blockchain addresses using the Turnkey CLI and API endpoints. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, and other chains. Covers wallet creation, account derivation, listing, import, and export operations. Use when asked to 'create a wallet with turnkey CLI', 'turnkey wallets create', 'list wallets via API', 'derive an address using turnkey request', 'export wallet mnemonic via CLI', 'import a wallet with turnkey', 'create a private key using turnkey CLI', 'add a chain to my wallet via the API', or 'list wallet accounts using turnkey'. Do NOT use for signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), generating API keys (use managing-credentials-api), ."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys with managing-credentials-api skill first."
 metadata:
@@ -159,4 +159,3 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 - `signing-transactions-api` for signing transactions with wallet addresses
 - `managing-policies-api` for access control on wallets
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)
-- `creating-wallets-sdk` for SDK-based wallet creation in TypeScript

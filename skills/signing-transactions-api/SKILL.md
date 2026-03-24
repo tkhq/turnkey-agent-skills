@@ -1,6 +1,6 @@
 ---
 name: signing-transactions-api
-description: "Signs and broadcasts blockchain transactions using the Turnkey CLI and API endpoints. Supports Ethereum, Bitcoin, Solana, Tron, Sui, TON, Cosmos via signTransaction, signRawPayload, and sponsored/gasless transactions via ethSendTransaction and solSendTransaction. Use when asked to 'sign a transaction with turnkey CLI', 'turnkey ethereum transaction', 'sign a raw payload via the API', 'sign a Bitcoin transaction using turnkey request', 'sign a Solana transaction via turnkey', 'use turnkey raw sign', 'send a sponsored transaction via the API', 'gasless transaction with turnkey', or 'sign on Sui/TON/Cosmos via Turnkey API'. Do NOT use for creating wallets (use creating-wallets-api), managing policies (use managing-policies-api), managing credentials (use managing-credentials-api), or SDK-based signing with viem/ethers (use signing-transactions-sdk)."
+description: "Signs and broadcasts blockchain transactions using the Turnkey CLI and API endpoints. Supports Ethereum, Bitcoin, Solana, Tron, Sui, TON, Cosmos via signTransaction, signRawPayload, and sponsored/gasless transactions via ethSendTransaction and solSendTransaction. Use when asked to 'sign a transaction with turnkey CLI', 'turnkey ethereum transaction', 'sign a raw payload via the API', 'sign a Bitcoin transaction using turnkey request', 'sign a Solana transaction via turnkey', 'use turnkey raw sign', 'send a sponsored transaction via the API', 'gasless transaction with turnkey', or 'sign on Sui/TON/Cosmos via Turnkey API'. Do NOT use for creating wallets (use creating-wallets-api), managing policies (use managing-policies-api), managing credentials (use managing-credentials-api), ."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys and wallets first."
 metadata:
@@ -146,4 +146,3 @@ For gasless/sponsored transactions (paymaster), see [references/sponsored-transa
 - `managing-policies-api` for transaction governance and spending limits.
 - `managing-credentials-api` for API key setup.
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature).
-- `signing-transactions-sdk` for SDK-based transaction signing in TypeScript.

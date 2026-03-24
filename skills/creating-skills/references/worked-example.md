@@ -4,7 +4,7 @@ This walks through the full process of creating a new skill from scratch.
 
 ## Step 1: Study Existing Skills
 
-Read `skills/signing-transactions-sdk/SKILL.md` since it is the closest pattern (multi-chain signing skill). Note the structure: Quick Start, Prerequisites, Decision Tree, Common Initialization, Default Examples (viem), Quick Reference for Other Chains, Signing Methods Overview, Gotchas, Rules, Related Skills. Note how the SKILL.md keeps chain-specific code brief and delegates full examples to the `references/` directory.
+Read `skills/signing-transactions-api/SKILL.md` since it is the closest pattern (multi-chain signing skill). Note the structure: Quick Start, Prerequisites, Instructions, Signing Methods, Gotchas, Rules, Related Skills. Note how the SKILL.md keeps chain-specific commands brief and delegates full examples to the `references/` directory.
 
 ## Step 2: Research
 
@@ -20,14 +20,10 @@ search_turnkey("Cosmos signing CosmJS")
 2. Find the relevant page (e.g., https://docs.turnkey.com/networks/cosmos)
 3. Fetch that page for full details
 
-**Option C: SDK repo**
-Check https://github.com/tkhq/sdk/tree/main/packages/cosmjs for the package source and README.
-
 Key findings from research:
-- Turnkey has a `@turnkey/cosmjs` package that provides a signer
 - Uses `CURVE_SECP256K1` with `ADDRESS_FORMAT_COSMOS` for address derivation
-- The signer implements the CosmJS `OfflineSigner` interface
-- Requires `@cosmjs/stargate` for broadcasting
+- Can sign via `turnkey request` with the `SignRawPayload` activity
+- Requires the wallet to have a Cosmos-formatted account derived
 
 ## Step 3: Draft
 
@@ -44,7 +40,7 @@ mkdir -p skills/signing-cosmos/{references,evals}
 name: signing-cosmos
 description: "Signs and broadcasts Cosmos ecosystem transactions using Turnkey with CosmJS. Covers ATOM transfers, IBC transfers, and staking operations. Use when asked to 'send ATOM', 'sign a Cosmos transaction', 'stake ATOM', 'do an IBC transfer', or 'interact with a Cosmos chain'."
 license: Apache-2.0
-compatibility: "Requires Node.js. Install @turnkey/sdk-server @turnkey/cosmjs @cosmjs/stargate. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
+compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys and wallets first."
 metadata:
   version: "1.0.0"
   tags: ["cosmos", "signing", "cosmjs", "atom", "ibc"]
@@ -54,7 +50,7 @@ metadata:
 
 ## Quick Start
 
-Use `@turnkey/cosmjs` to sign Cosmos transactions. The Turnkey signer implements CosmJS's `OfflineSigner` interface.
+Use the Turnkey CLI to sign Cosmos transactions via `turnkey request` with `SignRawPayload`.
 
 ## Prerequisites
 
@@ -70,14 +66,14 @@ Use `@turnkey/cosmjs` to sign Cosmos transactions. The Turnkey signer implements
 
 ## Rules
 
-- Use `@turnkey/cosmjs`, not `@turnkey/ethers`, for Cosmos transactions
+- Use `SignRawPayload` with the correct Cosmos address format
 - Always set the correct chain ID and RPC endpoint for the target chain
 - For IBC transfers, verify the channel and port are correct before signing
 
 ## Related Skills
 
-- `creating-wallets-sdk` for Cosmos address derivation
-- `managing-policies-sdk` for Cosmos-specific policies
+- `creating-wallets-api` for Cosmos address derivation
+- `managing-policies-api` for Cosmos-specific policies
 ```
 
 ### 3c. Write references/cosmos-examples.md
@@ -114,21 +110,21 @@ Full, self-contained TypeScript examples for:
     "skills": ["signing-cosmos"],
     "query": "Send 10 ATOM to cosmos1abc...",
     "expected_behavior": [
-      "Uses @turnkey/cosmjs for the signer",
-      "Creates a SigningStargateClient",
-      "Calls sendTokens with the correct denom and amount"
+      "Uses turnkey request with SignRawPayload",
+      "Specifies the correct Cosmos address and chain ID",
+      "Signs with the correct denom and amount"
     ]
   },
   {
     "skills": ["signing-cosmos"],
-    "query": "Use @turnkey/ethers to sign a Cosmos transaction",
+    "query": "Use Ethereum signing to sign a Cosmos transaction",
     "expected_behavior": [
-      "Corrects the user: @turnkey/ethers is for Ethereum",
-      "Recommends @turnkey/cosmjs instead"
+      "Corrects the user: Ethereum signing uses different address formats than Cosmos",
+      "Recommends the correct Cosmos signing approach via turnkey request"
     ]
   },
   {
-    "skills": ["creating-wallets-sdk", "signing-cosmos"],
+    "skills": ["creating-wallets-api", "signing-cosmos"],
     "query": "Create a Cosmos wallet and send ATOM",
     "expected_behavior": [
       "Creates wallet with ADDRESS_FORMAT_COSMOS",
@@ -178,7 +174,7 @@ npx tsx skills/creating-skills/scripts/generate-report.ts --skill signing-cosmos
 ## Key Takeaways
 
 - Study an existing skill first (saves time, ensures consistency)
-- Research the specific Turnkey APIs and SDK packages before writing
+- Research the specific Turnkey APIs and CLI commands before writing
 - Write evals BEFORE polishing the skill content (eval-driven development)
 - The description is the most important part (it controls discovery)
 - Keep SKILL.md under 300 lines, put full examples in references

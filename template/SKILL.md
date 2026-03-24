@@ -2,7 +2,7 @@
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
+compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
 metadata:
   version: "1.0.0"
   tags: ["your-tags-here"]
@@ -17,37 +17,30 @@ One sentence: the simplest way to accomplish this skill's task.
 ## Prerequisites
 
 ```bash
-npm install @turnkey/sdk-server
+brew install tkhq/tap/turnkey
 ```
 
 ## Environment Variables
 
 ```env
-TURNKEY_API_PUBLIC_KEY=    # required
-TURNKEY_API_PRIVATE_KEY=   # required
-TURNKEY_ORGANIZATION_ID=   # required
+ORGANIZATION_ID=   # required, your Turnkey organization UUID
 ```
 
 ## Instructions
 
-### Step 1: Initialize the Turnkey client
+### Step 1: Set up CLI authentication
 
-```typescript
-import { Turnkey } from "@turnkey/sdk-server";
+```bash
+# Generate API keys (if not already done)
+turnkey generate api-key --organization $ORGANIZATION_ID --key-name default
 
-const turnkey = new Turnkey({
-  apiBaseUrl: "https://api.turnkey.com",
-  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-});
-
-const client = turnkey.apiClient();
+# Verify CLI is working
+turnkey version
 ```
 
 ### Step 2: Perform the action
 
-Brief code pattern here (10-15 lines max). Delegate full examples to references.
+Brief command pattern here (10-15 lines max). Delegate full examples to references.
 
 For complete examples, see [references/examples.md](references/examples.md).
 
@@ -58,5 +51,5 @@ For complete examples, see [references/examples.md](references/examples.md).
 
 ## Related Skills
 
-- `creating-wallets-sdk` for wallet setup
-- `signing-transactions-sdk` for transaction signing
+- `creating-wallets-api` for wallet setup
+- `signing-transactions-api` for transaction signing

@@ -22,7 +22,7 @@
     "skills": ["creating-skills"],
     "query": "I want to add a skill for Turnkey policy management",
     "expected_behavior": [
-      "Starts with research phase using Turnkey Docs MCP or SDK",
+      "Starts with research phase using Turnkey Docs MCP or documentation",
       "Uses gerund naming convention (e.g., managing-policies)",
       "Includes trigger phrases in the description",
       "Plans for references/ with code examples"

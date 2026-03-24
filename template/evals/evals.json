@@ -3,7 +3,7 @@
     "skills": ["your-skill-name"],
     "query": "A realistic user request that exercises the happy path",
     "expected_behavior": [
-      "Uses the correct Turnkey SDK method",
+      "Uses the correct Turnkey CLI command or API endpoint",
       "Handles the response correctly",
       "Follows the documented pattern"
     ]

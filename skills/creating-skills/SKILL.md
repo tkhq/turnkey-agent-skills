@@ -21,9 +21,9 @@ To create a new skill, follow these steps in order: Study, Research, Draft, Eval
 
 Before writing anything, read 1-2 existing skills to understand the pattern. Good references:
 
-- `skills/creating-wallets-sdk/SKILL.md` is the simplest skill (wallet CRUD)
-- `skills/signing-transactions-sdk/SKILL.md` shows multi-chain support with progressive disclosure
-- `skills/authenticating-users-sdk/SKILL.md` shows progressive disclosure across multiple auth methods
+- `skills/creating-wallets-api/SKILL.md` is the simplest skill (wallet CRUD)
+- `skills/signing-transactions-api/SKILL.md` shows multi-chain support with progressive disclosure
+- `skills/managing-credentials-api/SKILL.md` shows credential management and user provisioning
 
 Read the SKILL.md, one reference file, and the evals for whichever skill is closest to what you are building. This gives you the exact pattern to follow.
 
@@ -32,8 +32,8 @@ Read the SKILL.md, one reference file, and the evals for whichever skill is clos
 Gather the specific information you need to write the skill:
 
 **What to research:**
-- Which Turnkey API methods are involved (e.g., `createWallet`, `signTransaction`)
-- Which SDK package to use (e.g., `@turnkey/sdk-server`, `@turnkey/ethers`)
+- Which Turnkey API endpoints are involved (e.g., `CreateWallet`, `SignTransaction`)
+- Which CLI commands to use (e.g., `turnkey wallets create`, `turnkey request`)
 - What the request parameters and response shapes look like
 - Common patterns, gotchas, and required ordering of operations
 - What environment variables are needed
@@ -57,14 +57,7 @@ Start with `llms.txt` to find relevant pages, then fetch individual pages by app
 
 Use `llms-full.txt` only when you need to search across all docs at once (it is very large).
 
-**3. Turnkey SDK** (for TypeScript code examples):
-- Public repo: https://github.com/tkhq/sdk
-- Local clone (if available): `~/turnkey/sdk/`
-- Key directories:
-  - `packages/` contains all SDK packages (`sdk-server`, `ethers`, `viem`, `solana`, `cosmjs`, etc.)
-  - `examples/` contains 70+ runnable examples organized by feature
-
-**4. Turnkey docs repo** (for raw documentation source):
+**3. Turnkey docs repo** (for raw documentation source):
 - https://github.com/tkhq/docs
 
 ### Step 3: Draft the Skill
@@ -83,7 +76,7 @@ Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-transactions`, 
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
+compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
 metadata:
   version: "1.0.0"
   tags: ["relevant", "tags"]
@@ -109,7 +102,7 @@ metadata:
 **Body rules:**
 - Under 300 lines preferred, 500 max
 - Only include context the LLM does not already know (Turnkey-specific APIs, gotchas, required ordering)
-- Every skill starts with the same Turnkey client initialization pattern
+- Every skill starts with the same CLI authentication and setup pattern
 - Keep code in SKILL.md to brief patterns (10-15 lines max per block)
 - Delegate full, self-contained examples to `references/` files
 
@@ -117,7 +110,7 @@ metadata:
 
 Create `references/*.md` files with complete, runnable TypeScript examples. Each example should:
 - Include all imports
-- Include the full Turnkey client initialization
+- Include the full CLI setup and authentication
 - Be self-contained (copy-pasteable)
 - Cover one specific use case per example
 
@@ -150,7 +143,7 @@ Create two files in `evals/`:
 Write 4+ evals covering these categories:
 1. **Happy path**: Standard request that should work perfectly
 2. **Edge case**: Unusual but valid request
-3. **Adversarial**: User asks for the wrong SDK/approach (skill should correct them)
+3. **Adversarial**: User asks for the wrong approach (skill should correct them)
 4. **Cross-skill**: Request that requires this skill plus another
 
 See [references/eval-guide.md](references/eval-guide.md) for detailed guidance with examples.
@@ -261,7 +254,7 @@ Always re-eval after applying the improved description. The LLM suggestion does 
 - Use `--num-workers 2` in the full eval to avoid contention with parallel Claude sessions.
 - Single runs have high variance. A query that fails 1 run may pass the next. Use 3 runs minimum for any final judgment.
 - Explicit trigger phrases in the description ("Use when asked to 'create a wallet'") perform as well or better than abstract phrasing ("Use for any task involving wallet creation").
-- Cross-reference all blockchain network names, address formats, curves, and derivation paths against the official Turnkey docs at `docs/concepts/wallets.mdx` before publishing. The SDK docs table is the source of truth.
+- Cross-reference all blockchain network names, address formats, curves, and derivation paths against the official Turnkey docs at `docs/concepts/wallets.mdx` before publishing. The Turnkey docs are the source of truth.
 
 ### Step 7: Finalize
 
@@ -275,8 +268,8 @@ Review the eval results. If everything passes, run the checklist below.
 - SKILL.md body MUST stay under 500 lines (prefer under 300)
 - Reference files MUST be one level deep from SKILL.md (no nested references)
 - Do not duplicate code between SKILL.md and reference files
-- All code examples in references MUST be complete, self-contained TypeScript
-- Every skill MUST include the standard Turnkey client initialization pattern
+- All code examples in references MUST be complete and self-contained
+- Every skill MUST include the standard Turnkey CLI setup pattern
 - Use consistent environment variable names: TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH
 
 ## Checklist
@@ -284,7 +277,7 @@ Review the eval results. If everything passes, run the checklist below.
 Before considering a skill complete:
 
 - [ ] Studied 1-2 existing skills as reference
-- [ ] Researched the Turnkey feature via docs/SDK
+- [ ] Researched the Turnkey feature via docs
 - [ ] Description has trigger phrases and is under 1024 chars
 - [ ] SKILL.md is under 300 lines
 - [ ] Has Quick Start, Prerequisites, Environment Variables, Instructions, Rules, Related Skills sections

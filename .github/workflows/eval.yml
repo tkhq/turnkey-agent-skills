@@ -25,18 +25,12 @@ jobs:
       fail-fast: false
       matrix:
         skill:
-          - authenticating-users-sdk
           - creating-skills
           - creating-wallets-api
-          - creating-wallets-sdk
-          - embedded-wallets-workflow
           - managing-credentials-api
           - managing-policies-api
-          - managing-policies-sdk
-          - server-wallets-workflow
           - setup-account-workflow
           - signing-transactions-api
-          - signing-transactions-sdk
           - wallet-governance-workflow
     steps:
       - uses: actions/checkout@v4

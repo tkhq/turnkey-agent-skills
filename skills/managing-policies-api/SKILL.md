@@ -1,6 +1,6 @@
 ---
 name: managing-policies-api
-description: "Creates and manages Turnkey organization policies for access control and transaction governance using the Turnkey CLI and API endpoints. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval via turnkey request commands. Use when asked to 'create a policy with turnkey request', 'manage policies via turnkey API', 'set up an allowlist using the API', 'create a deny policy via turnkey request', 'delete a policy via the API', 'list policies using turnkey CLI', 'write a policy condition via the API', or 'set up multi-sig approval using turnkey request'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), generating API keys (use managing-credentials-api), or SDK-based policy management with @turnkey/sdk-server (use managing-policies-sdk)."
+description: "Creates and manages Turnkey organization policies for access control and transaction governance using the Turnkey CLI and API endpoints. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval via turnkey request commands. Use when asked to 'create a policy with turnkey request', 'manage policies via turnkey API', 'set up an allowlist using the API', 'create a deny policy via turnkey request', 'delete a policy via the API', 'list policies using turnkey CLI', 'write a policy condition via the API', or 'set up multi-sig approval using turnkey request'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), generating API keys (use managing-credentials-api), ."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
 metadata:
@@ -163,4 +163,3 @@ For complete examples organized by use case, see [references/policy-cli-examples
 - `signing-transactions-api` for signing transactions (policies govern signing)
 - `managing-credentials-api` for user and organization management
 - `wallet-governance-workflow` for production hardening (policies, scoped users, governance)
-- `managing-policies-sdk` for SDK-based policy management in TypeScript

@@ -1,6 +1,6 @@
 ---
 name: managing-credentials-api
-description: "Generates API key pairs, creates users, and manages organizations using the Turnkey CLI and API endpoints. Covers key generation, user provisioning, sub-organization setup, and encryption key management. Use when asked to 'generate an API key', 'create a turnkey API key', 'set up turnkey CLI', 'add a user to my turnkey organization', 'create a sub-organization', 'generate an encryption key', 'rotate API keys', 'list turnkey users', 'create an organization via turnkey request', or 'provision API access'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), or setting up frontend auth flows like OAuth or passkeys (use authenticating-users-sdk)."
+description: "Generates API key pairs, creates users, and manages organizations using the Turnkey CLI and API endpoints. Covers key generation, user provisioning, sub-organization setup, and encryption key management. Use when asked to 'generate an API key', 'create a turnkey API key', 'set up turnkey CLI', 'add a user to my turnkey organization', 'create a sub-organization', 'generate an encryption key', 'rotate API keys', 'list turnkey users', 'create an organization via turnkey request', or 'provision API access'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), ."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). API keys stored in ~/.config/turnkey/keys/."
 metadata:
@@ -145,4 +145,3 @@ For complete examples including key rotation and sub-organization patterns, see 
 - `managing-policies-api` for access control and transaction governance via CLI/API
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)
 - `wallet-governance-workflow` for production hardening (policies, scoped users, governance)
-- `authenticating-users-sdk` for SDK-based user authentication in React apps

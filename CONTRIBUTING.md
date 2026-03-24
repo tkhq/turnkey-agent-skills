@@ -55,10 +55,9 @@ Before submitting a PR:
 
 ## Code Style
 
-- All code examples must be valid TypeScript
-- Use `@turnkey/sdk-server` as the primary SDK
-- Use standard environment variable names (`TURNKEY_API_PUBLIC_KEY`, etc.)
-- Include error handling in reference examples where appropriate
+- All code examples must use the Turnkey CLI and API endpoints
+- Use standard environment variable names (`ORGANIZATION_ID`, etc.)
+- Include complete, runnable CLI commands in reference examples
 
 ## PR Guidelines
 

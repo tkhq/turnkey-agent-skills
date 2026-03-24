@@ -17,9 +17,7 @@
     "Create a new wallet with Turnkey CLI",
     "Set up a policy to restrict signing",
     "Generate an API key for Turnkey",
-    "Send ETH using viem and @turnkey/viem",
     "List my wallets using the turnkey command",
-    "Sign a transaction using @turnkey/viem in my React app",
     "How do I create a wallet with the turnkey CLI?"
   ]
 }

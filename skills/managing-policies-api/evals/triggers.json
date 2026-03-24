@@ -17,7 +17,6 @@
     "Create a wallet using turnkey CLI",
     "Sign a transaction with turnkey",
     "Generate an API key pair",
-    "Create a policy using @turnkey/sdk-server",
     "Add email login to my React app",
     "How do I create an Ethereum wallet with Turnkey?"
   ]

@@ -60,7 +60,7 @@ Functional evals verify that your skill produces correct output when activated.
     "skills": ["your-skill-name"],
     "query": "A realistic user request",
     "expected_behavior": [
-      "Uses the correct Turnkey SDK method",
+      "Uses the correct Turnkey API endpoint or CLI command",
       "Handles the response correctly",
       "Follows the documented pattern"
     ]
@@ -83,11 +83,11 @@ Test that the skill corrects users who ask for the wrong approach:
 
 ```json
 {
-  "skills": ["signing-transactions-sdk"],
-  "query": "Use the @turnkey/ethers package to sign a Solana transaction",
+  "skills": ["signing-transactions-api"],
+  "query": "Use the Ethereum signing method to sign a Solana transaction",
   "expected_behavior": [
-    "Corrects the user: @turnkey/ethers is for Ethereum, not Solana",
-    "Recommends @turnkey/solana instead",
+    "Corrects the user: Ethereum and Solana use different signing methods",
+    "Recommends the correct Solana signing approach",
     "Provides the correct Solana signing pattern"
   ]
 }
@@ -99,12 +99,12 @@ Test that the skill works alongside related skills:
 
 ```json
 {
-  "skills": ["creating-wallets-sdk", "signing-transactions-sdk"],
+  "skills": ["creating-wallets-api", "signing-transactions-api"],
   "query": "Create a wallet and send 0.01 ETH to 0xabc...",
   "expected_behavior": [
-    "Creates a wallet first using createWallet",
+    "Creates a wallet first using turnkey wallets create",
     "Derives an Ethereum address",
-    "Signs and sends the transaction using ethers or viem"
+    "Signs and sends the transaction via turnkey request"
   ]
 }
 ```

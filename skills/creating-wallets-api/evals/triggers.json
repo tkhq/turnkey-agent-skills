@@ -18,8 +18,6 @@
     "Create a spending limit policy for my wallet",
     "Add Google OAuth login to my React app",
     "Generate an API key for my organization",
-    "Create a wallet using @turnkey/sdk-server",
-    "Create a wallet using @turnkey/sdk-server in TypeScript",
     "How do I send Bitcoin from my Turnkey wallet?"
   ]
 }

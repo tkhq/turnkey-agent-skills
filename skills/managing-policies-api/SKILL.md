@@ -162,3 +162,4 @@ For complete examples organized by use case, see [references/policy-cli-examples
 - `creating-wallets-api` for wallet setup (policies govern wallet operations)
 - `signing-transactions-api` for signing transactions (policies govern signing)
 - `managing-credentials-api` for user and organization management
+- `secure-wallets-workflow` for production hardening (policies, scoped users, governance)

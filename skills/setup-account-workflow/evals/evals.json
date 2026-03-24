@@ -1,0 +1,50 @@
+[
+  {
+    "skills": ["setup-account-workflow"],
+    "query": "Walk me through setting up Turnkey from scratch for Ethereum",
+    "expected_behavior": [
+      "Follows a phased workflow: install CLI, generate API key, create wallet, test signature",
+      "References managing-credentials-api for key generation details",
+      "Creates a wallet with an Ethereum account using ADDRESS_FORMAT_ETHEREUM",
+      "Verifies with a test signature using turnkey raw sign"
+    ]
+  },
+  {
+    "skills": ["setup-account-workflow"],
+    "query": "Set up Turnkey for both Ethereum and Solana from zero",
+    "expected_behavior": [
+      "Recommends one wallet with two accounts (different curves)",
+      "Creates accounts with ADDRESS_FORMAT_ETHEREUM and ADDRESS_FORMAT_SOLANA",
+      "Uses CURVE_SECP256K1 for Ethereum and CURVE_ED25519 for Solana",
+      "Tests signing on both chains with appropriate hash functions"
+    ]
+  },
+  {
+    "skills": ["setup-account-workflow"],
+    "query": "Bootstrap Turnkey for my 3-person engineering team",
+    "expected_behavior": [
+      "Follows the full setup workflow through phases 1-3",
+      "Includes Phase 4 team member onboarding with create_users",
+      "Generates separate API key pairs per team member",
+      "Mentions policies or secure-wallets-workflow for access control"
+    ]
+  },
+  {
+    "skills": ["setup-account-workflow"],
+    "query": "Set up Turnkey from scratch and add spending limits",
+    "expected_behavior": [
+      "Follows the setup workflow for initial bootstrapping",
+      "References secure-wallets-workflow for policy/governance setup",
+      "Does not try to implement policies inline within the setup flow"
+    ]
+  },
+  {
+    "skills": ["setup-account-workflow"],
+    "query": "I need to get a Turnkey wallet running with the CLI as fast as possible",
+    "expected_behavior": [
+      "Follows the phased workflow: CLI install, key gen, wallet create, test sign",
+      "Shows turnkey generate api-key and turnkey request create_wallet commands",
+      "Verifies the setup works with a test signature"
+    ]
+  }
+]

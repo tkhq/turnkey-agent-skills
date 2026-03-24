@@ -1,6 +1,6 @@
 [
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "Create a policy that only allows ETH transfers to 0xabc and 0xdef",
     "expected_behavior": [
       "Uses createPolicy or createPolicies API",
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "Set up guardrails for my agent wallet so it can only interact with a specific Solana program",
     "expected_behavior": [
       "Uses Solana-specific policy condition language (solana.tx)",
@@ -19,7 +19,7 @@
     ]
   },
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "List all policies in my organization and delete the one named test-policy",
     "expected_behavior": [
       "Calls getPolicies to list policies",
@@ -28,7 +28,7 @@
     ]
   },
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "Block all transaction signing in my organization",
     "expected_behavior": [
       "Creates a DENY policy targeting activity.action == 'SIGN'",
@@ -37,7 +37,7 @@
     ]
   },
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "Require two admins to approve any wallet export",
     "expected_behavior": [
       "Uses consensus with approvers.filter().count() >= 2",
@@ -46,7 +46,7 @@
     ]
   },
   {
-    "skills": ["managing-policies"],
+    "skills": ["managing-policies-sdk"],
     "query": "Cap Bitcoin transaction fees at 50000 satoshis",
     "expected_behavior": [
       "Creates a DENY policy",

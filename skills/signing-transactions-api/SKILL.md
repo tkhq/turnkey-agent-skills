@@ -146,3 +146,4 @@ For gasless/sponsored transactions (paymaster), see [references/sponsored-transa
 - `managing-policies-api` for transaction governance and spending limits.
 - `managing-credentials-api` for API key setup.
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature).
+- `signing-transactions-sdk` for SDK-based transaction signing in TypeScript.

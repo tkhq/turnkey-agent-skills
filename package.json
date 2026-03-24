@@ -11,6 +11,9 @@
     "eval:loop": "tsx skills/creating-skills/scripts/eval-loop.ts",
     "report": "tsx skills/creating-skills/scripts/generate-report.ts"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "gray-matter": "^4.0.3",
     "tsx": "^4.0.0",

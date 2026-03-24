@@ -1,12 +1,44 @@
 ---
 name: signing-transactions-sdk
-description: "Signs and broadcasts blockchain transactions using Turnkey. Supports Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS), Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via paymaster. Use when asked to 'send ETH', 'send BTC', 'send SOL', 'sign a transaction', 'transfer tokens', 'sign a message', 'sign typed data', 'deploy a contract', 'swap on Uniswap', 'send a Cosmos transaction', 'sign on Sui', 'send TON', 'send TRX', 'pay with x402', 'use sponsored transactions', 'gasless transaction', 'sign a PSBT', 'sign with taproot', 'transfer ERC-20', 'transfer SPL tokens', 'sign EIP-712', or 'broadcast a transaction'. Do NOT use for creating wallets (use creating-wallets-sdk), managing policies (use managing-policies-sdk), authenticating users (use authenticating-users-sdk), or CLI/API-based signing using the turnkey command line tool (use signing-transactions-api instead)."
+description: >-
+  Signs and broadcasts blockchain transactions using the Turnkey SDK. Supports
+  Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS),
+  Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via
+  paymaster. Use when asked to send ETH to an address, send SOL to a Solana
+  address, send BTC, sign a transaction, sign a raw payload for a custom chain,
+  transfer tokens, sign a message, sign typed data, deploy a contract, swap on
+  Uniswap, send a Cosmos transaction, sign on Sui, send TON, send TRX, pay with
+  x402, use sponsored transactions, gasless transaction, sign a PSBT, sign with
+  taproot, transfer ERC-20, transfer SPL tokens, sign EIP-712, broadcast a
+  transaction, send crypto to an address on any chain, or sign raw bytes with
+  Turnkey. Do NOT use for creating wallets (use creating-wallets-sdk), managing
+  policies (use managing-policies-sdk), authenticating users (use
+  authenticating-users-sdk), or CLI/API-based signing (use
+  signing-transactions-api instead).
 license: Apache-2.0
-compatibility: "Requires Node.js and TypeScript. Install @turnkey/sdk-server plus chain-specific packages. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars."
+compatibility: >-
+  Requires Node.js and TypeScript. Install @turnkey/sdk-server plus
+  chain-specific packages. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY,
+  TURNKEY_ORGANIZATION_ID, SIGN_WITH env vars.
 metadata:
   author: turnkey
-  version: "1.0.0"
-  tags: ["signing", "transactions", "ethereum", "bitcoin", "solana", "viem", "ethers", "cosmos", "sui", "ton", "tron", "uniswap", "x402", "paymaster", "multichain"]
+  version: 1.0.0
+  tags:
+    - signing
+    - transactions
+    - ethereum
+    - bitcoin
+    - solana
+    - viem
+    - ethers
+    - cosmos
+    - sui
+    - ton
+    - tron
+    - uniswap
+    - x402
+    - paymaster
+    - multichain
 ---
 
 # Signing Transactions
@@ -278,3 +310,4 @@ Turnkey offers several signing approaches depending on the chain and use case:
 - `creating-wallets-sdk` for wallet setup and address derivation
 - `managing-policies-sdk` for transaction governance and spending limits
 - `authenticating-users-sdk` for user management and auth flows
+- `signing-transactions-api` for CLI-based transaction signing

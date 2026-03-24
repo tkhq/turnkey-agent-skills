@@ -193,12 +193,12 @@ export async function sendOtp(email: string) {
   return otpId;
 }
 
-export async function verifyAndLogin(otpId: string, otpCode: string, publicKey: string) {
+export async function verifyAndLogin(otpId: string, otpCode: string, email: string, publicKey: string) {
   const { verificationToken } = await client.verifyOtp({ otpId, otpCode });
   // Look up or create sub-org for this user
   const { organizationIds } = await client.getVerifiedSubOrgIds({
     filterType: "EMAIL",
-    filterValue: extractEmailFromToken(verificationToken),
+    filterValue: email,
   });
   const subOrgId = organizationIds[0] ?? await createSubOrg(email);
   // Complete login

@@ -145,3 +145,4 @@ For complete examples including key rotation and sub-organization patterns, see 
 - `managing-policies-api` for access control and transaction governance via CLI/API
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)
 - `secure-wallets-workflow` for production hardening (policies, scoped users, governance)
+- `authenticating-users-sdk` for SDK-based user authentication in React apps

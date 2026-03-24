@@ -159,6 +159,10 @@ For the complete policy language reference (all keywords, types, struct fields, 
 
 For complete, runnable TypeScript examples organized by use case, see [references/policy-examples.md](references/policy-examples.md).
 
+## Chain-Specific Policy Support
+
+Policy condition fields like `eth.tx.*`, `solana.tx.*`, and `bitcoin.tx.*` are fully supported with parsed transaction data. For chains without dedicated parsing (Cosmos, Sui, TON, and others), transactions are signed via `signRawPayload` and policies can only match on `activity.action`, `wallet.id`, and user/tag conditions, not on transaction-level fields like destination address or value.
+
 ## Important Gotchas
 
 - The policy engine does NOT short-circuit. If a condition has `wallet.id == 'X' || private_key.id == 'Y'`, one side will always error because an activity targets either a wallet or a private key, not both. Split these into separate policies.
@@ -171,8 +175,8 @@ For complete, runnable TypeScript examples organized by use case, see [reference
 
 - DENY always takes precedence over ALLOW
 - Non-root users are denied by default when no policy matches
-- Always test policies on testnet before deploying to production
-- Never create a DENY-all policy without an ALLOW escape path for admins
+- Test policies on testnet before deploying to production. A misconfigured policy can lock out all signing access with no way to recover except through root quorum.
+- Avoid creating a DENY-all policy without an ALLOW escape path for admins. A blanket deny with no exceptions requires root quorum intervention to fix.
 - Use descriptive policy names and notes for auditability
 - Split complex conditions into separate policies to avoid evaluation errors
 - Use `in [list]` syntax for allowlists instead of chaining `||` when possible
@@ -184,3 +188,4 @@ For complete, runnable TypeScript examples organized by use case, see [reference
 - `creating-wallets-sdk` for wallet setup (policies govern wallet operations)
 - `signing-transactions-sdk` for signing and broadcasting transactions (policies govern signing)
 - `authenticating-users-sdk` for user and sub-organization management
+- `managing-policies-api` for CLI-based policy management

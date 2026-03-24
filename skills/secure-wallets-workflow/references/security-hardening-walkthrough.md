@@ -40,7 +40,18 @@ turnkey request --path /public/v1/query/list_policies --body '{}' --organization
 turnkey generate api-key --organization $ORGANIZATION_ID --key-name trading-bot-key
 # Record the public key from stdout
 
-# Create user with tags
+# Create tags first (the API requires tag IDs, not names)
+turnkey request --path /public/v1/submit/create_user_tag --body '{
+  "tagName": "bot"
+}' --organization $ORGANIZATION_ID
+# Note the tagId from the response
+
+turnkey request --path /public/v1/submit/create_user_tag --body '{
+  "tagName": "trading"
+}' --organization $ORGANIZATION_ID
+# Note the tagId from the response
+
+# Create user with tag IDs
 turnkey request --path /public/v1/submit/create_users --body '{
   "users": [{
     "userName": "trading-bot",
@@ -50,7 +61,7 @@ turnkey request --path /public/v1/submit/create_users --body '{
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["bot", "trading"]
+    "userTags": ["<BOT_TAG_ID>", "<TRADING_TAG_ID>"]
   }]
 }' --organization $ORGANIZATION_ID
 # Record the userId from the response

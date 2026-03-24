@@ -58,5 +58,5 @@ For complete examples, see [references/examples.md](references/examples.md).
 
 ## Related Skills
 
-- `creating-wallets` for wallet setup
-- `signing-ethereum` for EVM transaction signing
+- `creating-wallets-sdk` for wallet setup
+- `signing-transactions-sdk` for transaction signing

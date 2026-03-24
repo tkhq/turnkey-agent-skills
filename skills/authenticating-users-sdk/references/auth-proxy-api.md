@@ -36,7 +36,7 @@ Create a sub-organization (new user onboarding). Optionally creates a wallet.
   "oauthProviders": [],
   "wallet": {
     "path": "m/44'/0'/0'/0/0",
-    "curve": "CURVE_TYPE_ED25519"
+    "curve": "CURVE_ED25519"
   }
 }
 

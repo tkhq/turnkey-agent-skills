@@ -24,7 +24,7 @@ const turnkey = new Turnkey({
   defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
-const provider = new ethers.InfuraProvider("goerli", process.env.INFURA_KEY);
+const provider = new ethers.InfuraProvider("sepolia", process.env.INFURA_KEY);
 
 const signer = new TurnkeySigner({
   client: turnkey.apiClient(),
@@ -44,9 +44,9 @@ Once the signer is set up, use it with the Uniswap V3 SDK to construct and execu
 import { Token, CurrencyAmount, TradeType, Percent } from "@uniswap/sdk-core";
 import { Pool, Route, Trade, SwapRouter } from "@uniswap/v3-sdk";
 
-// Define tokens (example: WETH/USDC on Goerli)
-const WETH = new Token(5, "0xWETH_ADDRESS", 18, "WETH");
-const USDC = new Token(5, "0xUSDC_ADDRESS", 6, "USDC");
+// Define tokens (example: WETH/USDC on Sepolia)
+const WETH = new Token(11155111, "0xWETH_ADDRESS", 18, "WETH");
+const USDC = new Token(11155111, "0xUSDC_ADDRESS", 6, "USDC");
 
 // Fetch pool data and construct trade (simplified)
 // In production, fetch pool state from on-chain

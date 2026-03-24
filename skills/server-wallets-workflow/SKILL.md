@@ -96,10 +96,10 @@ import * as path from "path";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 const turnkey = new Turnkey({
-  apiBaseUrl: process.env.BASE_URL || "https://api.turnkey.com",
-  apiPublicKey: process.env.API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.ORGANIZATION_ID!,
+  apiBaseUrl: process.env.TURNKEY_API_BASE_URL || "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
 const client = turnkey.apiClient();
@@ -107,10 +107,10 @@ const client = turnkey.apiClient();
 
 **Environment variables:**
 ```env
-API_PUBLIC_KEY=<starts-with-02-or-03>
-API_PRIVATE_KEY=<your-private-key>
-ORGANIZATION_ID=<your-org-id>
-BASE_URL=https://api.turnkey.com
+TURNKEY_API_PUBLIC_KEY=<starts-with-02-or-03>
+TURNKEY_API_PRIVATE_KEY=<your-private-key>
+TURNKEY_ORGANIZATION_ID=<your-org-id>
+TURNKEY_API_BASE_URL=https://api.turnkey.com
 ```
 
 ### 1.2 Check existing wallets, then create
@@ -136,6 +136,8 @@ if (wallets.length === 0) {
 
 For wallet topology guidance: create separate wallets per purpose (hot wallet for frequent operations, cold wallet for long-term storage). See the chain support table in `creating-wallets-sdk` for all supported chains, curves, and derivation paths.
 
+**Verify:** `getWallets()` returns the created wallet with expected accounts. Each account's `address` field matches the expected chain format.
+
 ## Phase 2: Transaction Signing
 
 **Skill:** Follow `signing-transactions-sdk` for detailed implementation.
@@ -151,7 +153,7 @@ import { sepolia } from "viem/chains";
 
 const account = await createAccount({
   client: turnkey.apiClient(),
-  organizationId: process.env.ORGANIZATION_ID!,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!, // ETH address from Phase 1
 });
 
@@ -199,6 +201,8 @@ try {
   throw error;
 }
 ```
+
+**Verify:** A test transaction on Sepolia succeeds and returns a transaction hash. Check the hash on a block explorer to confirm it was broadcast.
 
 ## Phase 3: Access Control
 
@@ -272,6 +276,8 @@ await client.createPolicy({
 ```
 
 See `managing-policies-sdk` for the full policy language reference, chain-specific transaction fields, and gotchas.
+
+**Verify:** `getPolicies()` returns the created policies. Test enforcement by attempting a transaction that should be denied and confirming it fails.
 
 ## Common Patterns
 

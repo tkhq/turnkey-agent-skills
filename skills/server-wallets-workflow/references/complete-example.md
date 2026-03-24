@@ -8,10 +8,10 @@ A complete Node.js service that creates a wallet, sends ETH payments, and enforc
 
 ```env
 # .env.local
-API_PUBLIC_KEY=<starts-with-02-or-03>
-API_PRIVATE_KEY=<your-api-private-key>
-ORGANIZATION_ID=<your-org-id>
-BASE_URL=https://api.turnkey.com
+TURNKEY_API_PUBLIC_KEY=<starts-with-02-or-03>
+TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
+TURNKEY_ORGANIZATION_ID=<your-org-id>
+TURNKEY_API_BASE_URL=https://api.turnkey.com
 SIGN_WITH=<eth-address-from-wallet>
 INFURA_KEY=<your-infura-key>
 ```
@@ -37,10 +37,10 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 // Step 1: Initialize Turnkey client
 const turnkey = new Turnkey({
-  apiBaseUrl: process.env.BASE_URL || "https://api.turnkey.com",
-  apiPublicKey: process.env.API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.ORGANIZATION_ID!,
+  apiBaseUrl: process.env.TURNKEY_API_BASE_URL || "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
 const client = turnkey.apiClient();
@@ -105,7 +105,7 @@ async function sendPayment(to: string, ethAmount: string) {
 
   const account = await createAccount({
     client: turnkey.apiClient(),
-    organizationId: process.env.ORGANIZATION_ID!,
+    organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
     signWith,
   });
 
@@ -168,10 +168,10 @@ import * as path from "path";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 const turnkey = new Turnkey({
-  apiBaseUrl: process.env.BASE_URL || "https://api.turnkey.com",
-  apiPublicKey: process.env.API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.ORGANIZATION_ID!,
+  apiBaseUrl: process.env.TURNKEY_API_BASE_URL || "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
 const client = turnkey.apiClient();
@@ -244,7 +244,7 @@ async function main() {
   for (const wallet of wallets) {
     for (const account of wallet.accounts) {
       if (account.addressFormat === "ADDRESS_FORMAT_ETHEREUM") {
-        await sweepEth(account.address, destination, "0");
+        await sweepEth(account.address, destination, "10000000000000000"); // 0.01 ETH in wei
       }
     }
   }
@@ -266,10 +266,10 @@ import * as path from "path";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 const turnkey = new Turnkey({
-  apiBaseUrl: process.env.BASE_URL || "https://api.turnkey.com",
-  apiPublicKey: process.env.API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.ORGANIZATION_ID!,
+  apiBaseUrl: process.env.TURNKEY_API_BASE_URL || "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
 });
 
 const client = turnkey.apiClient();
@@ -354,7 +354,7 @@ import { sepolia } from "viem/chains";
 
 const account = await createAccount({
   client: turnkey.apiClient(),
-  organizationId: process.env.ORGANIZATION_ID!,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
   signWith: process.env.SIGN_WITH!,
 });
 

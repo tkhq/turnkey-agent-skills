@@ -50,7 +50,7 @@ tx.setGasPayment([{
   digest: coins.data[0].digest,
 }]);
 
-const coin = tx.splitCoins(tx.gas, [tx.pure("u64", 1_000_000n)]); // 0.001 SUI
+const coin = tx.splitCoins(tx.gas, [tx.pure.u64(1_000_000n)]); // 0.001 SUI
 tx.transferObjects([coin], tx.pure.address("RECIPIENT_SUI_ADDRESS"));
 
 const txBytes = await tx.build();

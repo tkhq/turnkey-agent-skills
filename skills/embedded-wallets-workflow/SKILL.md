@@ -122,6 +122,8 @@ auth: {
 
 This creates ETH + SOL wallets for every new user at signup. Adjust the accounts array for your target chains. See the chain table in `creating-wallets-sdk` for all supported chains.
 
+**Verify:** `handleLogin()` opens the auth modal and `authState` changes to `Authenticated` after login. The `wallets` array from `useTurnkey()` is populated if `createSuborgParams` included wallet configuration.
+
 ## Phase 2: Wallet Management
 
 **Skill:** Follow `creating-wallets-sdk` for detailed implementation.
@@ -160,6 +162,8 @@ await handleImportWallet({
   defaultWalletAccounts: ["ADDRESS_FORMAT_ETHEREUM", "ADDRESS_FORMAT_SOLANA"],
 });
 ```
+
+**Verify:** `wallets` from `useTurnkey()` returns at least one wallet with accounts. Each account has an `address` field with a valid chain-specific address.
 
 ## Phase 3: Transaction Signing
 
@@ -214,6 +218,8 @@ const turnkey = new Turnkey({
 ```
 
 This requires a delegated access policy. See Phase 4.
+
+**Verify:** `signMessage` returns a valid signature string. For `signAndSendTransaction`, the returned transaction hash can be looked up on a block explorer.
 
 ## Phase 4: Security Hardening (Optional)
 

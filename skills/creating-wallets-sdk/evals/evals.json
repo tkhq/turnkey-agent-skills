@@ -1,6 +1,6 @@
 [
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "Create an HD wallet with Ethereum and Solana addresses",
     "expected_behavior": [
       "Checks for existing wallets using getWallets before creating",
@@ -11,7 +11,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "Get the Ethereum address from my existing wallet",
     "expected_behavior": [
       "Calls getWallets to find existing wallets",
@@ -21,7 +21,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "I need a Bitcoin testnet address, create a wallet for me right away",
     "expected_behavior": [
       "Still checks getWallets first despite user urgency",
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "Add a Cosmos address to my existing wallet",
     "expected_behavior": [
       "Uses createWalletAccounts (not createWallet) to add to existing wallet",
@@ -39,7 +39,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "Set up wallets for my end users, each user should have their own Ethereum wallet",
     "expected_behavior": [
       "Recommends sub-organization model (one sub-org per user)",
@@ -49,7 +49,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets"],
+    "skills": ["creating-wallets-sdk"],
     "query": "Create a wallet with a TON and XRP address",
     "expected_behavior": [
       "Checks for existing wallets first",

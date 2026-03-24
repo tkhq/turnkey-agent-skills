@@ -83,7 +83,18 @@ Stop using root keys for day-to-day operations. Create purpose-built users with 
 # Generate key for a trading bot
 turnkey generate api-key --organization $ORGANIZATION_ID --key-name trading-bot-key
 
-# Create user with tag
+# Create tags first (the API requires tag IDs, not names)
+turnkey request --path /public/v1/submit/create_user_tag --body '{
+  "tagName": "bot"
+}' --organization $ORGANIZATION_ID
+# Note the tagId from the response (e.g., "tag-abc123")
+
+turnkey request --path /public/v1/submit/create_user_tag --body '{
+  "tagName": "trading"
+}' --organization $ORGANIZATION_ID
+# Note the tagId from the response (e.g., "tag-def456")
+
+# Create user with tag IDs
 turnkey request --path /public/v1/submit/create_users --body '{
   "users": [{
     "userName": "trading-bot",
@@ -93,7 +104,7 @@ turnkey request --path /public/v1/submit/create_users --body '{
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["bot", "trading"]
+    "userTags": ["<BOT_TAG_ID>", "<TRADING_TAG_ID>"]
   }]
 }' --organization $ORGANIZATION_ID
 ```
@@ -154,6 +165,19 @@ For production, increase root quorum to at least 3 members with a threshold of 2
 - Minimize who has root quorum access. Day-to-day operations should go through scoped users + policies.
 - Each root quorum member should use a separate, securely stored key (different machines, hardware keys).
 - Root quorum changes require existing root quorum approval.
+
+```bash
+# List current users to identify root quorum candidates
+turnkey request --path /public/v1/query/list_users --body '{}' --organization $ORGANIZATION_ID
+
+# Update root quorum: require 2-of-3 approval
+turnkey request --path /public/v1/submit/update_root_quorum --body '{
+  "threshold": 2,
+  "userIds": ["<USER_ID_1>", "<USER_ID_2>", "<USER_ID_3>"]
+}' --organization $ORGANIZATION_ID
+```
+
+**Verify:** Run `list_users` again and confirm the root quorum shows the updated threshold and member list. If the current root quorum threshold is already greater than 1, this activity will require approval from other root quorum members before it completes.
 
 ### Phase 5: Test Before Going Live
 

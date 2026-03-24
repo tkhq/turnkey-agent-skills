@@ -80,6 +80,8 @@ turnkey request --path /public/v1/submit/create_wallet --body '{
 | Dogecoin | CURVE_SECP256K1 | m/44'/3'/0'/0/0 | ADDRESS_FORMAT_DOGE_MAINNET |
 | Sei | CURVE_ED25519 | m/44'/118'/0'/0/0 | ADDRESS_FORMAT_SEI |
 
+Note: Sei uses Ed25519 with the Cosmos coin type (118). This differs from other Cosmos chains which use secp256k1. Verify this matches your Sei deployment, as Sei v2 EVM addresses use secp256k1 with Ethereum format instead.
+
 For testnet Bitcoin, use `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR`.
 For TON variants, options include `ADDRESS_FORMAT_TON_V3R2` and `ADDRESS_FORMAT_TON_V4R2`.
 
@@ -157,3 +159,4 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 - `signing-transactions-api` for signing transactions with wallet addresses
 - `managing-policies-api` for access control on wallets
 - `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)
+- `creating-wallets-sdk` for SDK-based wallet creation in TypeScript

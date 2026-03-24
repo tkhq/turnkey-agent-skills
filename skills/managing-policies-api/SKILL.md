@@ -151,8 +151,8 @@ For complete examples organized by use case, see [references/policy-cli-examples
 
 - DENY always takes precedence over ALLOW
 - Non-root users are denied by default when no policy matches
-- Always test policies on testnet before deploying to production
-- Never create a DENY-all policy without an ALLOW escape path for admins
+- Test policies on testnet before deploying to production. A misconfigured policy can lock out all signing access with no way to recover except through root quorum.
+- Avoid creating a DENY-all policy without an ALLOW escape path for admins. A blanket deny with no exceptions requires root quorum intervention to fix.
 - Use descriptive policy names and notes for auditability
 - Split complex conditions into separate policies to avoid evaluation errors
 - Use `in [list]` syntax for allowlists instead of chaining `||`
@@ -163,3 +163,4 @@ For complete examples organized by use case, see [references/policy-cli-examples
 - `signing-transactions-api` for signing transactions (policies govern signing)
 - `managing-credentials-api` for user and organization management
 - `secure-wallets-workflow` for production hardening (policies, scoped users, governance)
+- `managing-policies-sdk` for SDK-based policy management in TypeScript

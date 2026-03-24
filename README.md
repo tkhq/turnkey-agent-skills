@@ -1,42 +1,83 @@
 # Turnkey Agent Skills
 
-Agent skills that teach AI assistants how to use [Turnkey](https://turnkey.com) for wallet management, transaction signing, authentication, and access control. Built following the [Agent Skills open standard](https://agentskills.io/specification).
+Agent skills that teach AI assistants how to use [Turnkey](https://turnkey.com) for wallet management, transaction signing, authentication, and access control. Skills are structured markdown files that AI assistants load contextually to provide accurate, up-to-date guidance for Turnkey development. Built following the [Agent Skills open standard](https://agentskills.io/specification).
+
+For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
+
+## Prerequisites
+
+- **Node.js >= 18** (for SDK skills and eval tooling)
+- **Turnkey account** with API credentials from the [Turnkey Dashboard](https://app.turnkey.com)
+- **Turnkey CLI** (optional, for CLI/API skills): `brew install tkhq/tap/turnkey`
 
 ## Quick Start
 
-### Claude Code (plugin marketplace)
-
-```bash
-/plugin marketplace add tkhq/turnkey-agent-skills
-/plugin install turnkey-skills@turnkey-agent-skills
-```
-
-### Claude Code (local)
+### Claude Code
 
 ```bash
 git clone https://github.com/tkhq/turnkey-agent-skills.git
 cd turnkey-agent-skills
-npm install
-claude --plugin-dir .
+npm install  # installs eval/validation tooling
 ```
 
-### Claude.ai
+Then start Claude Code from the repo directory. Skills are automatically discovered from the `skills/` folder.
 
-1. Download a skill folder (e.g., `skills/creating-wallets/`)
-2. Zip the folder
-3. Upload via **Settings > Capabilities > Skills**
+### Adding to an existing project
+
+Copy the skill folders you need into your project's `.claude/skills/` directory:
+
+```bash
+cp -r turnkey-agent-skills/skills/creating-wallets-sdk your-project/.claude/skills/
+```
 
 ## Skills
 
-| Skill | Description | Use when... |
-|-------|-------------|-------------|
-| `creating-wallets` | HD wallet creation and multi-chain address derivation | Setting up wallets, deriving addresses, listing existing wallets |
-| `signing-ethereum` | EVM transaction signing with ethers.js or viem | Sending ETH, transferring tokens, signing messages on any EVM chain |
-| `signing-solana` | Solana transaction signing | Sending SOL, transferring SPL tokens, signing Solana messages |
-| `signing-bitcoin` | Bitcoin signing (P2WPKH SegWit, P2TR Taproot) | Sending BTC, building PSBTs, signing Bitcoin transactions |
-| `managing-policies` | Policy engine for access control and governance | Adding spending limits, address allowlists, agent guardrails |
-| `authenticating-users` | Email OTP, OAuth/OIDC, passkeys/WebAuthn | Adding login, signup, social auth, or passkey authentication |
-| `creating-skills` | Meta skill for authoring and evaluating new skills | Building new skills, improving skill descriptions, running evals |
+Skills are organized into three categories based on how they interact with Turnkey.
+
+### SDK Skills (TypeScript, `@turnkey/sdk-server`)
+
+Use these when building applications with the Turnkey TypeScript SDK.
+
+| Skill | Description |
+|-------|-------------|
+| `authenticating-users-sdk` | Email OTP, SMS, OAuth, passkeys, and WebAuthn authentication for React apps |
+| `creating-wallets-sdk` | HD wallet creation, multi-chain address derivation, import/export |
+| `signing-transactions-sdk` | Transaction signing across 12+ chains (EVM, Solana, Bitcoin, Cosmos, Sui, TON, TRON) |
+| `managing-policies-sdk` | Policy engine for spending limits, address allowlists, and multi-sig approval |
+
+### CLI/API Skills (`turnkey` CLI)
+
+Use these when working with the Turnkey CLI or calling the HTTP API directly.
+
+| Skill | Description |
+|-------|-------------|
+| `managing-credentials-api` | API key generation, user provisioning, sub-organization setup |
+| `creating-wallets-api` | Wallet creation and address derivation via CLI commands |
+| `signing-transactions-api` | Transaction signing and broadcasting via CLI |
+| `managing-policies-api` | Policy CRUD and governance via CLI |
+
+### Workflow Skills (multi-step orchestration)
+
+Use these for end-to-end guides that compose multiple primitive skills.
+
+| Skill | Description |
+|-------|-------------|
+| `setup-account-workflow` | Bootstrap a Turnkey org from zero: CLI install, API keys, wallets, first signature |
+| `embedded-wallets-workflow` | Build a React app with user auth, wallets, signing, and policies (sub-org model) |
+| `server-wallets-workflow` | Build a Node.js backend with server wallets, signing, and policies (parent org model) |
+| `secure-wallets-workflow` | Add governance, policies, and access control to existing wallets for production |
+
+### Meta
+
+| Skill | Description |
+|-------|-------------|
+| `creating-skills` | For contributors: create, evaluate, and improve Turnkey agent skills |
+
+### Choosing between SDK and CLI skills
+
+- **SDK skills** (`-sdk` suffix) use `@turnkey/sdk-server` in TypeScript. Best for application development.
+- **CLI/API skills** (`-api` suffix) use the `turnkey` CLI tool. Best for bootstrapping, scripting, and ad-hoc operations.
+- **Workflow skills** (`-workflow` suffix) compose multiple primitive skills into step-by-step guides for common end-to-end scenarios.
 
 ## Environment Setup
 
@@ -51,8 +92,10 @@ cp .env.example .env
 TURNKEY_API_PUBLIC_KEY=    # API key public component (hex)
 TURNKEY_API_PRIVATE_KEY=   # API key private component (P-256 hex)
 TURNKEY_ORGANIZATION_ID=   # Organization UUID
-SIGN_WITH=                 # Address to sign with (for signing skills)
+SIGN_WITH=                 # Address or public key of the wallet account to sign with
 ```
+
+SDK skills read these via `process.env.TURNKEY_API_PUBLIC_KEY`, etc. CLI skills use shell variables (`$ORGANIZATION_ID`).
 
 ## Creating Your Own Skills
 
@@ -79,13 +122,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 npm run validate
 
 # Test trigger accuracy for a skill
-npm run eval -- --skill creating-wallets
+npm run eval -- --skill creating-wallets-sdk
 
 # Run improvement loop
-npm run eval:loop -- --skill creating-wallets
+npm run eval:loop -- --skill creating-wallets-sdk
 
 # Generate HTML report
-npm run report -- --skill creating-wallets
+npm run report -- --skill creating-wallets-sdk
 ```
 
 ## Project Structure
@@ -93,19 +136,24 @@ npm run report -- --skill creating-wallets
 ```
 turnkey-agent-skills/
   skills/
-    creating-wallets/          # Wallet creation and management
-    signing-ethereum/          # EVM signing (ethers.js + viem)
-    signing-solana/            # Solana signing
-    signing-bitcoin/           # Bitcoin signing (SegWit + Taproot)
-    managing-policies/         # Policy engine and access control
-    authenticating-users/      # Auth flows (OTP, OAuth, passkeys)
-    creating-skills/           # Meta skill + eval tooling
-  template/                    # Skeleton for new skills
-  .claude-plugin/              # Plugin marketplace config
+    authenticating-users-sdk/     # Auth flows (OTP, OAuth, passkeys) via SDK
+    creating-wallets-sdk/         # Wallet creation via SDK
+    signing-transactions-sdk/     # Transaction signing via SDK (12+ chains)
+    managing-policies-sdk/        # Policy management via SDK
+    creating-wallets-api/         # Wallet creation via CLI
+    signing-transactions-api/     # Transaction signing via CLI
+    managing-policies-api/        # Policy management via CLI
+    managing-credentials-api/     # API keys, users, sub-orgs via CLI
+    setup-account-workflow/       # Organization bootstrapping
+    embedded-wallets-workflow/    # React embedded wallet guide
+    server-wallets-workflow/      # Node.js server wallet guide
+    secure-wallets-workflow/      # Production security hardening
+    creating-skills/              # Meta skill for contributors
+  template/                       # Skeleton for new skills
 ```
 
 Each skill contains:
-- `SKILL.md` - Main instructions (loaded when skill triggers)
+- `SKILL.md` - Main instructions with YAML frontmatter (loaded when skill triggers)
 - `references/` - Detailed code examples (loaded on demand)
 - `evals/` - Trigger tests and functional evaluations
 

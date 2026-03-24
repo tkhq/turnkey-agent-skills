@@ -1,12 +1,31 @@
 ---
 name: creating-wallets-sdk
-description: "Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, TON, XRP, Stellar, and other chains using Turnkey's secure enclave infrastructure. Use when asked to 'create a wallet', 'set up a wallet', 'generate an address', 'derive an address', 'check if I have a wallet', 'list my wallets', 'make a new wallet', 'get a blockchain address', 'add a chain to my wallet', 'create a sub-organization with a wallet', or 'set up wallets for users'. Do NOT use for signing transactions, sending funds, setting wallet policies, or CLI/API-based wallet operations using the turnkey command line tool or turnkey request (use creating-wallets-api instead)."
+description: >-
+  Creates HD wallets, lists existing wallets, and derives blockchain addresses
+  for Ethereum, Solana, Bitcoin, Cosmos, TON, XRP, Stellar, and other chains
+  using Turnkey's secure enclave infrastructure. Use when asked to 'create a
+  wallet', 'set up a wallet', 'generate an Ethereum address', 'generate a Solana
+  address', 'derive an address', 'list all my existing wallets', 'list all my
+  wallets', 'show my wallets', 'check if I have a wallet', 'make a new wallet',
+  'get a blockchain address', 'add a chain to my wallet', 'create a
+  sub-organization with a wallet', 'set up wallets for users', 'generate an
+  address', or 'view wallet accounts'. Do NOT use for signing transactions,
+  sending funds, setting wallet policies, or CLI/API-based wallet operations
+  using the turnkey command line tool or turnkey request (use
+  creating-wallets-api instead).
 license: Apache-2.0
-compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
+compatibility: >-
+  Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY,
+  TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars.
 metadata:
   author: turnkey
-  version: "1.1.0"
-  tags: ["wallet", "blockchain", "address-derivation", "hd-wallet", "sub-organization"]
+  version: 1.1.0
+  tags:
+    - wallet
+    - blockchain
+    - address-derivation
+    - hd-wallet
+    - sub-organization
 ---
 
 # Creating Wallets
@@ -46,13 +65,19 @@ const turnkey = new Turnkey({
 const client = turnkey.apiClient();
 ```
 
-### Step 2: Check for existing wallets
+### Step 2: Check for existing wallets and accounts
 
 ```typescript
 const { wallets } = await client.getWallets();
 if (wallets.length > 0) {
   console.log("Existing wallets found:", wallets);
-  // Use existing wallet instead of creating a new one
+
+  // List accounts (addresses) for a specific wallet
+  const { accounts } = await client.getWalletAccounts({
+    walletId: wallets[0].walletId,
+  });
+  console.log("Wallet accounts:", accounts);
+  // Each account has: address, addressFormat, path, curve
 }
 ```
 
@@ -86,6 +111,8 @@ const wallet = await client.createWallet({
 | Stellar (XLM) | CURVE_ED25519 | m/44'/148'/0'/0'/0 | ADDRESS_FORMAT_XLM |
 | Dogecoin | CURVE_SECP256K1 | m/44'/3'/0'/0/0 | ADDRESS_FORMAT_DOGE_MAINNET |
 | Sei | CURVE_ED25519 | m/44'/118'/0'/0/0 | ADDRESS_FORMAT_SEI |
+
+Note: Sei uses Ed25519 with the Cosmos coin type (118). This differs from other Cosmos chains which use secp256k1. Verify this matches your Sei deployment, as Sei v2 EVM addresses use secp256k1 with Ethereum format instead.
 
 For testnet Bitcoin, use `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR`.
 For TON variants, options include `ADDRESS_FORMAT_TON_V3R2` and `ADDRESS_FORMAT_TON_V4R2`.
@@ -131,8 +158,8 @@ For complete import and export workflows (wallet mnemonic backup, private key ex
 
 ## Rules
 
-- NEVER call `createWallet` without first calling `getWallets` to check for existing wallets
-- Always specify both `curve` and `addressFormat` for each account
+- Check for existing wallets with `getWallets` before creating new ones. Duplicate wallets fragment funds and confuse users about which wallet holds their assets.
+- Specify both `curve` and `addressFormat` for each account. Omitting either causes the API to reject the request.
 - Use standard BIP-44 derivation paths for each chain
 - Wallet names should be descriptive and unique within the organization
 - For end-user wallets, use the sub-organization model (one sub-org per user)
@@ -144,3 +171,4 @@ For complete import and export workflows (wallet mnemonic backup, private key ex
 - `server-wallets-workflow` for the full end-to-end flow: wallets, signing, and policies in backend services
 - `signing-transactions-sdk` for signing and broadcasting transactions across all supported chains
 - `managing-policies-sdk` for setting access control on wallets
+- `creating-wallets-api` for CLI-based wallet creation and management

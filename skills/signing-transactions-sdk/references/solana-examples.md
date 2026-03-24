@@ -8,6 +8,44 @@ Complete examples for signing Solana transactions with `@turnkey/solana`.
 npm install @turnkey/sdk-server @turnkey/solana @solana/web3.js @solana/spl-token
 ```
 
+## Send SOL
+
+```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+import { TurnkeySigner } from "@turnkey/solana";
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+
+const signer = new TurnkeySigner({
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  client: turnkey.apiClient(),
+});
+
+const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+const fromKey = new PublicKey(process.env.SIGN_WITH!);
+
+const tx = new Transaction().add(
+  SystemProgram.transfer({
+    fromPubkey: fromKey,
+    toPubkey: new PublicKey("RECIPIENT_ADDRESS"),
+    lamports: LAMPORTS_PER_SOL / 100, // 0.01 SOL
+  })
+);
+
+tx.feePayer = fromKey;
+tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+await signer.addSignature(tx, process.env.SIGN_WITH!);
+const sig = await connection.sendRawTransaction(tx.serialize());
+console.log("Transfer signature:", sig);
+```
+
 ## SPL Token Transfer
 
 ```typescript
@@ -105,7 +143,7 @@ for (const r of recipients) {
     SystemProgram.transfer({
       fromPubkey: fromKey,
       toPubkey: new PublicKey(r.address),
-      lamports: r.amount * LAMPORTS_PER_SOL,
+      lamports: Math.round(r.amount * LAMPORTS_PER_SOL),
     })
   );
 }

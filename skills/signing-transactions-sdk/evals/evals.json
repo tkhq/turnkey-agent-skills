@@ -1,6 +1,6 @@
 [
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send 0.01 ETH to 0xabc123 on Sepolia using viem",
     "expected_behavior": [
       "Uses @turnkey/viem createAccount",
@@ -9,7 +9,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Transfer 100 USDC to 0xdef456 using ethers",
     "expected_behavior": [
       "Uses @turnkey/ethers TurnkeySigner",
@@ -18,7 +18,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Sign an EIP-712 typed data message for a DeFi order",
     "expected_behavior": [
       "Uses walletClient.signTypedData with viem",
@@ -27,7 +27,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Sign a personal message with my Turnkey wallet",
     "expected_behavior": [
       "Uses signMessage with viem or ethers",
@@ -36,7 +36,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Use @turnkey/solana to sign an Ethereum transaction",
     "expected_behavior": [
       "Corrects the user: @turnkey/solana is for Solana only",
@@ -44,7 +44,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Use @turnkey/ethers to sign a Bitcoin transaction",
     "expected_behavior": [
       "Corrects the user: @turnkey/ethers is for EVM chains only",
@@ -53,7 +53,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send 10000 satoshis to a Bitcoin testnet address using SegWit",
     "expected_behavior": [
       "Uses signTransaction with TRANSACTION_TYPE_BITCOIN",
@@ -62,7 +62,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Sign a Bitcoin transaction using a Taproot address",
     "expected_behavior": [
       "Uses signRawPayload with HASH_FUNCTION_NO_OP",
@@ -71,7 +71,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send 0.5 SOL to a devnet address",
     "expected_behavior": [
       "Uses @turnkey/solana TurnkeySigner",
@@ -80,7 +80,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Transfer SPL tokens to another wallet on Solana",
     "expected_behavior": [
       "Uses @turnkey/solana TurnkeySigner",
@@ -89,7 +89,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send 100 utia on Celestia testnet using CosmJS",
     "expected_behavior": [
       "Uses @turnkey/cosmjs TurnkeyDirectWallet",
@@ -99,7 +99,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Transfer 0.001 SUI to another address on testnet",
     "expected_behavior": [
       "Uses signRawPayload with HASH_FUNCTION_NOT_APPLICABLE",
@@ -108,7 +108,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send 0.015 TON to a recipient address",
     "expected_behavior": [
       "Uses WalletContractV4 from @ton/ton",
@@ -117,7 +117,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Transfer 1 TRX on TRON testnet",
     "expected_behavior": [
       "Uses tronweb transactionBuilder.sendTrx",
@@ -126,7 +126,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send USDC on Base without paying gas using Turnkey paymaster",
     "expected_behavior": [
       "Uses ethSendTransaction with sponsor: true",
@@ -135,7 +135,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Send a sponsored SPL token transfer on Solana",
     "expected_behavior": [
       "Uses solSendTransaction with sponsor: true",
@@ -144,7 +144,7 @@
     ]
   },
   {
-    "skills": ["creating-wallets", "signing-transactions"],
+    "skills": ["creating-wallets-sdk", "signing-transactions-sdk"],
     "query": "Create a Bitcoin wallet and send some BTC on testnet",
     "expected_behavior": [
       "Uses creating-wallets skill for wallet creation",
@@ -153,7 +153,7 @@
     ]
   },
   {
-    "skills": ["signing-transactions"],
+    "skills": ["signing-transactions-sdk"],
     "query": "Set up x402 payment flow with Turnkey to charge 0.01 USDC",
     "expected_behavior": [
       "Uses @turnkey/viem for signing",

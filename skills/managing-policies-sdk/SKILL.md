@@ -1,9 +1,10 @@
 ---
-name: managing-policies
-description: "Creates and manages Turnkey organization policies for access control and transaction governance. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval using Turnkey's policy language. Use when asked to 'create a policy', 'add a spending limit', 'restrict which addresses can be sent to', 'set up an allowlist', 'add a deny policy', 'limit transaction amounts', 'require approval from multiple users', 'lock down signing', 'write a policy condition', 'set up access control', 'list policies', or 'delete a policy'. Do NOT use for creating wallets, signing transactions, sending funds, authenticating users, setting up email auth, deriving addresses, or deploying contracts."
+name: managing-policies-sdk
+description: "Creates and manages Turnkey organization policies for access control and transaction governance. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval using Turnkey's policy language. Use when asked to 'create a policy', 'add a spending limit', 'restrict which addresses can be sent to', 'set up an allowlist', 'add a deny policy', 'limit transaction amounts', 'require approval from multiple users', 'lock down signing', 'write a policy condition', 'set up access control', 'list policies', or 'delete a policy'. Do NOT use for creating wallets, signing transactions, sending funds, authenticating users, setting up email auth, deriving addresses, deploying contracts, or CLI/API-based policy management using the turnkey command line tool or turnkey request (use managing-policies-api instead)."
 license: Apache-2.0
 compatibility: "Requires Node.js. Install @turnkey/sdk-server. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
 metadata:
+  author: turnkey
   version: "2.0.0"
   tags: ["policy", "access-control", "governance", "security", "allowlist", "deny", "consensus"]
 ---
@@ -178,6 +179,6 @@ For complete, runnable TypeScript examples organized by use case, see [reference
 
 ## Related Skills
 
-- `creating-wallets` for wallet setup (policies govern wallet operations)
-- `signing-transactions` for signing and broadcasting transactions (policies govern signing)
-- `authenticating-users` for user and sub-organization management
+- `creating-wallets-sdk` for wallet setup (policies govern wallet operations)
+- `signing-transactions-sdk` for signing and broadcasting transactions (policies govern signing)
+- `authenticating-users-sdk` for user and sub-organization management

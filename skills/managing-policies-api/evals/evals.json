@@ -1,0 +1,47 @@
+[
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Create an ETH address allowlist policy using turnkey request",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_policy",
+      "JSON body includes EFFECT_ALLOW and eth.tx.to condition with in list syntax",
+      "Includes consensus expression"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "List all policies and delete a specific one via the API",
+    "expected_behavior": [
+      "First calls turnkey request --path /public/v1/query/list_policies",
+      "Then calls turnkey request --path /public/v1/submit/delete_policy with policyId",
+      "Shows sequential workflow"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Block all signing except for a specific wallet via the Turnkey API",
+    "expected_behavior": [
+      "Creates a DENY policy for broad signing restriction",
+      "Creates a companion ALLOW policy scoped to wallet.id",
+      "Warns about DENY precedence"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Require two admins to approve wallet exports using the API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_policy",
+      "Consensus uses approvers.filter with count >= 2",
+      "Condition uses activity.action == 'EXPORT'"
+    ]
+  },
+  {
+    "skills": ["managing-policies-api"],
+    "query": "Create a policy that restricts Solana transactions to the System Program only",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_policy",
+      "Uses solana.tx.program_keys.all() condition",
+      "References the System Program address 11111111111111111111111111111111"
+    ]
+  }
+]

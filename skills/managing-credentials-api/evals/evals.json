@@ -1,0 +1,56 @@
+[
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "Generate an API key for my Turnkey organization using the CLI",
+    "expected_behavior": [
+      "Uses turnkey generate api-key with --organization flag",
+      "Shows where key files are stored (~/.config/turnkey/keys/)",
+      "Mentions the public key output for registration"
+    ]
+  },
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "Create a new user with an API key via the Turnkey API",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_users",
+      "Includes proper JSON body with userName and apiKeys array",
+      "Shows the --organization flag"
+    ]
+  },
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "Set up a sub-organization with a root user for a new customer",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_sub_organization",
+      "Includes rootUsers with userName and apiKeys",
+      "Sets rootQuorumThreshold"
+    ]
+  },
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "Generate an encryption key for exporting a wallet",
+    "expected_behavior": [
+      "Uses turnkey generate encryption-key",
+      "Specifies --organization and --user flags",
+      "Explains encryption keys are for secure wallet import/export"
+    ]
+  },
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "Set up a sub-organization with a root user and wallet for a new customer",
+    "expected_behavior": [
+      "Uses turnkey request --path /public/v1/submit/create_sub_organization",
+      "Includes rootUsers with API key configuration",
+      "Optionally includes wallet in the sub-org creation"
+    ]
+  },
+  {
+    "skills": ["managing-credentials-api"],
+    "query": "How do I set up the turnkey CLI tool for the first time?",
+    "expected_behavior": [
+      "Shows brew install tkhq/tap/turnkey",
+      "Explains turnkey generate api-key with --organization flag",
+      "Mentions where keys are stored (~/.config/turnkey/keys/)"
+    ]
+  }
+]

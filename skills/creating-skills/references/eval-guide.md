@@ -83,7 +83,7 @@ Test that the skill corrects users who ask for the wrong approach:
 
 ```json
 {
-  "skills": ["signing-transactions"],
+  "skills": ["signing-transactions-sdk"],
   "query": "Use the @turnkey/ethers package to sign a Solana transaction",
   "expected_behavior": [
     "Corrects the user: @turnkey/ethers is for Ethereum, not Solana",
@@ -99,7 +99,7 @@ Test that the skill works alongside related skills:
 
 ```json
 {
-  "skills": ["creating-wallets", "signing-transactions"],
+  "skills": ["creating-wallets-sdk", "signing-transactions-sdk"],
   "query": "Create a wallet and send 0.01 ETH to 0xabc...",
   "expected_behavior": [
     "Creates a wallet first using createWallet",

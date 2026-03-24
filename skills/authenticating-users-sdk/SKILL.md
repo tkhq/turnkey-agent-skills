@@ -1,9 +1,10 @@
 ---
-name: authenticating-users
+name: authenticating-users-sdk
 description: "Implements user authentication for React apps using Turnkey's Embedded Wallet Kit (@turnkey/react-wallet-kit) with Auth Proxy or custom backend. Supports email OTP, SMS OTP, OAuth social login (Google, Apple, Facebook), passkeys/WebAuthn, and external wallet sign-in. Handles sub-organization creation, session management, and multi-method credential linking. Use when asked to 'add login', 'set up authentication', 'add email OTP', 'add Google login', 'add social login', 'implement passkey auth', 'create a signup flow', 'add wallet-based login', 'set up Turnkey auth', 'integrate Turnkey authentication', 'add SMS verification', 'connect wallet to log in', 'build a login page with Turnkey', or 'configure the auth proxy'. Do NOT use for signing transactions, sending funds, creating wallets outside of auth, or setting policies."
 license: Apache-2.0
 compatibility: "Requires Node.js and React. Install @turnkey/react-wallet-kit. For custom backends, also install @turnkey/sdk-server."
 metadata:
+  author: turnkey
   version: "2.0.0"
   tags: ["authentication", "react", "otp", "oauth", "passkey", "webauthn", "wallet-auth", "sub-organization", "embedded-wallet-kit"]
 ---
@@ -270,6 +271,6 @@ The user must always have at least one auth method. Removing the last method wil
 
 ## Related Skills
 
-- `creating-wallets` for adding wallets to existing sub-organizations
-- `managing-policies` for access control within sub-organizations
-- `signing-transactions` for signing and broadcasting transactions after authentication
+- `creating-wallets-sdk` for adding wallets to existing sub-organizations
+- `managing-policies-sdk` for access control within sub-organizations
+- `signing-transactions-sdk` for signing and broadcasting transactions after authentication

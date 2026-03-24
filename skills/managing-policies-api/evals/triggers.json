@@ -1,0 +1,24 @@
+{
+  "should_trigger": [
+    "Create a policy using turnkey request",
+    "List all policies in my organization via the API",
+    "How do I set up an address allowlist using the Turnkey API?",
+    "Delete a policy via turnkey request",
+    "Create a deny policy for large transfers using the Turnkey CLI",
+    "Update an existing policy with turnkey request",
+    "Write a policy condition for Solana transactions via the API",
+    "Set up multi-sig approval using Turnkey's policy API",
+    "How do I restrict ETH transfers to specific addresses via the Turnkey API?",
+    "Use turnkey request to add a spending cap policy",
+    "I need to create a multi-signature approval policy via the API",
+    "List my current policies using turnkey request"
+  ],
+  "should_not_trigger": [
+    "Create a wallet using turnkey CLI",
+    "Sign a transaction with turnkey",
+    "Generate an API key pair",
+    "Create a policy using @turnkey/sdk-server",
+    "Add email login to my React app",
+    "How do I create an Ethereum wallet with Turnkey?"
+  ]
+}

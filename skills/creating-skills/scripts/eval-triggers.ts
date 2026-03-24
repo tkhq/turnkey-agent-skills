@@ -5,11 +5,12 @@
  * Usage:
  *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets
  *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets --runs 3
+ *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets --threshold 90 --concurrency 4
  *
  * Adapted from Anthropic's skill-creator run_eval.py (Apache 2.0).
  */
 
-import { execSync, spawn } from "child_process";
+import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -24,6 +25,24 @@ interface EvalResult {
   expected: boolean;
   triggered: boolean;
   pass: boolean;
+}
+
+async function runWithConcurrency<T>(
+  tasks: (() => Promise<T>)[],
+  concurrency: number
+): Promise<T[]> {
+  const results: T[] = new Array(tasks.length);
+  let index = 0;
+  async function worker() {
+    while (index < tasks.length) {
+      const i = index++;
+      results[i] = await tasks[i]();
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker())
+  );
+  return results;
 }
 
 function loadTriggers(skillName: string): TriggerTestCase {
@@ -122,30 +141,36 @@ function testTrigger(
   });
 }
 
-function parseArgs(): { skill: string; runs: number } {
+function parseArgs(): { skill: string; runs: number; threshold: number; concurrency: number } {
   const args = process.argv.slice(2);
   let skill = "";
   let runs = 1;
+  let threshold = 100;
+  let concurrency = 1;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--skill" && args[i + 1]) {
       skill = args[++i];
     } else if (args[i] === "--runs" && args[i + 1]) {
       runs = parseInt(args[++i], 10);
+    } else if (args[i] === "--threshold" && args[i + 1]) {
+      threshold = parseFloat(args[++i]);
+    } else if (args[i] === "--concurrency" && args[i + 1]) {
+      concurrency = parseInt(args[++i], 10);
     }
   }
 
   if (!skill) {
-    console.error("Usage: eval-triggers.ts --skill <skill-name> [--runs N]");
+    console.error("Usage: eval-triggers.ts --skill <skill-name> [--runs N] [--threshold N] [--concurrency N]");
     process.exit(1);
   }
 
-  return { skill, runs };
+  return { skill, runs, threshold, concurrency };
 }
 
 // Main
 async function main() {
-  const { skill, runs } = parseArgs();
+  const { skill, runs, threshold, concurrency } = parseArgs();
   const pluginDir = process.cwd();
 
   // Verify skill exists
@@ -161,37 +186,37 @@ async function main() {
   console.log(`Evaluating triggers for: ${skill}`);
   console.log(`Description (${description.length} chars): ${description.substring(0, 100)}...`);
   console.log(`Runs per query: ${runs}`);
+  console.log(`Threshold: ${threshold}%`);
+  console.log(`Concurrency: ${concurrency}`);
   console.log(`Should trigger: ${triggers.should_trigger.length} queries`);
   console.log(`Should not trigger: ${triggers.should_not_trigger.length} queries`);
   console.log("");
 
-  const results: EvalResult[] = [];
+  // Build task array for all queries
+  interface QueryTask {
+    query: string;
+    expected: boolean;
+  }
 
-  // Test should_trigger queries
-  for (const query of triggers.should_trigger) {
+  const queryTasks: QueryTask[] = [
+    ...triggers.should_trigger.map((q) => ({ query: q, expected: true })),
+    ...triggers.should_not_trigger.map((q) => ({ query: q, expected: false })),
+  ];
+
+  const tasks = queryTasks.map((qt) => async (): Promise<EvalResult> => {
     let triggerCount = 0;
     for (let r = 0; r < runs; r++) {
-      const triggered = await testTrigger(query, skill, pluginDir);
+      const triggered = await testTrigger(qt.query, skill, pluginDir);
       if (triggered) triggerCount++;
     }
     const triggered = triggerCount > runs / 2; // Majority vote
-    const pass = triggered === true;
-    results.push({ query, expected: true, triggered, pass });
-    console.log(`${pass ? "PASS" : "FAIL"}  [should trigger]     "${query}" (${triggerCount}/${runs})`);
-  }
+    const pass = qt.expected ? triggered : !triggered;
+    const label = qt.expected ? "should trigger" : "should NOT trigger";
+    console.log(`${pass ? "PASS" : "FAIL"}  [${label}]${qt.expected ? "     " : " "}"${qt.query}" (${triggerCount}/${runs})`);
+    return { query: qt.query, expected: qt.expected, triggered, pass };
+  });
 
-  // Test should_not_trigger queries
-  for (const query of triggers.should_not_trigger) {
-    let triggerCount = 0;
-    for (let r = 0; r < runs; r++) {
-      const triggered = await testTrigger(query, skill, pluginDir);
-      if (triggered) triggerCount++;
-    }
-    const triggered = triggerCount > runs / 2;
-    const pass = triggered === false;
-    results.push({ query, expected: false, triggered, pass });
-    console.log(`${pass ? "PASS" : "FAIL"}  [should NOT trigger] "${query}" (${triggerCount}/${runs})`);
-  }
+  const results = await runWithConcurrency(tasks, concurrency);
 
   // Summary
   const passed = results.filter((r) => r.pass).length;
@@ -221,6 +246,11 @@ async function main() {
 
   console.log(`Trigger accuracy: ${triggerAccuracy}%`);
   console.log(`False positive rate: ${falsePositiveRate}%`);
+  console.log(`Threshold: ${threshold}%`);
+
+  const accuracyNum = parseFloat(accuracy);
+  const passed_threshold = accuracyNum >= threshold;
+  console.log(`Status: ${passed_threshold ? "PASS" : "FAIL"}`);
 
   // Write results to file
   const outputPath = path.join(skillDir, "evals", "trigger-results.json");
@@ -231,11 +261,12 @@ async function main() {
         skill,
         timestamp: new Date().toISOString(),
         runs,
+        threshold,
         results,
         summary: {
           total,
           passed,
-          accuracy: parseFloat(accuracy),
+          accuracy: accuracyNum,
           triggerAccuracy: parseFloat(triggerAccuracy as string) || 0,
           falsePositiveRate: parseFloat(falsePositiveRate as string) || 0,
         },
@@ -246,7 +277,7 @@ async function main() {
   );
   console.log(`\nResults saved to ${outputPath}`);
 
-  process.exit(passed === total ? 0 : 1);
+  process.exit(passed_threshold ? 0 : 1);
 }
 
 main();

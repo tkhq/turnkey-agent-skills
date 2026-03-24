@@ -8,6 +8,8 @@
   "scripts": {
     "validate": "tsx skills/creating-skills/scripts/validate.ts",
     "eval": "tsx skills/creating-skills/scripts/eval-triggers.ts",
+    "eval:all": "tsx skills/creating-skills/scripts/eval-all.ts",
+    "eval:ci": "tsx skills/creating-skills/scripts/eval-triggers.ts --threshold 90 --concurrency 4",
     "eval:loop": "tsx skills/creating-skills/scripts/eval-loop.ts",
     "report": "tsx skills/creating-skills/scripts/generate-report.ts"
   },

@@ -1,6 +1,6 @@
 ---
 name: setup-account-workflow
-description: "Bootstraps a Turnkey organization from zero to operational using the CLI and API. Walks through CLI installation, API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey', 'set up Turnkey from scratch', 'bootstrap my Turnkey organization', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use creating-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-credentials-api), or adding policies (use secure-wallets-workflow or managing-policies-api)."
+description: "Bootstraps a Turnkey organization from zero to operational using the CLI and API. Walks through CLI installation, API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey', 'set up Turnkey from scratch', 'bootstrap my Turnkey organization', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use creating-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-credentials-api), or adding policies (use wallet-governance-workflow or managing-policies-api)."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Composes managing-credentials-api, creating-wallets-api, and signing-transactions-api skills."
 metadata:
@@ -150,13 +150,13 @@ turnkey request --path /public/v1/submit/create_users --body '{
 |-----------|----------|
 | Solo / CI only | Skip this phase. Use your root key. |
 | 2-5 members | Create named users. Root quorum is sufficient for now. |
-| 5+ members | Create users with tags, then add policies (see `secure-wallets-workflow`). |
+| 5+ members | Create users with tags, then add policies (see `wallet-governance-workflow`). |
 
 See `managing-credentials-api` for detailed user provisioning and sub-organization patterns.
 
 ### Phase 5: (Optional) Harden for Production
 
-If you are moving toward production, continue with `secure-wallets-workflow` to add policies, access controls, and root quorum hardening.
+If you are moving toward production, continue with `wallet-governance-workflow` to add policies, access controls, and root quorum hardening.
 
 ## Verification Checklist
 
@@ -175,13 +175,13 @@ After completing phases 1-3, confirm:
 - Verify each phase before moving to the next. A failed Phase 1 will cascade into failures in Phase 2 and 3.
 - Record wallet addresses before funding them. There is no way to recover funds sent to an address you do not control.
 - Do not skip the test signature. It catches misconfigured keys, missing permissions, and incorrect signer addresses.
-- For production use, always follow up with `secure-wallets-workflow` to add governance.
+- For production use, always follow up with `wallet-governance-workflow` to add governance.
 
 ## Related Skills
 
 - `managing-credentials-api` for detailed API key and user management
 - `creating-wallets-api` for all supported chains, derivation paths, and import/export
 - `signing-transactions-api` for chain-specific signing methods and broadcasting
-- `secure-wallets-workflow` for adding governance, policies, and access control
+- `wallet-governance-workflow` for adding governance, policies, and access control
 
 For a complete end-to-end command walkthrough, see [references/full-setup-walkthrough.md](references/full-setup-walkthrough.md).

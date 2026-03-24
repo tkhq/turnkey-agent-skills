@@ -1,6 +1,6 @@
 [
   {
-    "skills": ["secure-wallets-workflow"],
+    "skills": ["wallet-governance-workflow"],
     "query": "Help me secure my Turnkey wallets for production",
     "expected_behavior": [
       "Follows a phased workflow: audit, create scoped users, implement policies, test",
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "skills": ["secure-wallets-workflow"],
+    "skills": ["wallet-governance-workflow"],
     "query": "Add spending limits to my hot wallet on Ethereum",
     "expected_behavior": [
       "Creates a DENY policy with condition on eth.tx.value",
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "skills": ["secure-wallets-workflow"],
+    "skills": ["wallet-governance-workflow"],
     "query": "Set up 2-of-3 approval for my treasury wallet",
     "expected_behavior": [
       "Creates a consensus policy using approvers.filter().count() >= 2",
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "skills": ["secure-wallets-workflow"],
+    "skills": ["wallet-governance-workflow"],
     "query": "Set up Turnkey from scratch and secure it for production",
     "expected_behavior": [
       "References setup-account-workflow for initial bootstrapping",
@@ -39,7 +39,7 @@
     ]
   },
   {
-    "skills": ["secure-wallets-workflow"],
+    "skills": ["wallet-governance-workflow"],
     "query": "I need to onboard a new team member with limited access to our Turnkey wallets",
     "expected_behavior": [
       "Creates a scoped user with descriptive tags",

@@ -1,5 +1,5 @@
 ---
-name: secure-wallets-workflow
+name: wallet-governance-workflow
 description: "Adds governance, policies, and access control to existing Turnkey wallets for production readiness. Walks through auditing current state, choosing a governance strategy, creating scoped API users, implementing policies (allowlists, spending limits, consensus requirements), testing enforcement, and hardening root quorum. Use when asked to 'secure my Turnkey wallets', 'harden Turnkey for production', 'set up governance for my organization', 'lock down my wallets', 'production-ready Turnkey setup', 'add access control to Turnkey', 'prepare Turnkey for mainnet', 'implement least privilege on Turnkey', or 'what policies should I add to my wallets'. Do NOT use for creating wallets (use creating-wallets-api), initial account setup (use setup-account-workflow), signing transactions (use signing-transactions-api), or individual policy CRUD (use managing-policies-api)."
 license: Apache-2.0
 compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Requires existing wallets and API keys. Composes managing-policies-api and managing-credentials-api skills."

@@ -60,7 +60,7 @@ Functional evals verify that your skill produces correct output when activated.
     "skills": ["your-skill-name"],
     "query": "A realistic user request",
     "expected_behavior": [
-      "Uses the correct Turnkey API endpoint or CLI command",
+      "Uses the correct Turnkey API endpoint",
       "Handles the response correctly",
       "Follows the documented pattern"
     ]
@@ -102,9 +102,9 @@ Test that the skill works alongside related skills:
   "skills": ["creating-wallets-api", "signing-transactions-api"],
   "query": "Create a wallet and send 0.01 ETH to 0xabc...",
   "expected_behavior": [
-    "Creates a wallet first using turnkey wallets create",
+    "Creates a wallet first using POST /public/v1/submit/create_wallet",
     "Derives an Ethereum address",
-    "Signs and sends the transaction via turnkey request"
+    "Signs and sends the transaction via POST /public/v1/submit/sign_transaction"
   ]
 }
 ```

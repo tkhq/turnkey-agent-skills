@@ -1,17 +1,17 @@
 {
   "should_trigger": [
-    "Create a wallet using the turnkey CLI",
+    "Create a wallet using the Turnkey API",
     "How do I list wallets via the Turnkey API?",
-    "Derive a Solana address using turnkey request",
-    "Add a Bitcoin account to my existing wallet via CLI",
-    "Export my wallet mnemonic using the turnkey command",
+    "Derive a Solana address using the create_wallet endpoint",
+    "Add a Bitcoin account to my existing wallet via the API",
+    "Export my wallet mnemonic using the Turnkey API",
     "Import a wallet seed phrase into Turnkey via the API",
-    "Create a standalone private key with turnkey",
-    "List all wallet accounts using turnkey wallets accounts list",
-    "How do I create a Bitcoin wallet using the turnkey API endpoint?",
-    "Use turnkey request to list all my wallet accounts",
-    "I want to create a private key for Solana using the turnkey CLI",
-    "Show me how to derive a Cosmos address via turnkey wallets accounts create"
+    "Create a standalone private key with the Turnkey API",
+    "List all wallet accounts using the list_wallet_accounts endpoint",
+    "How do I create a Bitcoin wallet using the Turnkey API endpoint?",
+    "Use the Turnkey API to list all my wallet accounts",
+    "I want to create a private key for Solana using the Turnkey API",
+    "Show me how to derive a Cosmos address via create_wallet_accounts"
   ],
   "should_not_trigger": [
     "Sign a transaction on Ethereum",

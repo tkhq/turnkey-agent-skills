@@ -1,23 +1,34 @@
 # Sponsored Transaction Examples (Gasless via Paymaster)
 
-Turnkey can sponsor gas fees so users pay nothing. Unlike signTransaction and signRawPayload, these endpoints handle transaction construction, signing, and broadcasting in one call. These are API-only (no CLI shortcut exists).
+Turnkey can sponsor gas fees so users pay nothing. Unlike signTransaction and signRawPayload, these endpoints handle transaction construction, signing, and broadcasting in one call.
+
+**Base URL:** `https://api.turnkey.com`
 
 ## EVM: Send Sponsored Transaction
 
 Turnkey handles gas estimation, nonce management, signing, and broadcasting.
 
-```bash
-# Step 1: Get gas station nonce (optional, for replay protection)
-turnkey request --path /public/v1/query/get_nonces --body '{
+**Step 1: Get gas station nonce (optional, for replay protection)**
+
+`POST /public/v1/query/get_nonces`
+
+```json
+{
   "organizationId": "<ORG_ID>",
   "address": "0xYOUR_SENDER_ADDRESS",
   "caip2": "eip155:8453",
   "gasStationNonce": true
-}'
-# Response: { "gasStationNonce": "42" }
+}
+```
 
-# Step 2: Send sponsored transaction
-turnkey request --path /public/v1/submit/eth_send_transaction --body '{
+Response: `{ "gasStationNonce": "42" }`
+
+**Step 2: Send sponsored transaction**
+
+`POST /public/v1/submit/eth_send_transaction`
+
+```json
+{
   "from": "0xYOUR_SENDER_ADDRESS",
   "to": "0xUSDC_CONTRACT_ADDRESS",
   "caip2": "eip155:8453",
@@ -25,7 +36,7 @@ turnkey request --path /public/v1/submit/eth_send_transaction --body '{
   "data": "0xa9059cbb000000000000000000000000RECIPIENT_ADDRESS0000000000000000000000000000000000000000000000000000000000989680",
   "value": "0",
   "gasStationNonce": "42"
-}'
+}
 ```
 
 Response:
@@ -66,13 +77,15 @@ When `sponsor: true`, Turnkey handles gas estimation and fee parameters. Do not 
 
 The client must construct and serialize the unsigned transaction. Turnkey handles the fee payer, blockhash (if not provided), signing, and broadcasting.
 
-```bash
-turnkey request --path /public/v1/submit/sol_send_transaction --body '{
+`POST /public/v1/submit/sol_send_transaction`
+
+```json
+{
   "unsignedTransaction": "<BASE64_ENCODED_SERIALIZED_TX>",
   "signWith": "<SOLANA_ADDRESS>",
   "caip2": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
   "sponsor": true
-}'
+}
 ```
 
 Response:
@@ -105,11 +118,13 @@ Response:
 
 Sponsored transactions are async. After submitting, poll until confirmed or failed.
 
-```bash
-turnkey request --path /public/v1/query/get_send_transaction_status --body '{
+`POST /public/v1/query/get_send_transaction_status`
+
+```json
+{
   "organizationId": "<ORG_ID>",
   "sendTransactionStatusId": "<STATUS_ID>"
-}'
+}
 ```
 
 Response:
@@ -140,10 +155,12 @@ Poll every 2 seconds until status is `INCLUDED` or `FAILED`. The `error` field c
 
 Monitor your organization's gas sponsorship usage.
 
-```bash
-turnkey request --path /public/v1/query/get_gas_usage --body '{
+`POST /public/v1/query/get_gas_usage`
+
+```json
+{
   "organizationId": "<ORG_ID>"
-}'
+}
 ```
 
 Response:

@@ -1,12 +1,12 @@
 ---
 name: setup-account-workflow
-description: "Bootstraps a Turnkey organization from zero to operational using the CLI and API. Walks through CLI installation, API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey', 'set up Turnkey from scratch', 'bootstrap my Turnkey organization', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use creating-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-credentials-api), or adding policies (use wallet-governance-workflow or managing-policies-api)."
+description: "Bootstraps a Turnkey organization from zero to operational using the API. Walks through API key generation, wallet creation, address derivation for target chains, and verification with a test signature. Covers chain selection, wallet topology, and team member onboarding. Use when asked to 'get started with Turnkey from scratch', 'bootstrap my Turnkey organization via the API', 'set up Turnkey from scratch using the API', 'go from zero to signing transactions', 'Turnkey quickstart', 'initial Turnkey setup', 'onboard onto Turnkey', 'set up my first wallet and sign a transaction', or 'walk me through the full Turnkey setup'. Do NOT use for individual operations like creating a single wallet (use creating-wallets-api), signing a specific transaction (use signing-transactions-api), generating a single API key (use managing-credentials-api), or adding policies (use wallet-governance-workflow or managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Composes managing-credentials-api, creating-wallets-api, and signing-transactions-api skills."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["workflow", "quickstart", "onboarding", "setup", "cli", "organization"]
+  tags: ["workflow", "quickstart", "onboarding", "setup", "organization"]
 ---
 
 # Setting Up a Turnkey Account
@@ -15,43 +15,51 @@ metadata:
 
 Bootstrap a Turnkey organization from zero to "I can sign transactions" by following this five-phase workflow.
 
+**Base URL:** `https://api.turnkey.com`
+
 ## Prerequisites
 
-- Turnkey CLI: `brew install tkhq/tap/turnkey`
 - An organization ID from the Turnkey dashboard (app.turnkey.com)
-
-Set your org ID for all subsequent commands:
-
-```bash
-export ORGANIZATION_ID="<your-org-id>"
-```
+- A P-256 key pair for authenticating API requests (see managing-credentials-api for details)
 
 ## Building Blocks
 
-This workflow composes three primitive skills in order. Each phase below tells you WHAT to do and HOW to verify. For detailed command variations, consult the corresponding skill.
+This workflow composes three primitive skills in order. Each phase below tells you WHAT to do and HOW to verify. For detailed endpoint variations, consult the corresponding skill.
 
-1. **managing-credentials-api** - CLI installation, API key generation, user provisioning
+1. **managing-credentials-api** - API key generation, user provisioning
 2. **creating-wallets-api** - Wallet creation, address derivation for target chains
 3. **signing-transactions-api** - Test signing to verify everything works end-to-end
 
 ## Instructions
 
-### Phase 1: Install CLI and Generate API Keys
+### Phase 1: Generate API Keys
 
-Install the CLI and create your first API key pair:
+Get your organization ID from the Turnkey dashboard at app.turnkey.com, then generate a P-256 key pair locally using any crypto library (e.g., OpenSSL, Node.js crypto, Go crypto/ecdsa). Register the public key with your organization:
 
-```bash
-brew install tkhq/tap/turnkey
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name default
+`POST /public/v1/submit/create_api_keys`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_API_KEYS",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "apiKeys": [
+      {
+        "apiKeyName": "default",
+        "publicKey": "<hex-encoded-P256-public-key>",
+        "curveType": "API_KEY_CURVE_P256"
+      }
+    ],
+    "userId": "<your-user-id>"
+  }
+}
 ```
 
-The public key is printed to stdout. The private key is saved to `~/.config/turnkey/keys/default/`.
-
 **Verify:**
-- `turnkey version` returns a version number
-- `ls ~/.config/turnkey/keys/default/` shows key files
+- The response includes `apiKeyIds` confirming registration
 
-See `managing-credentials-api` for key curves, custom paths, and key rotation patterns.
+See `managing-credentials-api` for key curves, authentication header construction, and key rotation patterns.
 
 ### Decision Gate: Choose Your Chain Strategy
 
@@ -68,36 +76,66 @@ One wallet with multiple accounts is the default recommendation. Use separate wa
 
 ### Phase 2: Create Your Wallet
 
-Check for existing wallets, then create a wallet with accounts for your target chains:
+First check for existing wallets:
 
-```bash
-# Check existing
-turnkey wallets list --key-name default
+`POST /public/v1/query/list_wallets`
 
-# Create wallet with Ethereum + Solana accounts
-turnkey request --path /public/v1/submit/create_wallet --body '{
-  "walletName": "default",
-  "accounts": [
-    {
-      "curve": "CURVE_SECP256K1",
-      "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'60'\''/'0'\''/'0/0",
-      "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
-    },
-    {
-      "curve": "CURVE_ED25519",
-      "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'501'\''/'0'\''/'0'\''",
-      "addressFormat": "ADDRESS_FORMAT_SOLANA"
-    }
-  ],
-  "mnemonicLength": 12
-}'
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+Then create a wallet with accounts for your target chains:
+
+`POST /public/v1/submit/create_wallet`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "walletName": "default",
+    "accounts": [
+      {
+        "curve": "CURVE_SECP256K1",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/44'/60'/0'/0/0",
+        "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
+      },
+      {
+        "curve": "CURVE_ED25519",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/44'/501'/0'/0'",
+        "addressFormat": "ADDRESS_FORMAT_SOLANA"
+      }
+    ],
+    "mnemonicLength": 12
+  }
+}
 ```
 
 **Verify:**
-- `turnkey wallets list --key-name default` shows the new wallet
-- `turnkey wallets accounts list --wallet default` shows your derived addresses
+
+`POST /public/v1/query/list_wallets`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+Confirm the new wallet appears. Then list accounts:
+
+`POST /public/v1/query/list_wallet_accounts`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "walletId": "<wallet-id>"
+}
+```
 
 Record the addresses. You will need them for funding and signing.
 
@@ -107,43 +145,58 @@ For EVM-only, remove the Solana account. For other chains (Bitcoin, Cosmos, Sui,
 
 Sign a test message to confirm everything is wired up correctly:
 
-```bash
-turnkey raw sign \
-  --signer <YOUR_ETH_ADDRESS> \
-  --payload "Hello, Turnkey!" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_KECCAK256
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "signWith": "<your-eth-address>",
+    "payload": "48656c6c6f2c205475726e6b657921",
+    "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
+    "hashFunction": "HASH_FUNCTION_KECCAK256"
+  }
+}
 ```
 
 **Verify:**
-- The command returns a signature (r, s, v values) without errors
+- The response includes a signature (r, s, v values) without errors
 
-If this fails, check: is the signer address from a wallet you own? Are your API keys valid? Use `--no-post` to preview the request without sending.
+If this fails, check: is the signer address from a wallet you own? Are your API keys valid?
 
 See `signing-transactions-api` for chain-specific transaction signing methods.
 
 ### Phase 4: (Optional) Onboard Team Members
 
-For teams, create additional API users with their own key pairs:
+For teams, generate a P-256 key pair for each new team member locally, then create users with their public keys:
 
-```bash
-# Generate a key pair for the new team member
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name alice-key
+`POST /public/v1/submit/create_users`
 
-# Create the user
-turnkey request --path /public/v1/submit/create_users --body '{
-  "users": [{
-    "userName": "alice",
-    "userEmail": "alice@example.com",
-    "apiKeys": [{
-      "apiKeyName": "alice-key",
-      "publicKey": "<ALICE_PUBLIC_KEY>",
-      "curveType": "API_KEY_CURVE_P256"
-    }],
-    "authenticators": [],
-    "userTags": []
-  }]
-}'
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_USERS",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "users": [
+      {
+        "userName": "alice",
+        "userEmail": "alice@example.com",
+        "apiKeys": [
+          {
+            "apiKeyName": "alice-key",
+            "publicKey": "<alice-hex-encoded-P256-public-key>",
+            "curveType": "API_KEY_CURVE_P256"
+          }
+        ],
+        "authenticators": [],
+        "userTags": []
+      }
+    ]
+  }
+}
 ```
 
 | Team Size | Approach |
@@ -162,10 +215,9 @@ If you are moving toward production, continue with `wallet-governance-workflow` 
 
 After completing phases 1-3, confirm:
 
-- [ ] CLI installed and `turnkey version` responds
-- [ ] API key generated and stored in `~/.config/turnkey/keys/`
+- [ ] API key pair generated and registered with your organization
 - [ ] Wallet created with accounts for target chains
-- [ ] `turnkey wallets accounts list` shows correct addresses
+- [ ] List wallet accounts returns correct addresses
 - [ ] Test signature succeeds without errors
 - [ ] Addresses recorded for funding
 
@@ -184,4 +236,4 @@ After completing phases 1-3, confirm:
 - `signing-transactions-api` for chain-specific signing methods and broadcasting
 - `wallet-governance-workflow` for adding governance, policies, and access control
 
-For a complete end-to-end command walkthrough, see [references/full-setup-walkthrough.md](references/full-setup-walkthrough.md).
+For a complete end-to-end API walkthrough, see [references/full-setup-walkthrough.md](references/full-setup-walkthrough.md).

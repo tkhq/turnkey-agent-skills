@@ -2,7 +2,7 @@
 name: wallet-governance-workflow
 description: "Adds governance, policies, and access control to existing Turnkey wallets for production readiness. Walks through auditing current state, choosing a governance strategy, creating scoped API users, implementing policies (allowlists, spending limits, consensus requirements), testing enforcement, and hardening root quorum. Use when asked to 'secure my Turnkey wallets', 'harden Turnkey for production', 'set up governance for my organization', 'lock down my wallets', 'production-ready Turnkey setup', 'add access control to Turnkey', 'prepare Turnkey for mainnet', 'implement least privilege on Turnkey', or 'what policies should I add to my wallets'. Do NOT use for creating wallets (use creating-wallets-api), initial account setup (use setup-account-workflow), signing transactions (use signing-transactions-api), or individual policy CRUD (use managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Requires existing wallets and API keys. Composes managing-policies-api and managing-credentials-api skills."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup. Requires existing wallets and API keys."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -17,13 +17,9 @@ Add governance and access control to existing Turnkey wallets by auditing curren
 
 ## Prerequisites
 
-- Turnkey CLI installed (`brew install tkhq/tap/turnkey`)
+- Turnkey API credentials (P-256 key pair). See `managing-credentials-api` for authentication setup.
 - Existing wallets and API keys (complete `setup-account-workflow` first if starting fresh)
 - Root quorum access for policy changes
-
-```bash
-export ORGANIZATION_ID="<your-org-id>"
-```
 
 ## Building Blocks
 
@@ -51,16 +47,37 @@ Design ALLOW policies for what should work, then add DENY policies as guardrails
 
 List everything in your organization to understand what you are securing:
 
-```bash
-# List wallets and accounts
-turnkey wallets list --key-name default
-turnkey wallets accounts list --wallet <wallet-name>
+`POST /public/v1/query/list_wallets`
 
-# List users
-turnkey request --path /public/v1/query/list_users --body '{}' --organization $ORGANIZATION_ID
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
 
-# List existing policies
-turnkey request --path /public/v1/query/list_policies --body '{}' --organization $ORGANIZATION_ID
+`POST /public/v1/query/list_wallet_accounts`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "walletId": "<wallet-id>"
+}
+```
+
+`POST /public/v1/query/list_users`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+`POST /public/v1/query/list_policies`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
 
 **Verify:** You have a clear picture of all wallets, their addresses, all users, and any existing policies. Document this before making changes.
@@ -77,25 +94,41 @@ Pick the tier that matches your environment and follow the corresponding phases 
 
 ### Phase 2: Create Scoped API Users
 
-Stop using root keys for day-to-day operations. Create purpose-built users with descriptive names and tags:
+Stop using root keys for day-to-day operations. Create purpose-built users with descriptive names and tags.
 
-```bash
-# Generate key for a trading bot
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name trading-bot-key
+Generate a P-256 key pair locally, then register it via the API. See `managing-credentials-api` for key generation details.
 
-# Create tags first (the API requires tag IDs, not names)
-turnkey request --path /public/v1/submit/create_user_tag --body '{
+Create tags first (the API requires tag IDs, not names):
+
+`POST /public/v1/submit/create_user_tag`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "tagName": "bot"
-}' --organization $ORGANIZATION_ID
-# Note the tagId from the response (e.g., "tag-abc123")
+}
+```
 
-turnkey request --path /public/v1/submit/create_user_tag --body '{
+Note the tagId from the response (e.g., "tag-abc123").
+
+`POST /public/v1/submit/create_user_tag`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "tagName": "trading"
-}' --organization $ORGANIZATION_ID
-# Note the tagId from the response (e.g., "tag-def456")
+}
+```
 
-# Create user with tag IDs
-turnkey request --path /public/v1/submit/create_users --body '{
+Note the tagId from the response (e.g., "tag-def456").
+
+Create the user with tag IDs:
+
+`POST /public/v1/submit/create_users`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "users": [{
     "userName": "trading-bot",
     "apiKeys": [{
@@ -106,7 +139,7 @@ turnkey request --path /public/v1/submit/create_users --body '{
     "authenticators": [],
     "userTags": ["<BOT_TAG_ID>", "<TRADING_TAG_ID>"]
   }]
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 | Role | Suggested Tags | Purpose |
@@ -116,7 +149,7 @@ turnkey request --path /public/v1/submit/create_users --body '{
 | CI/CD pipeline | ci, deploy | Deploy-wallet signing only |
 | Read-only monitor | monitor | No policies needed (reads are implicit) |
 
-**Verify:** `turnkey request --path /public/v1/query/list_users --body '{}'` shows the new users with correct tags.
+**Verify:** Call `POST /public/v1/query/list_users` and confirm the new users appear with correct tags.
 
 See `managing-credentials-api` for detailed user provisioning and sub-organization patterns.
 
@@ -136,23 +169,33 @@ Choose policies based on your use case. Start with the pattern that matches, the
 
 #### Example: Hot Wallet with Spending Limit
 
-```bash
-# ALLOW: trading bot can sign with the hot wallet
-turnkey request --path /public/v1/submit/create_policy --body '{
+ALLOW: trading bot can sign with the hot wallet.
+
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "allow-trading-bot-signing",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('\''trading'\''))",
-  "condition": "activity.action == '\''SIGN'\'' && wallet.id == '\''<HOT_WALLET_ID>'\''",
+  "consensus": "approvers.any(user, user.tags.contains('trading'))",
+  "condition": "activity.action == 'SIGN' && wallet.id == '<HOT_WALLET_ID>'",
   "notes": "Trading bot can sign transactions from the hot wallet"
-}' --organization $ORGANIZATION_ID
+}
+```
 
-# DENY: block transfers above 1 ETH (1e18 wei)
-turnkey request --path /public/v1/submit/create_policy --body '{
+DENY: block transfers above 1 ETH (1e18 wei).
+
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "deny-large-transfers",
   "effect": "EFFECT_DENY",
   "condition": "eth.tx.value > 1000000000000000000",
   "notes": "Block any single transfer above 1 ETH"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 For more patterns (allowlists, multi-sig, Solana, Bitcoin), see the complete examples in `managing-policies-api` and [references/security-hardening-walkthrough.md](references/security-hardening-walkthrough.md).
@@ -166,35 +209,62 @@ For production, increase root quorum to at least 3 members with a threshold of 2
 - Each root quorum member should use a separate, securely stored key (different machines, hardware keys).
 - Root quorum changes require existing root quorum approval.
 
-```bash
-# List current users to identify root quorum candidates
-turnkey request --path /public/v1/query/list_users --body '{}' --organization $ORGANIZATION_ID
+List current users to identify root quorum candidates:
 
-# Update root quorum: require 2-of-3 approval
-turnkey request --path /public/v1/submit/update_root_quorum --body '{
-  "threshold": 2,
-  "userIds": ["<USER_ID_1>", "<USER_ID_2>", "<USER_ID_3>"]
-}' --organization $ORGANIZATION_ID
+`POST /public/v1/query/list_users`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
 
-**Verify:** Run `list_users` again and confirm the root quorum shows the updated threshold and member list. If the current root quorum threshold is already greater than 1, this activity will require approval from other root quorum members before it completes.
+Update root quorum to require 2-of-3 approval:
+
+`POST /public/v1/submit/update_root_quorum`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "threshold": 2,
+  "userIds": ["<USER_ID_1>", "<USER_ID_2>", "<USER_ID_3>"]
+}
+```
+
+**Verify:** Call `POST /public/v1/query/list_users` again and confirm the root quorum shows the updated threshold and member list. If the current root quorum threshold is already greater than 1, this activity will require approval from other root quorum members before it completes.
 
 ### Phase 5: Test Before Going Live
 
-Test both the happy path and the denial path:
+Test both the happy path and the denial path.
 
-```bash
-# Test ALLOWED: bot signs a small transaction (should succeed)
-turnkey raw sign \
-  --signer <HOT_WALLET_ADDRESS> \
-  --payload "test" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_KECCAK256 \
-  --key-name trading-bot-key
+Test ALLOWED: bot signs a small message (should succeed).
 
-# Test DENIED: attempt a large transfer (should fail with policy denial)
-# Use --no-post to preview without sending, or test on testnet
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "signWith": "<HOT_WALLET_ADDRESS>",
+  "payload": "test",
+  "encoding": "PAYLOAD_ENCODING_TEXT_UTF8",
+  "hashFunction": "HASH_FUNCTION_KECCAK256"
+}
 ```
+
+Test DENIED: attempt a large transfer (should fail with policy denial).
+
+`POST /public/v1/submit/sign_transaction`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "signWith": "<HOT_WALLET_ADDRESS>",
+  "unsignedTransaction": "<SERIALIZED_TX_ABOVE_1_ETH>",
+  "type": "TRANSACTION_TYPE_ETHEREUM"
+}
+```
+
+This should return a policy denial error because the DENY policy blocks transfers above 1 ETH.
 
 **Verify:**
 - Authorized operations succeed
@@ -222,7 +292,7 @@ turnkey raw sign \
 
 - DENY always takes precedence over ALLOW. Design with this in mind.
 - Do not add users to root quorum unless they need to bypass all policies.
-- Test policies on testnet or with `--no-post` before applying to production.
+- Test policies on testnet before applying to production.
 - The policy engine does not short-circuit. Split complex conditions into separate policies to avoid evaluation errors.
 - Use descriptive policy names and notes for auditability.
 - Key rotation: create new, verify, then delete old. Never delete first.

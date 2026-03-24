@@ -9,7 +9,7 @@ Copy `template/SKILL.md` and modify it. This document explains each section.
 name: your-skill-name          # kebab-case, max 64 chars, MUST match directory name
 description: "..."              # See "Writing the Description" below
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["relevant", "tags"]   # Used for search and categorization
@@ -25,10 +25,10 @@ The description is the most critical field. It controls when the skill gets load
 ### Good descriptions (from existing skills):
 
 **creating-wallets-api:**
-"Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, and other chains using Turnkey's secure enclave infrastructure. Use when asked to 'create a wallet', 'set up a wallet', 'get a blockchain address', 'derive an address', 'check if I have a wallet', or 'list my wallets'."
+"Creates HD wallets and derives blockchain addresses for Ethereum, Solana, Bitcoin, Cosmos, and other chains using the Turnkey API. Use when asked to 'create a wallet via the API', 'list wallets', 'get a blockchain address', 'derive an address', or 'list my wallets'."
 
 **signing-transactions-api:**
-"Signs and broadcasts blockchain transactions using Turnkey. Supports Ethereum/EVM (viem, ethers), Bitcoin (P2WPKH, P2TR), Solana, Cosmos (CosmJS), Uniswap, Sui, TON, TRON, x402 payments, and sponsored/gasless transactions via paymaster. Use when asked to 'send ETH', 'send BTC', 'send SOL', 'sign a transaction', 'transfer tokens', 'sign a message', or 'broadcast a transaction'."
+"Signs and broadcasts blockchain transactions using the Turnkey HTTP API. Supports Ethereum, Bitcoin, Solana, Cosmos, Sui, TON, TRON, and sponsored/gasless transactions. Use when asked to 'sign a transaction via the API', 'sign a raw payload', 'sign a Bitcoin transaction', or 'broadcast a transaction'."
 
 ### What makes these good:
 - Third person ("Creates...", "Signs...")
@@ -45,30 +45,30 @@ The description is the most critical field. It controls when the skill gets load
 ## SKILL.md Body Sections
 
 ### Quick Start
-One sentence. The simplest path. Example: "Use the Turnkey CLI to create an HD wallet and derive addresses."
+One sentence. The simplest path. Example: "Use the Turnkey API to create an HD wallet and derive addresses."
 
 ### Prerequisites
-Just the npm install command. Nothing else.
-
-### Environment Variables
-Standard env block. Every skill uses the same three base variables. Add `SIGN_WITH` for signing skills.
+Reference managing-credentials-api for authentication. Note any additional requirements.
 
 ### Instructions
-Step-by-step with brief code/command patterns (10-15 lines per block). The first step is always CLI setup and authentication:
+Step-by-step with brief API call patterns (10-15 lines per block). Show the HTTP endpoint and JSON body:
 
-```bash
-# Install the CLI
-brew install tkhq/tap/turnkey
-
-# Generate API keys
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name default
+```
+POST /public/v1/submit/create_wallet
 ```
 
-Subsequent steps show the key CLI command pattern, then link to references for full examples.
+```json
+{
+  "walletName": "my-wallet",
+  "accounts": [...]
+}
+```
+
+Subsequent steps show the key API call pattern, then link to references for full examples.
 
 ### Rules
 Mandatory guardrails specific to THIS feature. Examples:
-- "Always check for existing wallets with turnkey wallets list before creating new ones" (creating-wallets-api)
+- "Always check for existing wallets with POST /public/v1/query/list_wallets before creating new ones" (creating-wallets-api)
 - "Always verify the chain and address format before signing" (signing-transactions-api)
 - "DENY always takes precedence over ALLOW" (managing-policies-api)
 
@@ -79,7 +79,7 @@ Cross-references to skills that are commonly used together.
 
 Put in `references/*.md`. Each file should have:
 - A clear heading per example
-- Complete, self-contained examples (full CLI commands and API calls)
+- Complete, self-contained API examples (HTTP endpoint + JSON body)
 - Multiple examples covering different use cases
 
 Keep references one level deep. SKILL.md links to `references/foo.md`, never `references/sub/foo.md`.

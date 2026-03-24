@@ -1,65 +1,65 @@
 ---
 name: creating-wallets-api
-description: "Creates HD wallets and derives blockchain addresses using the Turnkey CLI and API endpoints. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, and other chains. Covers wallet creation, account derivation, listing, import, and export operations. Use when asked to 'create a wallet with turnkey CLI', 'turnkey wallets create', 'list wallets via API', 'derive an address using turnkey request', 'export wallet mnemonic via CLI', 'import a wallet with turnkey', 'create a private key using turnkey CLI', 'add a chain to my wallet via the API', or 'list wallet accounts using turnkey'. Do NOT use for signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), generating API keys (use managing-credentials-api), ."
+description: "Creates HD wallets and derives blockchain addresses using the Turnkey API. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, and other chains. Covers wallet creation, account derivation, listing, import, and export operations. Use when asked to 'create a wallet with Turnkey API', 'POST create_wallet', 'list wallets via API', 'derive an address using the Turnkey API', 'export wallet mnemonic via API', 'import a wallet with Turnkey API', 'create a private key using Turnkey API', 'add a chain to my wallet via the API', or 'list wallet accounts using the API'. Do NOT use for signing transactions (use signing-transactions-api), managing policies (use managing-policies-api), generating API keys (use managing-credentials-api), ."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys with managing-credentials-api skill first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["wallet", "cli", "blockchain", "address-derivation", "hd-wallet", "import", "export", "private-keys"]
+  tags: ["wallet", "api", "blockchain", "address-derivation", "hd-wallet", "import", "export", "private-keys"]
 ---
 
-# Creating Wallets (CLI)
+# Creating Wallets (API)
 
 ## Quick Start
 
-Use the Turnkey CLI or API endpoints to create HD wallets and derive blockchain addresses. Always check for existing wallets before creating new ones.
+Use the Turnkey API to create HD wallets and derive blockchain addresses. Always check for existing wallets before creating new ones.
+
+Base URL: `https://api.turnkey.com`
 
 ## Prerequisites
 
-```bash
-brew install tkhq/tap/turnkey
-```
-
-Requires API keys configured via `turnkey generate api-key` (see managing-credentials-api skill).
+Requires API credentials configured via the managing-credentials-api skill. All requests must be signed with your P-256 key pair using Turnkey's stamp authentication.
 
 ## Instructions
 
 ### Step 1: Check for existing wallets
 
-```bash
-# CLI shortcut
-turnkey wallets list --key-name default
+```
+POST /public/v1/query/list_wallets
+```
 
-# API endpoint
-turnkey request --path /public/v1/query/list_wallets --body '{}'
+```json
+{}
 ```
 
 ### Step 2: Create a wallet
 
-```bash
-# CLI shortcut (creates wallet, then add accounts separately)
-turnkey wallets create --name my-wallet
+Create a wallet with accounts in one call:
 
-# API endpoint (create wallet with accounts in one call)
-turnkey request --path /public/v1/submit/create_wallet --body '{
+```
+POST /public/v1/submit/create_wallet
+```
+
+```json
+{
   "walletName": "my-wallet",
   "accounts": [
     {
       "curve": "CURVE_SECP256K1",
       "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'60'\''/'0'\''/'0/0",
+      "path": "m/44'/60'/0'/0/0",
       "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
     },
     {
       "curve": "CURVE_ED25519",
       "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'501'\''/'0'\''/'0'\''",
+      "path": "m/44'/501'/0'/0'",
       "addressFormat": "ADDRESS_FORMAT_SOLANA"
     }
   ],
   "mnemonicLength": 12
-}'
+}
 ```
 
 ### Supported Address Formats
@@ -87,71 +87,106 @@ For TON variants, options include `ADDRESS_FORMAT_TON_V3R2` and `ADDRESS_FORMAT_
 
 ### Step 3: Add accounts to an existing wallet
 
-```bash
-# CLI shortcut
-turnkey wallets accounts create --wallet my-wallet --address-format ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH
+```
+POST /public/v1/submit/create_wallet_accounts
+```
 
-# API endpoint
-turnkey request --path /public/v1/submit/create_wallet_accounts --body '{
+```json
+{
   "walletId": "<WALLET_ID>",
   "accounts": [{
     "curve": "CURVE_SECP256K1",
     "pathFormat": "PATH_FORMAT_BIP32",
-    "path": "m/84'\''/'0'\''/'0'\''/'0/0",
+    "path": "m/84'/0'/0'/0/0",
     "addressFormat": "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"
   }]
-}'
+}
 ```
 
 ### Step 4: List wallet accounts
 
-```bash
-# CLI shortcut
-turnkey wallets accounts list --wallet my-wallet
+```
+POST /public/v1/query/list_wallet_accounts
+```
 
-# API endpoint
-turnkey request --path /public/v1/query/list_wallet_accounts --body '{"walletId": "<WALLET_ID>"}'
+```json
+{
+  "walletId": "<WALLET_ID>"
+}
 ```
 
 ### Step 5: Export a wallet (mnemonic backup)
 
-```bash
-turnkey wallets export --name my-wallet --export-bundle-output export-bundle.txt --encryption-key-name default
+Wallet export uses an encrypted channel so the mnemonic never leaves the secure enclave unencrypted.
+
+**1. Call the export endpoint:**
+
+```
+POST /public/v1/submit/export_wallet
 ```
 
-The export bundle is encrypted. Decrypt with:
-
-```bash
-turnkey decrypt --export-bundle-input export-bundle.txt --plaintext-output mnemonic.txt
+```json
+{
+  "walletId": "<WALLET_ID>",
+  "targetPublicKey": "<YOUR_HPKE_PUBLIC_KEY>"
+}
 ```
+
+The response contains an encrypted `exportBundle`.
+
+**2. Client-side: decrypt the export bundle using HPKE with your local private key.** The decrypted result is the BIP-39 mnemonic seed phrase. Store it securely.
 
 ### Step 6: Import a wallet
 
-```bash
-# Step 1: Initialize import
-turnkey wallets init-import --user $USER_ID --import-bundle-output import-bundle.txt
+Wallet import encrypts the mnemonic client-side before sending it to the secure enclave.
 
-# Step 2: Encrypt the mnemonic
-turnkey encrypt --import-bundle-input import-bundle.txt --plaintext-input mnemonic.txt --encrypted-bundle-output encrypted-bundle.txt --user $USER_ID
+**1. Initialize the import:**
 
-# Step 3: Import
-turnkey wallets import --user $USER_ID --name imported-wallet --encrypted-bundle-input encrypted-bundle.txt
 ```
+POST /public/v1/submit/init_import_wallet
+```
+
+```json
+{
+  "userId": "<USER_ID>"
+}
+```
+
+The response contains an `importBundle` with the enclave's target public key.
+
+**2. Client-side: encrypt your mnemonic with the target public key from the response using HPKE.** This produces an encrypted bundle. The plaintext mnemonic never leaves your machine.
+
+**3. Complete the import:**
+
+```
+POST /public/v1/submit/import_wallet
+```
+
+```json
+{
+  "userId": "<USER_ID>",
+  "walletName": "imported-wallet",
+  "encryptedBundle": "<ENCRYPTED_BUNDLE>",
+  "accounts": []
+}
+```
+
+After import, derive accounts on the imported wallet using the `create_wallet_accounts` endpoint.
 
 For complete import/export workflows and private key operations, see [references/import-export-examples.md](references/import-export-examples.md).
 
-For multi-chain wallet creation examples and all supported chains, see [references/wallet-cli-examples.md](references/wallet-cli-examples.md).
+For multi-chain wallet creation examples and all supported chains, see [references/wallet-api-examples.md](references/wallet-api-examples.md).
 
 ## Rules
 
-- Always check for existing wallets with `turnkey wallets list` before creating new ones
-- Specify both `curve` and `addressFormat` for each account when using the API endpoint
+- Always check for existing wallets with `POST /public/v1/query/list_wallets` before creating new ones
+- Specify both `curve` and `addressFormat` for each account when using the API
 - Use standard BIP-44 derivation paths for each chain (see table above)
 - Wallet names should be descriptive and unique within the organization
 - For end-user wallets, use the sub-organization model (one sub-org per user, see managing-credentials-api skill)
 - Use `create_wallet_accounts` to add chains to an existing wallet, not `create_wallet`
-- Export requires an encryption key (generate one first with `turnkey generate encryption-key`)
-- When using `turnkey request`, shell-escape single quotes in derivation paths with `'\''`
+- Export requires a client-side HPKE key pair for encrypting the export bundle
+- Import uses a three-step flow: init, client-side encrypt, then import
 
 ## Related Skills
 

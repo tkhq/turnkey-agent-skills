@@ -8,7 +8,7 @@ For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
 
 - **Node.js >= 18** (for eval tooling)
 - **Turnkey account** with API credentials from the [Turnkey Dashboard](https://app.turnkey.com)
-- **Turnkey CLI**: `brew install tkhq/tap/turnkey`
+- **Turnkey API credentials** (P-256 key pair, see managing-credentials-api skill)
 
 ## Quick Start
 
@@ -32,16 +32,16 @@ cp -r turnkey-agent-skills/skills/creating-wallets-api your-project/.claude/skil
 
 ## Skills
 
-### CLI/API Skills (`turnkey` CLI)
+### API Skills (Turnkey HTTP API)
 
-Use the Turnkey CLI or call the HTTP API directly.
+Call the Turnkey HTTP API directly at `https://api.turnkey.com`.
 
 | Skill | Description |
 |-------|-------------|
-| `managing-credentials-api` | API key generation, user provisioning, sub-organization setup |
-| `creating-wallets-api` | Wallet creation and address derivation via CLI commands |
-| `signing-transactions-api` | Transaction signing and broadcasting via CLI |
-| `managing-policies-api` | Policy CRUD and governance via CLI |
+| `managing-credentials-api` | API key generation, authentication, user provisioning, sub-organization setup |
+| `creating-wallets-api` | Wallet creation and address derivation via API |
+| `signing-transactions-api` | Transaction signing and broadcasting via API |
+| `managing-policies-api` | Policy CRUD and governance via API |
 
 ### Workflow Skills (multi-step orchestration)
 
@@ -49,7 +49,7 @@ End-to-end guides that compose multiple primitive skills.
 
 | Skill | Description |
 |-------|-------------|
-| `setup-account-workflow` | Bootstrap a Turnkey org from zero: CLI install, API keys, wallets, first signature |
+| `setup-account-workflow` | Bootstrap a Turnkey org from zero: API keys, wallets, first signature |
 | `wallet-governance-workflow` | Add governance, policies, scoped users, and root quorum hardening for production |
 
 ### Meta
@@ -74,7 +74,7 @@ TURNKEY_ORGANIZATION_ID=   # Organization UUID
 SIGN_WITH=                 # Address or public key of the wallet account to sign with
 ```
 
-Skills use shell variables (`$ORGANIZATION_ID`) or read from `~/.config/turnkey/keys/`.
+Skills reference these credentials in API request bodies.
 
 ## Creating Your Own Skills
 
@@ -115,10 +115,10 @@ npm run report -- --skill creating-wallets-api
 ```
 turnkey-agent-skills/
   skills/
-    creating-wallets-api/         # Wallet creation via CLI
-    signing-transactions-api/     # Transaction signing via CLI
-    managing-policies-api/        # Policy management via CLI
-    managing-credentials-api/     # API keys, users, sub-orgs via CLI
+    creating-wallets-api/         # Wallet creation via API
+    signing-transactions-api/     # Transaction signing via API
+    managing-policies-api/        # Policy management via API
+    managing-credentials-api/     # API keys, auth, users, sub-orgs
     setup-account-workflow/       # Organization bootstrapping
     wallet-governance-workflow/   # Governance, policies, and access control
     creating-skills/              # Meta skill for contributors

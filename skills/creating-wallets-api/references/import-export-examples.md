@@ -4,29 +4,28 @@
 
 Export retrieves the wallet's mnemonic seed phrase through an encrypted channel. The mnemonic never leaves the secure enclave unencrypted.
 
-### Step 1: Generate an encryption key (one-time setup)
+### Step 1: Generate an HPKE key pair (client-side, one-time setup)
 
-```bash
-turnkey generate encryption-key --name default
-```
-
-This creates a local key pair. The public portion is registered with Turnkey, and the private portion stays on your machine for decrypting export bundles.
+Generate a P-256 HPKE key pair locally. The public key will be sent to Turnkey as the `targetPublicKey` for encrypting the export bundle. The private key stays on your machine for decryption.
 
 ### Step 2: Export the wallet
 
-```bash
-turnkey wallets export --name my-wallet --export-bundle-output export-bundle.txt --encryption-key-name default
+```
+POST /public/v1/submit/export_wallet
 ```
 
-The output file (`export-bundle.txt`) contains the mnemonic encrypted with your public key. It cannot be read without the corresponding private key.
-
-### Step 3: Decrypt the export bundle
-
-```bash
-turnkey decrypt --export-bundle-input export-bundle.txt --plaintext-output mnemonic.txt
+```json
+{
+  "walletId": "<WALLET_ID>",
+  "targetPublicKey": "<YOUR_HPKE_PUBLIC_KEY>"
+}
 ```
 
-The decrypted mnemonic is written to `mnemonic.txt`. Store this securely and delete the file after use.
+The response contains an `exportBundle` encrypted with your public key. It cannot be read without the corresponding private key.
+
+### Step 3: Decrypt the export bundle (client-side)
+
+Client-side: decrypt the `exportBundle` using HPKE with your local private key. The decrypted result is the BIP-39 mnemonic seed phrase. Store this securely and delete any plaintext copies after use.
 
 ## Full wallet import flow
 
@@ -34,58 +33,100 @@ Import allows you to bring an existing mnemonic seed phrase into Turnkey. The mn
 
 ### Step 1: Initialize import
 
-```bash
-turnkey wallets init-import --user $USER_ID --import-bundle-output import-bundle.txt
+```
+POST /public/v1/submit/init_import_wallet
 ```
 
-This creates a secure channel by generating a target encryption key inside the enclave. The import bundle contains the public key you will use to encrypt the mnemonic.
-
-### Step 2: Encrypt the mnemonic
-
-```bash
-turnkey encrypt --import-bundle-input import-bundle.txt --plaintext-input mnemonic.txt --encrypted-bundle-output encrypted-bundle.txt --user $USER_ID
+```json
+{
+  "userId": "<USER_ID>"
+}
 ```
 
-This encrypts your mnemonic with the enclave's public key. The plaintext mnemonic never leaves your machine.
+This creates a secure channel by generating a target encryption key inside the enclave. The response contains an `importBundle` with the public key you will use to encrypt the mnemonic.
+
+### Step 2: Encrypt the mnemonic (client-side)
+
+Client-side: encrypt your mnemonic with the target public key from the `importBundle` using HPKE. This produces an encrypted bundle. The plaintext mnemonic never leaves your machine.
 
 ### Step 3: Import the wallet
 
-```bash
-turnkey wallets import --user $USER_ID --name imported-wallet --encrypted-bundle-input encrypted-bundle.txt
+```
+POST /public/v1/submit/import_wallet
 ```
 
-After import, derive accounts on the imported wallet using `turnkey wallets accounts create` or the `create_wallet_accounts` API endpoint.
+```json
+{
+  "userId": "<USER_ID>",
+  "walletName": "imported-wallet",
+  "encryptedBundle": "<ENCRYPTED_BUNDLE>",
+  "accounts": []
+}
+```
+
+After import, derive accounts on the imported wallet using the `create_wallet_accounts` API endpoint.
 
 ## Private key export flow
 
 Export a standalone private key (not an HD wallet) for backup or migration.
 
-```bash
-# Generate encryption key if you have not already
-turnkey generate encryption-key --name default
+### Step 1: Generate an HPKE key pair (client-side)
 
-# Export the private key
-turnkey private-keys export --name my-signing-key --export-bundle-output pk-export-bundle.txt --encryption-key-name default
+Generate a P-256 HPKE key pair locally if you have not already. The public key is your `targetPublicKey`.
 
-# Decrypt to get the raw private key
-turnkey decrypt --export-bundle-input pk-export-bundle.txt --plaintext-output private-key.txt
+### Step 2: Export the private key
+
+```
+POST /public/v1/submit/export_private_key
 ```
 
-The default output format is hexadecimal. For Solana keys, use the `--key-format solana` flag during export.
+```json
+{
+  "privateKeyId": "<PRIVATE_KEY_ID>",
+  "targetPublicKey": "<YOUR_HPKE_PUBLIC_KEY>"
+}
+```
+
+### Step 3: Decrypt the export bundle (client-side)
+
+Client-side: decrypt the `exportBundle` using HPKE with your local private key. The decrypted result is the raw private key material.
+
+The default output format is hexadecimal. For Solana keys, the format is a 64-byte array containing both private and public key bytes.
 
 ## Private key import flow
 
 Import an existing private key into Turnkey.
 
-```bash
-# Step 1: Initialize import
-turnkey private-keys init-import --user $USER_ID --import-bundle-output pk-import-bundle.txt
+### Step 1: Initialize import
 
-# Step 2: Encrypt the private key
-turnkey encrypt --import-bundle-input pk-import-bundle.txt --plaintext-input private-key.txt --encrypted-bundle-output pk-encrypted-bundle.txt --user $USER_ID
+```
+POST /public/v1/submit/init_import_private_key
+```
 
-# Step 3: Import
-turnkey private-keys import --user $USER_ID --name imported-key --encrypted-bundle-input pk-encrypted-bundle.txt --curve CURVE_SECP256K1 --address-format ADDRESS_FORMAT_ETHEREUM
+```json
+{
+  "userId": "<USER_ID>"
+}
+```
+
+### Step 2: Encrypt the private key (client-side)
+
+Client-side: encrypt your private key with the target public key from the `importBundle` using HPKE. This produces an encrypted bundle. The plaintext key never leaves your machine.
+
+### Step 3: Import the private key
+
+```
+POST /public/v1/submit/import_private_key
+```
+
+```json
+{
+  "userId": "<USER_ID>",
+  "privateKeyName": "imported-key",
+  "encryptedBundle": "<ENCRYPTED_BUNDLE>",
+  "curve": "CURVE_SECP256K1",
+  "addressFormats": ["ADDRESS_FORMAT_ETHEREUM"]
+}
 ```
 
 ## Key format options
@@ -96,8 +137,18 @@ When exporting or importing keys, the format determines how the key material is 
 - **hexadecimal** (default for private keys): Raw key bytes as a hex string. Standard format for most blockchain tooling.
 - **solana**: Solana-specific format that includes both the private and public key in a single 64-byte array. Required when importing or exporting keys for use with Solana CLI tools.
 
-When importing a Solana private key, specify the key format:
+When importing a Solana private key, specify the appropriate curve and address format:
 
-```bash
-turnkey private-keys import --user $USER_ID --name solana-key --encrypted-bundle-input encrypted-bundle.txt --curve CURVE_ED25519 --address-format ADDRESS_FORMAT_SOLANA --key-format solana
+```
+POST /public/v1/submit/import_private_key
+```
+
+```json
+{
+  "userId": "<USER_ID>",
+  "privateKeyName": "solana-key",
+  "encryptedBundle": "<ENCRYPTED_BUNDLE>",
+  "curve": "CURVE_ED25519",
+  "addressFormats": ["ADDRESS_FORMAT_SOLANA"]
+}
 ```

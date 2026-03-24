@@ -2,76 +2,90 @@
 
 This walkthrough shows the most common setup path: a single wallet with Ethereum and Solana accounts. Adapt for your target chains using the address format table in `creating-wallets-api`.
 
-## Step 1: Install CLI
+**Base URL:** `https://api.turnkey.com`
 
-```bash
-brew install tkhq/tap/turnkey
-turnkey version
-# Expected: turnkey vX.Y.Z
+## Step 1: Get Organization ID
+
+Get your organization ID from the Turnkey dashboard at app.turnkey.com. It is a UUID like `a1b2c3d4-e5f6-7890-abcd-ef1234567890`.
+
+## Step 2: Generate and Register API Key
+
+Generate a P-256 key pair locally using any crypto library (e.g., OpenSSL, Node.js crypto, Go crypto/ecdsa). The public key should be hex-encoded in uncompressed form.
+
+Register the public key with your organization:
+
+`POST /public/v1/submit/create_api_keys`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_API_KEYS",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "apiKeys": [
+      {
+        "apiKeyName": "default",
+        "publicKey": "<hex-encoded-P256-public-key>",
+        "curveType": "API_KEY_CURVE_P256"
+      }
+    ],
+    "userId": "<your-user-id>"
+  }
+}
 ```
 
-## Step 2: Set Organization ID
+Expected response includes `apiKeyIds` confirming registration.
 
-```bash
-export ORGANIZATION_ID="<your-org-id-from-dashboard>"
+## Step 3: Verify API Connectivity
+
+`POST /public/v1/query/list_wallets`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
 
-Get this from the Turnkey dashboard at app.turnkey.com. It is a UUID like `a1b2c3d4-e5f6-7890-abcd-ef1234567890`.
-
-## Step 3: Generate API Key
-
-```bash
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name default
-```
-
-Expected output:
-```
-New API key generated:
-Public key: 04abcdef...  (hex-encoded P-256 public key)
-Private key stored at: /Users/<you>/.config/turnkey/keys/default/
-```
-
-The public key is automatically registered with your organization if this is your first key.
-
-## Step 4: Verify CLI Connectivity
-
-```bash
-turnkey request --path /public/v1/query/list_wallets --body '{}' --organization $ORGANIZATION_ID
-```
-
-Expected output:
+Expected response:
 ```json
 {
   "wallets": []
 }
 ```
 
-An empty list is correct for a new organization. If you get an authentication error, check that your key files exist at `~/.config/turnkey/keys/default/`.
+An empty list is correct for a new organization. If you get an authentication error, verify that your key pair is correctly generated and the X-Stamp header is properly constructed (see managing-credentials-api).
 
-## Step 5: Create Wallet with EVM + Solana Accounts
+## Step 4: Create Wallet with EVM + Solana Accounts
 
-```bash
-turnkey request --path /public/v1/submit/create_wallet --body '{
-  "walletName": "default",
-  "accounts": [
-    {
-      "curve": "CURVE_SECP256K1",
-      "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'60'\''/'0'\''/'0/0",
-      "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
-    },
-    {
-      "curve": "CURVE_ED25519",
-      "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'501'\''/'0'\''/'0'\''",
-      "addressFormat": "ADDRESS_FORMAT_SOLANA"
-    }
-  ],
-  "mnemonicLength": 12
-}' --organization $ORGANIZATION_ID
+`POST /public/v1/submit/create_wallet`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "walletName": "default",
+    "accounts": [
+      {
+        "curve": "CURVE_SECP256K1",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/44'/60'/0'/0/0",
+        "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
+      },
+      {
+        "curve": "CURVE_ED25519",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/44'/501'/0'/0'",
+        "addressFormat": "ADDRESS_FORMAT_SOLANA"
+      }
+    ],
+    "mnemonicLength": 12
+  }
+}
 ```
 
-Expected output includes `walletId` and two addresses:
+Expected response includes `walletId` and two addresses:
 ```json
 {
   "walletId": "wlt-...",
@@ -84,26 +98,48 @@ Expected output includes `walletId` and two addresses:
 
 Record both addresses.
 
-## Step 6: Verify Wallet and Accounts
+## Step 5: Verify Wallet and Accounts
 
-```bash
-turnkey wallets list --key-name default
-turnkey wallets accounts list --wallet default
+`POST /public/v1/query/list_wallets`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+Then list accounts for the wallet:
+
+`POST /public/v1/query/list_wallet_accounts`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "walletId": "<wallet-id>"
+}
 ```
 
 Expected: wallet listed with two accounts showing Ethereum and Solana addresses.
 
-## Step 7: Test Signature (Ethereum)
+## Step 6: Test Signature (Ethereum)
 
-```bash
-turnkey raw sign \
-  --signer 0x1234...abcd \
-  --payload "Hello, Turnkey!" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_KECCAK256
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "signWith": "0x1234...abcd",
+    "payload": "48656c6c6f2c205475726e6b657921",
+    "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
+    "hashFunction": "HASH_FUNCTION_KECCAK256"
+  }
+}
 ```
 
-Expected output:
+Expected response:
 ```json
 {
   "r": "0x...",
@@ -112,14 +148,22 @@ Expected output:
 }
 ```
 
-## Step 8: Test Signature (Solana)
+## Step 7: Test Signature (Solana)
 
-```bash
-turnkey raw sign \
-  --signer ABC123...xyz \
-  --payload "Hello, Turnkey!" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_NOT_APPLICABLE
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "signWith": "ABC123...xyz",
+    "payload": "48656c6c6f2c205475726e6b657921",
+    "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
+    "hashFunction": "HASH_FUNCTION_NOT_APPLICABLE"
+  }
+}
 ```
 
 Note the different hash function: Ed25519 (Solana) does not pre-hash, so use `HASH_FUNCTION_NOT_APPLICABLE`.
@@ -127,7 +171,7 @@ Note the different hash function: Ed25519 (Solana) does not pre-hash, so use `HA
 ## Setup Complete
 
 At this point you have:
-- CLI installed and authenticated
+- API keys generated and registered
 - A wallet with Ethereum and Solana accounts
 - Verified signing on both chains
 
@@ -141,55 +185,86 @@ At this point you have:
 
 ### EVM-Only Setup
 
-Remove the Solana account from Step 5:
+Remove the Solana account from Step 4:
 
-```bash
-turnkey request --path /public/v1/submit/create_wallet --body '{
-  "walletName": "default",
-  "accounts": [
-    {
-      "curve": "CURVE_SECP256K1",
-      "pathFormat": "PATH_FORMAT_BIP32",
-      "path": "m/44'\''/'60'\''/'0'\''/'0/0",
-      "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
-    }
-  ],
-  "mnemonicLength": 12
-}' --organization $ORGANIZATION_ID
+`POST /public/v1/submit/create_wallet`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "walletName": "default",
+    "accounts": [
+      {
+        "curve": "CURVE_SECP256K1",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/44'/60'/0'/0/0",
+        "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
+      }
+    ],
+    "mnemonicLength": 12
+  }
+}
 ```
 
 ### Adding Bitcoin
 
 Add a Bitcoin account to your existing wallet after creation:
 
-```bash
-turnkey wallets accounts create \
-  --wallet default \
-  --address-format ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH
+`POST /public/v1/submit/create_wallet_accounts`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET_ACCOUNTS",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "walletId": "<wallet-id>",
+    "accounts": [
+      {
+        "curve": "CURVE_SECP256K1",
+        "pathFormat": "PATH_FORMAT_BIP32",
+        "path": "m/84'/0'/0'/0/0",
+        "addressFormat": "ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH"
+      }
+    ]
+  }
+}
 ```
 
 For the full list of supported chains and address formats, see the table in `creating-wallets-api`.
 
 ### Adding a Second Team Member
 
-```bash
-# Generate their key
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name bob-key
+Generate a P-256 key pair for the new team member locally, then create the user:
 
-# Create user with that key
-turnkey request --path /public/v1/submit/create_users --body '{
-  "users": [{
-    "userName": "bob",
-    "userEmail": "bob@example.com",
-    "apiKeys": [{
-      "apiKeyName": "bob-key",
-      "publicKey": "<BOB_PUBLIC_KEY>",
-      "curveType": "API_KEY_CURVE_P256"
-    }],
-    "authenticators": [],
-    "userTags": []
-  }]
-}' --organization $ORGANIZATION_ID
+`POST /public/v1/submit/create_users`
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_USERS",
+  "timestampMs": "<current-timestamp-ms>",
+  "organizationId": "<your-org-id>",
+  "parameters": {
+    "users": [
+      {
+        "userName": "bob",
+        "userEmail": "bob@example.com",
+        "apiKeys": [
+          {
+            "apiKeyName": "bob-key",
+            "publicKey": "<bob-hex-encoded-P256-public-key>",
+            "curveType": "API_KEY_CURVE_P256"
+          }
+        ],
+        "authenticators": [],
+        "userTags": []
+      }
+    ]
+  }
+}
 ```
 
 See `managing-credentials-api` for user provisioning details, sub-organization patterns, and key rotation.

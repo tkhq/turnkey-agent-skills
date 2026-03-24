@@ -1,143 +1,173 @@
 # API Key Examples
 
-Complete examples for generating, managing, and rotating API keys using `turnkey request`.
+Complete examples for generating, managing, and rotating API keys using the Turnkey API.
 
 ## Generate keys with different curves
 
-### P-256 (default)
+Generate key pairs locally using any crypto library. The supported curves are:
 
-```bash
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name my-p256-key --curve p256
-```
+- **P-256** (API_KEY_CURVE_P256): Default. Recommended for most use cases.
+- **secp256k1** (API_KEY_CURVE_SECP256K1): Compatible with Ethereum-style signing.
+- **Ed25519** (API_KEY_CURVE_ED25519): Used for Ed25519-based authentication.
 
-### secp256k1
-
-```bash
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name my-secp-key --curve secp256k1
-```
-
-### Ed25519
-
-```bash
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name my-ed-key --curve ed25519
-```
-
-Each command prints the public key to stdout and saves the private key to `~/.config/turnkey/keys/<key-name>/`.
+The public key should be hex-encoded. Store the private key securely for signing API requests via the X-Stamp header.
 
 ## Create multiple users in one API call
 
-```bash
-turnkey request --path /public/v1/submit/create_users --body '{
-  "users": [
-    {
-      "userName": "alice",
-      "userEmail": "alice@example.com",
-      "apiKeys": [{
-        "apiKeyName": "alice-key",
-        "publicKey": "<ALICE_PUBLIC_KEY>",
-        "curveType": "API_KEY_CURVE_P256"
-      }],
-      "authenticators": [],
-      "userTags": ["engineering"]
-    },
-    {
-      "userName": "bob",
-      "userEmail": "bob@example.com",
-      "apiKeys": [{
-        "apiKeyName": "bob-key",
-        "publicKey": "<BOB_PUBLIC_KEY>",
-        "curveType": "API_KEY_CURVE_P256"
-      }],
-      "authenticators": [],
-      "userTags": ["operations"]
-    },
-    {
-      "userName": "charlie",
-      "userEmail": "charlie@example.com",
-      "apiKeys": [
-        {
-          "apiKeyName": "charlie-primary",
-          "publicKey": "<CHARLIE_PUBLIC_KEY_1>",
+```
+POST https://api.turnkey.com/public/v1/submit/create_users
+```
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_USERS_V2",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<ORGANIZATION_ID>",
+  "parameters": {
+    "users": [
+      {
+        "userName": "alice",
+        "userEmail": "alice@example.com",
+        "apiKeys": [{
+          "apiKeyName": "alice-key",
+          "publicKey": "<ALICE_PUBLIC_KEY>",
           "curveType": "API_KEY_CURVE_P256"
-        },
-        {
-          "apiKeyName": "charlie-backup",
-          "publicKey": "<CHARLIE_PUBLIC_KEY_2>",
-          "curveType": "API_KEY_CURVE_ED25519"
-        }
-      ],
-      "authenticators": [],
-      "userTags": ["admin"]
-    }
-  ]
-}' --organization $ORGANIZATION_ID
+        }],
+        "authenticators": [],
+        "userTags": ["engineering"]
+      },
+      {
+        "userName": "bob",
+        "userEmail": "bob@example.com",
+        "apiKeys": [{
+          "apiKeyName": "bob-key",
+          "publicKey": "<BOB_PUBLIC_KEY>",
+          "curveType": "API_KEY_CURVE_P256"
+        }],
+        "authenticators": [],
+        "userTags": ["operations"]
+      },
+      {
+        "userName": "charlie",
+        "userEmail": "charlie@example.com",
+        "apiKeys": [
+          {
+            "apiKeyName": "charlie-primary",
+            "publicKey": "<CHARLIE_PUBLIC_KEY_1>",
+            "curveType": "API_KEY_CURVE_P256"
+          },
+          {
+            "apiKeyName": "charlie-backup",
+            "publicKey": "<CHARLIE_PUBLIC_KEY_2>",
+            "curveType": "API_KEY_CURVE_ED25519"
+          }
+        ],
+        "authenticators": [],
+        "userTags": ["admin"]
+      }
+    ]
+  }
+}
 ```
 
 A single user can have multiple API keys with different curves. This is useful for providing backup access or supporting different authentication flows.
 
 ## Get user details
 
-```bash
-turnkey request --path /public/v1/query/get_user --body '{
+```
+POST https://api.turnkey.com/public/v1/query/get_user
+```
+
+```json
+{
+  "organizationId": "<ORGANIZATION_ID>",
   "userId": "<USER_ID>"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 The response includes the user's API keys (public keys only), authenticators, and tags.
 
 ## Key rotation pattern
 
-Key rotation follows a three-step process: create the new key, verify it works, then delete the old key.
+Key rotation follows a three-step process: create the new key, register it, verify it works, then delete the old key.
 
 ### Step 1: Generate a new API key
 
-```bash
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name rotated-key
-# Save the printed public key for the next step
-```
+Generate a new P-256 key pair locally using any crypto library. Save the hex-encoded public key for registration.
 
 ### Step 2: Register the new key with your user
 
-```bash
-turnkey request --path /public/v1/submit/create_api_keys --body '{
-  "userId": "<YOUR_USER_ID>",
-  "apiKeys": [{
-    "apiKeyName": "rotated-key",
-    "publicKey": "<NEW_PUBLIC_KEY>",
-    "curveType": "API_KEY_CURVE_P256"
-  }]
-}' --organization $ORGANIZATION_ID
+```
+POST https://api.turnkey.com/public/v1/submit/create_api_keys
+```
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_API_KEYS",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<ORGANIZATION_ID>",
+  "parameters": {
+    "userId": "<YOUR_USER_ID>",
+    "apiKeys": [{
+      "apiKeyName": "rotated-key",
+      "publicKey": "<NEW_PUBLIC_KEY>",
+      "curveType": "API_KEY_CURVE_P256"
+    }]
+  }
+}
 ```
 
 ### Step 3: Verify the new key works
 
-```bash
-turnkey request --path /public/v1/query/list_users --body '{}' \
-  --organization $ORGANIZATION_ID \
-  --key-name rotated-key
+Sign a request using the new private key and make a test call:
+
+```
+POST https://api.turnkey.com/public/v1/query/list_users
+```
+
+```json
+{
+  "organizationId": "<ORGANIZATION_ID>"
+}
 ```
 
 If this returns successfully, the new key is working.
 
 ### Step 4: Delete the old key
 
-```bash
-turnkey request --path /public/v1/submit/delete_api_keys --body '{
-  "userId": "<YOUR_USER_ID>",
-  "apiKeyIds": ["<OLD_API_KEY_ID>"]
-}' --organization $ORGANIZATION_ID --key-name rotated-key
+Sign this request with the new key:
+
+```
+POST https://api.turnkey.com/public/v1/submit/delete_api_keys
 ```
 
-Use the new key (`--key-name rotated-key`) to authenticate the deletion request. The `apiKeyIds` field accepts an array, so you can delete multiple old keys at once.
+```json
+{
+  "type": "ACTIVITY_TYPE_DELETE_API_KEYS",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<ORGANIZATION_ID>",
+  "parameters": {
+    "userId": "<YOUR_USER_ID>",
+    "apiKeyIds": ["<OLD_API_KEY_ID>"]
+  }
+}
+```
+
+The `apiKeyIds` field accepts an array, so you can delete multiple old keys at once.
 
 ## List all API keys for a user
 
 To see all API keys associated with a user, use `get_user` and inspect the `apiKeys` field in the response:
 
-```bash
-turnkey request --path /public/v1/query/get_user --body '{
+```
+POST https://api.turnkey.com/public/v1/query/get_user
+```
+
+```json
+{
+  "organizationId": "<ORGANIZATION_ID>",
   "userId": "<USER_ID>"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 The response includes each key's `apiKeyId`, `apiKeyName`, and `publicKey`. Use the `apiKeyId` values when deleting keys.

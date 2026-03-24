@@ -2,7 +2,7 @@
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["your-tags-here"]
@@ -16,31 +16,23 @@ One sentence: the simplest way to accomplish this skill's task.
 
 ## Prerequisites
 
-```bash
-brew install tkhq/tap/turnkey
-```
-
-## Environment Variables
-
-```env
-ORGANIZATION_ID=   # required, your Turnkey organization UUID
-```
+Requires API credentials configured via the managing-credentials-api skill. All requests must be signed with your P-256 key pair using Turnkey's X-Stamp authentication.
 
 ## Instructions
 
-### Step 1: Set up CLI authentication
+### Step 1: Perform the action
 
-```bash
-# Generate API keys (if not already done)
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name default
-
-# Verify CLI is working
-turnkey version
+```
+POST /public/v1/submit/your_endpoint
 ```
 
-### Step 2: Perform the action
+```json
+{
+  "your": "parameters"
+}
+```
 
-Brief command pattern here (10-15 lines max). Delegate full examples to references.
+Brief API call pattern here (10-15 lines max). Delegate full examples to references.
 
 For complete examples, see [references/examples.md](references/examples.md).
 

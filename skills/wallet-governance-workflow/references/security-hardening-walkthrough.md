@@ -13,46 +13,88 @@ You have a Turnkey organization with a hot wallet used by a trading bot. You wan
 
 ## Step 1: Audit Current State
 
-```bash
-export ORGANIZATION_ID="<your-org-id>"
+List wallets:
 
-# List wallets
-turnkey wallets list --key-name default
-# Expected: "default" wallet with Ethereum account
+`POST /public/v1/query/list_wallets`
 
-# Get wallet ID (you will need this for policies)
-turnkey request --path /public/v1/query/list_wallets --body '{}' --organization $ORGANIZATION_ID
-# Record the walletId from the response
-
-# List users
-turnkey request --path /public/v1/query/list_users --body '{}' --organization $ORGANIZATION_ID
-# Expected: your root user
-
-# List policies
-turnkey request --path /public/v1/query/list_policies --body '{}' --organization $ORGANIZATION_ID
-# Expected: empty (no policies yet)
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
+
+Expected: "default" wallet with Ethereum account. Record the walletId from the response.
+
+List wallet accounts:
+
+`POST /public/v1/query/list_wallet_accounts`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "walletId": "<wallet-id>"
+}
+```
+
+List users:
+
+`POST /public/v1/query/list_users`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+Expected: your root user.
+
+List policies:
+
+`POST /public/v1/query/list_policies`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
+```
+
+Expected: empty (no policies yet).
 
 ## Step 2: Create Scoped Bot User
 
-```bash
-# Generate API key for the bot
-turnkey generate api-key --organization $ORGANIZATION_ID --key-name trading-bot-key
-# Record the public key from stdout
+Generate a P-256 key pair locally for the bot. See `managing-credentials-api` for key generation details.
 
-# Create tags first (the API requires tag IDs, not names)
-turnkey request --path /public/v1/submit/create_user_tag --body '{
+Register the key by creating the bot user. First, create tags (the API requires tag IDs, not names):
+
+`POST /public/v1/submit/create_user_tag`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "tagName": "bot"
-}' --organization $ORGANIZATION_ID
-# Note the tagId from the response
+}
+```
 
-turnkey request --path /public/v1/submit/create_user_tag --body '{
+Note the tagId from the response.
+
+`POST /public/v1/submit/create_user_tag`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "tagName": "trading"
-}' --organization $ORGANIZATION_ID
-# Note the tagId from the response
+}
+```
 
-# Create user with tag IDs
-turnkey request --path /public/v1/submit/create_users --body '{
+Note the tagId from the response.
+
+Create the user with tag IDs:
+
+`POST /public/v1/submit/create_users`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "users": [{
     "userName": "trading-bot",
     "apiKeys": [{
@@ -63,59 +105,79 @@ turnkey request --path /public/v1/submit/create_users --body '{
     "authenticators": [],
     "userTags": ["<BOT_TAG_ID>", "<TRADING_TAG_ID>"]
   }]
-}' --organization $ORGANIZATION_ID
-# Record the userId from the response
+}
 ```
 
+Record the userId from the response.
+
 Verify the user was created:
-```bash
-turnkey request --path /public/v1/query/list_users --body '{}' --organization $ORGANIZATION_ID
-# Expected: root user + trading-bot user with tags ["bot", "trading"]
+
+`POST /public/v1/query/list_users`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
+
+Expected: root user + trading-bot user with tags ["bot", "trading"].
 
 ## Step 3: Create ALLOW Policy (Bot Can Sign with Hot Wallet)
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "allow-bot-sign-hot-wallet",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('\''trading'\''))",
-  "condition": "wallet.id == '\''<HOT_WALLET_ID>'\''",
+  "consensus": "approvers.any(user, user.tags.contains('trading'))",
+  "condition": "wallet.id == '<HOT_WALLET_ID>'",
   "notes": "Trading bot can sign transactions from the hot wallet only"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 This policy: users tagged "trading" can sign with the specified wallet. Without this policy, the bot would be denied by implicit deny.
 
 ## Step 4: Create Address Allowlist
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "allow-eth-approved-destinations",
   "effect": "EFFECT_ALLOW",
-  "condition": "eth.tx.to in ['\''0xAPPROVED_ADDR_1'\'', '\''0xAPPROVED_ADDR_2'\'']",
-  "consensus": "approvers.any(user, user.tags.contains('\''trading'\''))",
+  "condition": "eth.tx.to in ['0xAPPROVED_ADDR_1', '0xAPPROVED_ADDR_2']",
+  "consensus": "approvers.any(user, user.tags.contains('trading'))",
   "notes": "Only allow ETH transfers to approved exchange addresses"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 ## Step 5: Create DENY Guardrail (Spending Limit)
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "deny-large-eth-transfers",
   "effect": "EFFECT_DENY",
   "condition": "eth.tx.value > 1000000000000000000",
   "notes": "Block any single ETH transfer above 1 ETH (1e18 wei). Applies to ALL users including bot."
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 DENY policies have no consensus field because they block everyone. This acts as a hard ceiling regardless of other ALLOW policies.
 
 ## Step 6: Verify Policies
 
-```bash
-turnkey request --path /public/v1/query/list_policies --body '{}' --organization $ORGANIZATION_ID
+`POST /public/v1/query/list_policies`
+
+```json
+{
+  "organizationId": "<your-org-id>"
+}
 ```
 
 Expected: three policies listed:
@@ -127,85 +189,99 @@ Expected: three policies listed:
 
 ### Test 1: Bot signs a small message (should succeed)
 
-```bash
-turnkey raw sign \
-  --signer <HOT_WALLET_ETH_ADDRESS> \
-  --payload "test-signing" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_KECCAK256 \
-  --key-name trading-bot-key \
-  --organization $ORGANIZATION_ID
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "signWith": "<HOT_WALLET_ETH_ADDRESS>",
+  "payload": "test-signing",
+  "encoding": "PAYLOAD_ENCODING_TEXT_UTF8",
+  "hashFunction": "HASH_FUNCTION_KECCAK256"
+}
 ```
 
 Expected: signature returned successfully.
 
 ### Test 2: Root user still works (emergency access)
 
-```bash
-turnkey raw sign \
-  --signer <HOT_WALLET_ETH_ADDRESS> \
-  --payload "root-test" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_KECCAK256 \
-  --key-name default \
-  --organization $ORGANIZATION_ID
+`POST /public/v1/submit/sign_raw_payload`
+
+```json
+{
+  "organizationId": "<your-org-id>",
+  "signWith": "<HOT_WALLET_ETH_ADDRESS>",
+  "payload": "root-test",
+  "encoding": "PAYLOAD_ENCODING_TEXT_UTF8",
+  "hashFunction": "HASH_FUNCTION_KECCAK256"
+}
 ```
 
 Expected: signature returned successfully. Root quorum bypasses all policies.
 
-### Test 3: Preview a large transfer (should be denied)
+### Test 3: Large transfer (should be denied)
 
-Use `--no-post` to preview without sending:
+`POST /public/v1/submit/sign_transaction`
 
-```bash
-turnkey request --path /public/v1/submit/sign_transaction --body '{
+```json
+{
+  "organizationId": "<your-org-id>",
   "signWith": "<HOT_WALLET_ETH_ADDRESS>",
   "unsignedTransaction": "<SERIALIZED_TX_ABOVE_1_ETH>",
   "type": "TRANSACTION_TYPE_ETHEREUM"
-}' --organization $ORGANIZATION_ID --no-post
+}
 ```
 
-In a real test (without `--no-post`), this would return a policy denial error.
+Expected: policy denial error. The DENY policy blocks any single ETH transfer above 1 ETH regardless of other ALLOW policies.
 
 ## Additional Patterns
 
 ### Multi-Sig Treasury (2-of-3 approval)
 
-```bash
-# Create three treasury users with "treasury" tag
-# Then create a consensus policy:
-turnkey request --path /public/v1/submit/create_policy --body '{
+Create three treasury users with "treasury" tag, then create a consensus policy:
+
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "treasury-multi-sig",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('\''treasury'\'')).count() >= 2",
-  "condition": "wallet.id == '\''<TREASURY_WALLET_ID>'\''",
+  "consensus": "approvers.filter(user, user.tags.contains('treasury')).count() >= 2",
+  "condition": "wallet.id == '<TREASURY_WALLET_ID>'",
   "notes": "Require 2-of-3 treasury members to approve signing"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 ### Testnet-Only Policy
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "testnet-only",
   "effect": "EFFECT_DENY",
   "condition": "eth.tx.chain_id != 11155111",
   "notes": "Block all non-Sepolia transactions. Remove when ready for mainnet."
-}' --organization $ORGANIZATION_ID
+}
 ```
 
 ### Restrict Solana Programs
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+`POST /public/v1/submit/create_policy`
+
+```json
+{
+  "organizationId": "<your-org-id>",
   "policyName": "allow-solana-approved-programs",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('\''trading'\''))",
-  "condition": "solana.tx.program_keys.all(p, p == '\''<APPROVED_PROGRAM_ID>'\'')",
+  "consensus": "approvers.any(user, user.tags.contains('trading'))",
+  "condition": "solana.tx.program_keys.all(p, p == '<APPROVED_PROGRAM_ID>')",
   "notes": "Bot can only interact with approved Solana programs"
-}' --organization $ORGANIZATION_ID
+}
 ```
 
-For more policy patterns (Bitcoin fee caps, Tron restrictions, agent wallet scoping), see `managing-policies-api/references/policy-cli-examples.md`.
+For more policy patterns (Bitcoin fee caps, Tron restrictions, agent wallet scoping), see `managing-policies-api/references/policy-api-examples.md`.
 
 For the complete policy language reference (all keywords, types, and chain-specific fields), see `managing-policies-api/references/policy-language.md`.

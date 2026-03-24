@@ -22,7 +22,7 @@ search_turnkey("Cosmos signing CosmJS")
 
 Key findings from research:
 - Uses `CURVE_SECP256K1` with `ADDRESS_FORMAT_COSMOS` for address derivation
-- Can sign via `turnkey request` with the `SignRawPayload` activity
+- Can sign via `POST /public/v1/submit/sign_raw_payload` endpoint
 - Requires the wallet to have a Cosmos-formatted account derived
 
 ## Step 3: Draft
@@ -40,7 +40,7 @@ mkdir -p skills/signing-cosmos/{references,evals}
 name: signing-cosmos
 description: "Signs and broadcasts Cosmos ecosystem transactions using Turnkey with CosmJS. Covers ATOM transfers, IBC transfers, and staking operations. Use when asked to 'send ATOM', 'sign a Cosmos transaction', 'stake ATOM', 'do an IBC transfer', or 'interact with a Cosmos chain'."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys and wallets first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["cosmos", "signing", "cosmjs", "atom", "ibc"]
@@ -50,7 +50,7 @@ metadata:
 
 ## Quick Start
 
-Use the Turnkey CLI to sign Cosmos transactions via `turnkey request` with `SignRawPayload`.
+Use the Turnkey API to sign Cosmos transactions via `POST /public/v1/submit/sign_raw_payload`.
 
 ## Prerequisites
 
@@ -78,7 +78,7 @@ Use the Turnkey CLI to sign Cosmos transactions via `turnkey request` with `Sign
 
 ### 3c. Write references/cosmos-examples.md
 
-Full, self-contained TypeScript examples for:
+Full, self-contained API examples for:
 - ATOM transfer
 - IBC transfer
 - Staking delegation
@@ -110,7 +110,7 @@ Full, self-contained TypeScript examples for:
     "skills": ["signing-cosmos"],
     "query": "Send 10 ATOM to cosmos1abc...",
     "expected_behavior": [
-      "Uses turnkey request with SignRawPayload",
+      "Uses POST /public/v1/submit/sign_raw_payload",
       "Specifies the correct Cosmos address and chain ID",
       "Signs with the correct denom and amount"
     ]
@@ -120,7 +120,7 @@ Full, self-contained TypeScript examples for:
     "query": "Use Ethereum signing to sign a Cosmos transaction",
     "expected_behavior": [
       "Corrects the user: Ethereum signing uses different address formats than Cosmos",
-      "Recommends the correct Cosmos signing approach via turnkey request"
+      "Recommends the correct Cosmos signing approach via the sign_raw_payload endpoint"
     ]
   },
   {
@@ -174,7 +174,7 @@ npx tsx skills/creating-skills/scripts/generate-report.ts --skill signing-cosmos
 ## Key Takeaways
 
 - Study an existing skill first (saves time, ensures consistency)
-- Research the specific Turnkey APIs and CLI commands before writing
+- Research the specific Turnkey API endpoints before writing
 - Write evals BEFORE polishing the skill content (eval-driven development)
 - The description is the most important part (it controls discovery)
 - Keep SKILL.md under 300 lines, put full examples in references

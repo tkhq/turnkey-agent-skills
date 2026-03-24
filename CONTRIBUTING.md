@@ -55,9 +55,9 @@ Before submitting a PR:
 
 ## Code Style
 
-- All code examples must use the Turnkey CLI and API endpoints
+- All examples must use the Turnkey HTTP API endpoints
 - Use standard environment variable names (`ORGANIZATION_ID`, etc.)
-- Include complete, runnable CLI commands in reference examples
+- Include complete API request examples (endpoint + JSON body) in references
 
 ## PR Guidelines
 

@@ -33,7 +33,7 @@ Gather the specific information you need to write the skill:
 
 **What to research:**
 - Which Turnkey API endpoints are involved (e.g., `CreateWallet`, `SignTransaction`)
-- Which CLI commands to use (e.g., `turnkey wallets create`, `turnkey request`)
+- Which HTTP API endpoints to use (e.g., `POST /public/v1/submit/create_wallet`)
 - What the request parameters and response shapes look like
 - Common patterns, gotchas, and required ordering of operations
 - What environment variables are needed
@@ -76,7 +76,7 @@ Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-transactions`, 
 name: your-skill-name
 description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   tags: ["relevant", "tags"]
@@ -102,16 +102,16 @@ metadata:
 **Body rules:**
 - Under 300 lines preferred, 500 max
 - Only include context the LLM does not already know (Turnkey-specific APIs, gotchas, required ordering)
-- Every skill starts with the same CLI authentication and setup pattern
+- Every skill starts with a reference to managing-credentials-api for authentication
 - Keep code in SKILL.md to brief patterns (10-15 lines max per block)
 - Delegate full, self-contained examples to `references/` files
 
 **3d. Write reference files:**
 
-Create `references/*.md` files with complete, runnable TypeScript examples. Each example should:
-- Include all imports
-- Include the full CLI setup and authentication
-- Be self-contained (copy-pasteable)
+Create `references/*.md` files with complete API examples. Each example should:
+- Show the full HTTP endpoint and JSON request body
+- Include all required fields
+- Be self-contained
 - Cover one specific use case per example
 
 SKILL.md links to references like: `See [references/examples.md](references/examples.md)`.
@@ -269,7 +269,7 @@ Review the eval results. If everything passes, run the checklist below.
 - Reference files MUST be one level deep from SKILL.md (no nested references)
 - Do not duplicate code between SKILL.md and reference files
 - All code examples in references MUST be complete and self-contained
-- Every skill MUST include the standard Turnkey CLI setup pattern
+- Every skill MUST reference managing-credentials-api for authentication setup
 - Use consistent environment variable names: TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH
 
 ## Checklist

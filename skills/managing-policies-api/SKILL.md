@@ -1,23 +1,19 @@
 ---
 name: managing-policies-api
-description: "Creates and manages Turnkey organization policies for access control and transaction governance using the Turnkey CLI and API endpoints. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval via turnkey request commands. Use when asked to 'create a policy with turnkey request', 'manage policies via turnkey API', 'set up an allowlist using the API', 'create a deny policy via turnkey request', 'delete a policy via the API', 'list policies using turnkey CLI', 'write a policy condition via the API', or 'set up multi-sig approval using turnkey request'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), generating API keys (use managing-credentials-api), ."
+description: "Creates and manages Turnkey organization policies for access control and transaction governance using the Turnkey HTTP API. Policies are JSON rules with effect (ALLOW/DENY), consensus (who can approve), and condition (when it applies) fields. Covers spending limits, address allowlists, contract restrictions, user permissions, and multi-sig approval. Use when asked to 'create a policy via the Turnkey API', 'manage policies via turnkey API', 'set up an allowlist using the API', 'create a deny policy via the API', 'delete a policy via the API', 'list policies using the API', 'write a policy condition via the API', or 'set up multi-sig approval using the API'. Do NOT use for creating wallets (use creating-wallets-api), signing transactions (use signing-transactions-api), generating API keys (use managing-credentials-api)."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["policy", "cli", "access-control", "governance", "security", "allowlist", "deny", "consensus"]
+  tags: ["policy", "api", "access-control", "governance", "security", "allowlist", "deny", "consensus"]
 ---
 
 ## Quick Start
 
-Use `turnkey request` to create and manage policies that govern what actions users and agents can perform. Every policy has an `effect` (ALLOW or DENY), an optional `consensus` (who must approve), and an optional `condition` (when it applies).
+Use the Turnkey API to create and manage policies that govern what actions users and agents can perform. Every policy has an `effect` (ALLOW or DENY), an optional `consensus` (who must approve), and an optional `condition` (when it applies).
 
 ## Prerequisites
-
-```bash
-brew install tkhq/tap/turnkey
-```
 
 Requires API keys configured (see managing-credentials-api skill).
 
@@ -71,56 +67,84 @@ DENY always wins over ALLOW.
 
 ### Step 1: Create a policy
 
-```bash
-turnkey request --path /public/v1/submit/create_policy --body '{
+```
+POST https://api.turnkey.com/public/v1/submit/create_policy
+```
+
+```json
+{
   "policyName": "allow-eth-to-approved-addresses",
   "effect": "EFFECT_ALLOW",
-  "condition": "eth.tx.to in ['\''0xADDR1'\'', '\''0xADDR2'\'']",
-  "consensus": "approvers.any(user, user.id == '\''<USER_ID>'\'')",
+  "condition": "eth.tx.to in ['0xADDR1', '0xADDR2']",
+  "consensus": "approvers.any(user, user.id == '<USER_ID>')",
   "notes": "Only allow ETH transfers to approved addresses"
-}'
+}
 ```
 
 For creating multiple policies at once:
 
-```bash
-turnkey request --path /public/v1/submit/create_policies --body '{
+```
+POST https://api.turnkey.com/public/v1/submit/create_policies
+```
+
+```json
+{
   "policies": [
     { "policyName": "policy-1", "effect": "EFFECT_ALLOW", "condition": "...", "consensus": "..." },
     { "policyName": "policy-2", "effect": "EFFECT_DENY", "condition": "..." }
   ]
-}'
+}
 ```
 
 ### Step 2: List policies
 
-```bash
-turnkey request --path /public/v1/query/list_policies --body '{}'
+```
+POST https://api.turnkey.com/public/v1/query/list_policies
+```
+
+```json
+{}
 ```
 
 ### Step 3: Get policy details
 
-```bash
-turnkey request --path /public/v1/query/get_policy --body '{"policyId": "<POLICY_ID>"}'
+```
+POST https://api.turnkey.com/public/v1/query/get_policy
+```
+
+```json
+{
+  "policyId": "<POLICY_ID>"
+}
 ```
 
 ### Step 4: Update a policy
 
-```bash
-turnkey request --path /public/v1/submit/update_policy --body '{
+```
+POST https://api.turnkey.com/public/v1/submit/update_policy
+```
+
+```json
+{
   "policyId": "<POLICY_ID>",
   "policyName": "updated-name",
   "policyEffect": "EFFECT_ALLOW",
-  "policyCondition": "eth.tx.to == '\''0xNEW_ADDRESS'\''",
-  "policyConsensus": "approvers.any(user, user.id == '\''<USER_ID>'\'')",
+  "policyCondition": "eth.tx.to == '0xNEW_ADDRESS'",
+  "policyConsensus": "approvers.any(user, user.id == '<USER_ID>')",
   "policyNotes": "Updated notes"
-}'
+}
 ```
 
 ### Step 5: Delete a policy
 
-```bash
-turnkey request --path /public/v1/submit/delete_policy --body '{"policyId": "<POLICY_ID>"}'
+```
+POST https://api.turnkey.com/public/v1/submit/delete_policy
+```
+
+```json
+{
+  "policyId": "<POLICY_ID>"
+}
 ```
 
 ## Writing Policy Expressions
@@ -137,7 +161,7 @@ Only single quotes for strings inside expressions. The language is strongly type
 
 For the complete policy language reference (all keywords, types, struct fields, chain-specific data), see [references/policy-language.md](references/policy-language.md).
 
-For complete examples organized by use case, see [references/policy-cli-examples.md](references/policy-cli-examples.md).
+For complete examples organized by use case, see [references/policy-api-examples.md](references/policy-api-examples.md).
 
 ## Important Gotchas
 

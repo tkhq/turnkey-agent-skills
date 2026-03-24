@@ -1,32 +1,30 @@
 ---
 name: signing-transactions-api
-description: "Signs and broadcasts blockchain transactions using the Turnkey CLI and API endpoints. Supports Ethereum, Bitcoin, Solana, Tron, Sui, TON, Cosmos via signTransaction, signRawPayload, and sponsored/gasless transactions via ethSendTransaction and solSendTransaction. Use when asked to 'sign a transaction with turnkey CLI', 'turnkey ethereum transaction', 'sign a raw payload via the API', 'sign a Bitcoin transaction using turnkey request', 'sign a Solana transaction via turnkey', 'use turnkey raw sign', 'send a sponsored transaction via the API', 'gasless transaction with turnkey', or 'sign on Sui/TON/Cosmos via Turnkey API'. Do NOT use for creating wallets (use creating-wallets-api), managing policies (use managing-policies-api), managing credentials (use managing-credentials-api), ."
+description: "Signs and broadcasts blockchain transactions using the Turnkey HTTP API. Supports Ethereum, Bitcoin, Solana, Tron, Sui, TON, Cosmos via signTransaction, signRawPayload, and sponsored/gasless transactions via ethSendTransaction and solSendTransaction. Use when asked to 'sign a transaction via the Turnkey API', 'call the sign transaction endpoint', 'sign a raw payload via the API', 'sign a Bitcoin transaction using the Turnkey API', 'sign a Solana transaction via Turnkey', 'send a sponsored transaction via the API', 'gasless transaction with Turnkey', or 'sign on Sui/TON/Cosmos via Turnkey API'. Do NOT use for creating wallets (use creating-wallets-api), managing policies (use managing-policies-api), managing credentials (use managing-credentials-api)."
 license: Apache-2.0
-compatibility: "Requires turnkey CLI (brew install tkhq/tap/turnkey). Set up API keys and wallets first."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-credentials-api for authentication setup."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["signing", "cli", "transactions", "ethereum", "bitcoin", "solana", "raw-payload", "multichain"]
+  tags: ["signing", "api", "transactions", "ethereum", "bitcoin", "solana", "raw-payload", "multichain"]
 ---
 
 ## Quick Start
 
-Use the Turnkey CLI or API endpoints to sign transactions. Turnkey signs within its secure enclave and returns the signature. You construct the unsigned transaction externally and broadcast after signing.
+Use the Turnkey HTTP API to sign transactions. Turnkey signs within its secure enclave and returns the signature. You construct the unsigned transaction externally and broadcast after signing.
+
+**Base URL:** `https://api.turnkey.com`
 
 ## Prerequisites
-
-```bash
-brew install tkhq/tap/turnkey
-```
 
 Requires API keys and a wallet with derived addresses (see managing-credentials-api and creating-wallets-api skills).
 
 ## Choosing Your Signing Method
 
-| Method | When to use | CLI Command | API Endpoint |
-|--------|-------------|-------------|--------------|
-| **signTransaction** | Chain-aware signing. Turnkey parses the transaction and the policy engine can inspect chain-specific fields. | `turnkey ethereum transaction` (Ethereum only) | `/public/v1/submit/sign_transaction` (all supported chains) |
-| **signRawPayload** | Low-level, chain-agnostic. You hash and serialize the payload, Turnkey signs the raw bytes. Required for chains without dedicated transaction type support. | `turnkey raw sign` | `/public/v1/submit/sign_raw_payload` |
+| Method | When to use | API Endpoint |
+|--------|-------------|--------------|
+| **signTransaction** | Chain-aware signing. Turnkey parses the transaction and the policy engine can inspect chain-specific fields. | `POST /public/v1/submit/sign_transaction` (all supported chains) |
+| **signRawPayload** | Low-level, chain-agnostic. You hash and serialize the payload, Turnkey signs the raw bytes. Required for chains without dedicated transaction type support. | `POST /public/v1/submit/sign_raw_payload` |
 
 signTransaction supports these transaction types: TRANSACTION_TYPE_ETHEREUM, TRANSACTION_TYPE_SOLANA, TRANSACTION_TYPE_BITCOIN, TRANSACTION_TYPE_TRON, TRANSACTION_TYPE_TEMPO.
 
@@ -36,16 +34,14 @@ signRawPayload works with any chain since it operates at the cryptographic primi
 
 ### Step 1: Sign an Ethereum transaction
 
-```bash
-# CLI shortcut
-turnkey ethereum transaction --signer 0xYOUR_ADDRESS --payload 0xSERIALIZED_UNSIGNED_TX_HEX
+`POST /public/v1/submit/sign_transaction`
 
-# API endpoint
-turnkey request --path /public/v1/submit/sign_transaction --body '{
+```json
+{
   "signWith": "0xYOUR_ADDRESS",
   "unsignedTransaction": "0xSERIALIZED_UNSIGNED_TX_HEX",
   "type": "TRANSACTION_TYPE_ETHEREUM"
-}'
+}
 ```
 
 The signer can be a wallet account address, private key address, or private key ID.
@@ -54,39 +50,41 @@ The signer can be a wallet account address, private key address, or private key 
 
 For Solana, Bitcoin, Tron, use the API endpoint with the appropriate type:
 
-```bash
-# Solana
-turnkey request --path /public/v1/submit/sign_transaction --body '{
+**Solana:**
+
+`POST /public/v1/submit/sign_transaction`
+
+```json
+{
   "signWith": "<SOLANA_ADDRESS>",
   "unsignedTransaction": "<BASE64_ENCODED_TX>",
   "type": "TRANSACTION_TYPE_SOLANA"
-}'
+}
+```
 
-# Bitcoin
-turnkey request --path /public/v1/submit/sign_transaction --body '{
+**Bitcoin:**
+
+`POST /public/v1/submit/sign_transaction`
+
+```json
+{
   "signWith": "<BITCOIN_ADDRESS>",
   "unsignedTransaction": "<HEX_ENCODED_PSBT>",
   "type": "TRANSACTION_TYPE_BITCOIN"
-}'
+}
 ```
 
 ### Step 3: Sign a raw payload
 
-```bash
-# CLI shortcut
-turnkey raw sign \
-  --signer 0xYOUR_ADDRESS \
-  --payload "Hello, Turnkey!" \
-  --payload-encoding PAYLOAD_ENCODING_TEXT_UTF8 \
-  --hash-function HASH_FUNCTION_SHA256
+`POST /public/v1/submit/sign_raw_payload`
 
-# API endpoint
-turnkey request --path /public/v1/submit/sign_raw_payload --body '{
+```json
+{
   "signWith": "0xYOUR_ADDRESS",
   "payload": "48656c6c6f2c205475726e6b657921",
   "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
   "hashFunction": "HASH_FUNCTION_SHA256"
-}'
+}
 ```
 
 ### Payload Encodings

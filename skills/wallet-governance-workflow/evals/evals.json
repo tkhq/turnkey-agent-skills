@@ -4,8 +4,8 @@
     "query": "Help me secure my Turnkey wallets for production",
     "expected_behavior": [
       "Follows a phased workflow: audit, create scoped users, implement policies, test",
-      "Starts by listing wallets, users, and existing policies",
-      "References managing-policies-api for policy creation commands",
+      "Starts by listing wallets, users, and existing policies via API endpoints",
+      "References managing-policies-api for policy creation details",
       "Includes a production checklist or verification steps"
     ]
   },
@@ -13,7 +13,7 @@
     "skills": ["wallet-governance-workflow"],
     "query": "Add spending limits to my hot wallet on Ethereum",
     "expected_behavior": [
-      "Creates a DENY policy with condition on eth.tx.value",
+      "Creates a DENY policy via POST /public/v1/submit/create_policy with condition on eth.tx.value",
       "Uses wei for the amount (1 ETH = 1000000000000000000)",
       "Pairs the DENY limit with an ALLOW policy for authorized signers",
       "Explains that DENY always wins over ALLOW"
@@ -42,8 +42,8 @@
     "skills": ["wallet-governance-workflow"],
     "query": "I need to onboard a new team member with limited access to our Turnkey wallets",
     "expected_behavior": [
-      "Creates a scoped user with descriptive tags",
-      "Generates a dedicated API key pair for the new member",
+      "Creates a scoped user via POST /public/v1/submit/create_users with descriptive tags",
+      "Generates a dedicated P-256 key pair for the new member",
       "Creates ALLOW policies scoping the user to specific wallets or actions",
       "Does not add the user to root quorum"
     ]

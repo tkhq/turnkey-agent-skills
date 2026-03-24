@@ -1,16 +1,16 @@
 {
   "should_trigger": [
     "Generate an API key pair for my Turnkey organization",
-    "How do I create API keys using the turnkey CLI?",
+    "How do I create API keys using the Turnkey API?",
     "Set up a new Turnkey organization with a root user",
     "Create a sub-organization for a new customer",
     "I need to add a user with an API key to my Turnkey org",
     "Generate an encryption key for wallet export",
     "List all users in my Turnkey organization via the API",
     "How do I rotate API keys in Turnkey?",
-    "How do I set up the turnkey command line tool?",
+    "How do I authenticate requests to the Turnkey API?",
     "Create an API-only user in my Turnkey organization",
-    "I need to provision API access for a new team member via turnkey",
+    "I need to provision API access for a new team member via Turnkey API",
     "Set up a sub-organization with its own wallet via the Turnkey API"
   ],
   "should_not_trigger": [

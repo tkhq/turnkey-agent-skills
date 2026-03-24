@@ -2,7 +2,7 @@
 
 Proposed mapping of Turnkey API resources to agent skills. Each skill groups related resources that an AI agent would use together in typical workflows.
 
-**7 skills covering 78 endpoints (28 query, 50 submit)**
+**7 skills covering 78 endpoints (29 query, 49 submit)**
 
 ---
 
@@ -90,7 +90,7 @@ Transaction signing, raw payload signing, sponsored transactions, and on-chain d
 | `/public/v1/query/list_supported_assets` | Query | List supported assets for a network (beta) |
 | `/public/v1/query/get_send_transaction_status` | Query | Poll status of a send transaction |
 
-**Total: 10 endpoints (4 query, 6 submit)**
+**Total: 10 endpoints (5 query, 5 submit)**
 
 ---
 
@@ -211,12 +211,12 @@ Organization structure, sub-organization management, and root quorum configurati
 |-------|-------|--------|-------|
 | Wallets | 4 | 9 | 13 |
 | Private Keys | 3 | 8 | 11 |
-| Signing | 4 | 6 | 10 |
+| Signing | 5 | 5 | 10 |
 | Policies | 5 | 7 | 12 |
 | Activities | 3 | 2 | 5 |
 | Users | 6 | 12 | 18 |
 | Organizations | 3 | 6 | 9 |
-| **Total** | **28** | **50** | **78** |
+| **Total** | **29** | **49** | **78** |
 
 ---
 

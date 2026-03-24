@@ -273,6 +273,8 @@ Turnkey offers several signing approaches depending on the chain and use case:
 
 ## Related Skills
 
+- `embedded-wallets-workflow` for the full end-to-end flow: auth, wallets, signing, and policies in React apps
+- `server-wallets-workflow` for the full end-to-end flow: wallets, signing, and policies in backend services
 - `creating-wallets-sdk` for wallet setup and address derivation
 - `managing-policies-sdk` for transaction governance and spending limits
 - `authenticating-users-sdk` for user management and auth flows

@@ -271,6 +271,7 @@ The user must always have at least one auth method. Removing the last method wil
 
 ## Related Skills
 
+- `embedded-wallets-workflow` for the full end-to-end flow: auth, wallets, signing, and policies
 - `creating-wallets-sdk` for adding wallets to existing sub-organizations
 - `managing-policies-sdk` for access control within sub-organizations
 - `signing-transactions-sdk` for signing and broadcasting transactions after authentication

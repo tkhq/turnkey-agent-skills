@@ -179,6 +179,8 @@ For complete, runnable TypeScript examples organized by use case, see [reference
 
 ## Related Skills
 
+- `embedded-wallets-workflow` for the full end-to-end flow: auth, wallets, signing, and policies in React apps
+- `server-wallets-workflow` for the full end-to-end flow: wallets, signing, and policies in backend services
 - `creating-wallets-sdk` for wallet setup (policies govern wallet operations)
 - `signing-transactions-sdk` for signing and broadcasting transactions (policies govern signing)
 - `authenticating-users-sdk` for user and sub-organization management

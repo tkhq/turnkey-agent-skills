@@ -9,6 +9,21 @@ metadata:
   tags: ["policy", "api", "access-control", "governance", "security", "allowlist", "deny", "consensus", "smart-contract", "abi", "policy-evaluation", "debug"]
 ---
 
+## CRITICAL: Human Review Required
+
+**Policies control access to real wallets holding real funds. A misconfigured policy can permanently lock funds, grant unintended access to signing keys, or allow unauthorized transactions. There is no undo.**
+
+Before creating, updating, or deleting ANY policy, you MUST:
+
+1. **Stop and confirm with the human.** Display the exact policy you intend to create (effect, consensus, condition) and ask for explicit approval before submitting. Do not batch policy creation without individual review.
+2. **Explain the consequences in plain language.** State what this policy allows or denies, who it affects, and what could go wrong if the condition is wrong.
+3. **Follow deny-first methodology.** Always create DENY policies (guardrails) before ALLOW policies (permissions). If the human asks you to create ALLOW policies first, warn them that this creates a window where the agent has broader access than intended.
+4. **Verify after creation.** After creating policies, list them back and confirm with the human that the active policy set matches their intent.
+
+The human is solely responsible for ensuring policies are correct and safe. AI-generated policy conditions may contain subtle errors (wrong field names, missing edge cases, incorrect operator precedence) that pass validation but fail to protect against the intended threat. Policies that have not been carefully reviewed by a human and do not follow deny-first methodology can have severe unintended consequences, including total loss of funds.
+
+**When in doubt, do not create the policy. Ask the human.**
+
 ## Quick Start
 
 Use the Turnkey API to create and manage policies that govern what actions users and agents can perform. Every policy has an `effect` (ALLOW or DENY), an optional `consensus` (who must approve), and an optional `condition` (when it applies).
@@ -280,14 +295,17 @@ For complete examples organized by use case, see [references/policy-api-examples
 
 ## Rules
 
+- **STOP before every policy mutation.** Never create, update, or delete a policy without displaying it to the human and receiving explicit confirmation. This applies even when the human asked you to "set up policies" in general terms. Each individual policy requires its own confirmation.
 - DENY always takes precedence over ALLOW
 - Non-root users are denied by default when no policy matches
+- **Deny-first, always.** Create DENY guardrails before any ALLOW policies. If the human asks for ALLOW first, warn them and recommend the safe order.
 - Test policies on testnet before deploying to production. A misconfigured policy can lock out all signing access with no way to recover except through root quorum.
 - Avoid creating a DENY-all policy without an ALLOW escape path for admins. A blanket deny with no exceptions requires root quorum intervention to fix.
 - Use descriptive policy names and notes for auditability
 - Split complex conditions into separate policies to avoid evaluation errors
 - Use `in [list]` syntax for allowlists instead of chaining `||`
 - Upload ABIs for any contracts you want function-level policy control over
+- **After creating policies, always list the full active policy set and present it to the human for final review.** Confirm the combined effect matches their intent before proceeding.
 
 ## Related Skills
 

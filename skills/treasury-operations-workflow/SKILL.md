@@ -11,6 +11,19 @@ metadata:
 
 # Treasury Operations Workflow
 
+## CRITICAL: Human Review Required for Policy Steps
+
+**This workflow creates policies that govern access to treasury wallets holding real funds. Spending limits, multi-sig thresholds, and address allowlists are all enforced by policies. A misconfigured policy can allow unauthorized withdrawals, bypass multi-sig requirements, or permanently lock treasury funds with no recovery path except root quorum.**
+
+Before executing any policy creation step in this workflow, you MUST:
+
+1. **Stop and present each policy to the human for review.** Show the exact effect, consensus, and condition. Explain the financial impact: what transactions this policy allows or blocks, for which operators, and up to what amounts.
+2. **Create DENY guardrails first, ALLOW permissions second.** Spending limits (DENY policies that block amounts above a threshold) must be in place before any ALLOW policies grant signing access.
+3. **Verify multi-sig policies trigger CONSENSUS_NEEDED before going live.** If a cold wallet transaction returns COMPLETED instead of CONSENSUS_NEEDED, the multi-sig policy is not working and the cold wallet has single-signer access.
+4. **Confirm the full policy set with the human before any operator begins transacting.**
+
+The human is solely responsible for verifying that spending limits, approval thresholds, and address allowlists match their treasury security requirements.
+
 ## Quick Start
 
 Set up a company treasury on Turnkey by creating tiered wallets (hot for daily ops, cold for reserves), assigning operator roles via user tags, and enforcing spending limits and multi-sig approval through policies.
@@ -256,13 +269,16 @@ See [references/treasury-operations-examples.md](references/treasury-operations-
 
 ## Rules
 
+- **STOP before every policy step.** Present each policy (spending limits, multi-sig thresholds, address allowlists) to the human and get explicit confirmation before creating it. Treasury policies directly govern access to funds.
 - DENY always takes precedence over ALLOW. A misconfigured DENY policy can lock out all signing.
+- **Deny-first, always.** Create spending limit DENY policies and address restriction DENY policies before any ALLOW policies that grant signing access. Never create ALLOW policies before the corresponding guardrails are in place.
 - The policy engine does NOT short-circuit. Do not combine `wallet.id` and `private_key.id` checks in a single condition. Split them into separate policies.
 - `eth.tx.value` is in wei (1 ETH = 10^18 wei). Always convert human-readable amounts to wei.
 - Always verify cold wallet triggers `CONSENSUS_NEEDED` before going live. If it returns `COMPLETED`, the multi-sig policy is not working.
 - Tag keys and users rather than writing per-key or per-user policies. Tags make onboarding/offboarding automatic.
 - Test all policies on testnet before mainnet. A bad policy can permanently lock funds.
 - Root quorum users bypass all policies. Keep the root quorum small and offline.
+- **After all policies are created, list the full policy set and present it to the human for final review.** Confirm that spending limits, multi-sig thresholds, and allowlists all match the human's stated requirements before any operator begins transacting.
 
 ## Related Skills
 

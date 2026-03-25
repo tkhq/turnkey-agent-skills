@@ -11,6 +11,18 @@ metadata:
 
 # Agentic Wallet Workflow
 
+## CRITICAL: Human Review Required for Policy Steps
+
+**This workflow creates policies that control what an AI agent can and cannot do with real wallets and real funds. Policy misconfiguration can grant unintended signing access or lock out legitimate operations permanently.**
+
+Before executing any policy creation step in this workflow, you MUST:
+
+1. **Stop and present each policy to the human for review.** Show the exact effect, consensus, and condition. Explain in plain language what the policy does and what it prevents.
+2. **Create DENY guardrails first, ALLOW permissions second.** This workflow follows deny-first methodology. Do not skip or reorder the policy steps.
+3. **Confirm the full policy set with the human before handing off agent credentials.** An agent with credentials but incomplete policies has broader access than intended.
+
+The human is solely responsible for verifying that policies match their security requirements. AI-generated policies may contain subtle errors that pass validation but fail to enforce the intended constraints.
+
 ## Quick Start
 
 Give an AI agent its own isolated wallet on Turnkey with least-privilege policies, then manage and monitor it over time. This workflow composes five primitive skills (managing-organizations-api, managing-wallets-api, managing-users-api, managing-policies-api, monitoring-activities-api) into three phases: onboarding, management, and monitoring.
@@ -280,11 +292,13 @@ For the complete end-to-end walkthrough with full request/response JSON, see [re
 
 ## Rules
 
+- **STOP before every policy step.** Present each policy (DENY guardrails and ALLOW permissions) to the human and get explicit confirmation before creating it. Do not batch policy creation without individual review.
 - Always use sub-org isolation for production agents. Same-org is acceptable only for development.
 - The agent must be a non-root user. Root users bypass all policies.
-- Create DENY guardrails before giving the agent any credentials. DENY overrides ALLOW.
+- **Deny-first, always.** Create DENY guardrails before giving the agent any credentials. DENY overrides ALLOW. Never create ALLOW policies before the corresponding DENY guardrails are in place.
 - Split policy conditions into separate policies to avoid evaluation errors from the policy engine not short-circuiting.
 - Always verify the agent can sign (Step 5) before handing off credentials.
+- **After all policies are created, list the full policy set and confirm with the human that it matches their intent before proceeding to credential handoff.**
 - To revoke agent access, delete API keys first (instant), then clean up policies and users.
 - Use the `agent` user tag in policy consensus expressions so policies apply to any user tagged as an agent.
 - `eth.tx.value` is in wei, `solana.tx.transfers[].amount` is in lamports, `bitcoin.tx.outputs[].value` is in satoshis.

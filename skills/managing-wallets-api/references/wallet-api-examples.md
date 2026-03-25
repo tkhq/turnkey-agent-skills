@@ -252,13 +252,16 @@ Example activity response:
 
 Delete one or more wallets permanently. All derived accounts are also deleted.
 
+By default, deletion is blocked if a wallet has not been exported. Set `deleteWithoutExport` to `true` to delete wallets that have never been exported. If the wallet has already been exported, this field is ignored.
+
 ```
 POST /public/v1/submit/delete_wallets
 ```
 
 ```json
 {
-  "walletIds": ["wlt_abc123", "wlt_def456"]
+  "walletIds": ["wlt_abc123", "wlt_def456"],
+  "deleteWithoutExport": true
 }
 ```
 

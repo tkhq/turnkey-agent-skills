@@ -126,13 +126,16 @@ POST /public/v1/submit/update_wallet
 
 Delete one or more wallets by ID. This is a batch operation that permanently removes wallets and all their derived accounts.
 
+By default, deletion is blocked if a wallet has not been exported. Set `deleteWithoutExport` to `true` to override this safety guard. If the wallet has already been exported, this field is ignored.
+
 ```
 POST /public/v1/submit/delete_wallets
 ```
 
 ```json
 {
-  "walletIds": ["<WALLET_ID_1>", "<WALLET_ID_2>"]
+  "walletIds": ["<WALLET_ID_1>", "<WALLET_ID_2>"],
+  "deleteWithoutExport": true
 }
 ```
 
@@ -289,7 +292,7 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 - Export requires a client-side HPKE key pair for encrypting the export bundle
 - Import uses a three-step flow: init, client-side encrypt, then import
 - `export_wallet` returns the mnemonic (derives all keys). `export_wallet_account` returns one account's private key. Choose based on your use case.
-- `delete_wallets` and `delete_wallet_accounts` are permanent. Verify wallet IDs before calling.
+- `delete_wallets` and `delete_wallet_accounts` are permanent. Verify wallet IDs before calling. Deletion is blocked by default if the wallet has not been exported; set `deleteWithoutExport: true` to override.
 
 ## Related Skills
 

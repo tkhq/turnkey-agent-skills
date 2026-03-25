@@ -254,9 +254,9 @@ POST /public/v1/submit/sign_raw_payload
   "organizationId": "suborg-agent-5678",
   "parameters": {
     "signWith": "0x1234abcd5678ef901234abcd5678ef901234abcd",
-    "payload": "68656c6c6f",
+    "payload": "48656c6c6f2c205475726e6b657921",
     "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
-    "hashFunction": "HASH_FUNCTION_NO_OP"
+    "hashFunction": "HASH_FUNCTION_SHA256"
   }
 }
 ```

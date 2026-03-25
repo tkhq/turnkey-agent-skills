@@ -109,13 +109,15 @@ POST https://api.turnkey.com/public/v1/submit/sign_raw_payload
 ```json
 {
   "signWith": "<YOUR_ETH_ADDRESS>",
-  "payload": "68656c6c6f",
+  "payload": "48656c6c6f2c205475726e6b657921",
   "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
-  "hashFunction": "HASH_FUNCTION_NO_OP"
+  "hashFunction": "HASH_FUNCTION_SHA256"
 }
 ```
 
-The payload `68656c6c6f` is the hex encoding of "hello". The response contains an activity object with the signature in `activity.result.signRawPayloadResult` (fields: `r`, `s`, `v`).
+The payload `48656c6c6f2c205475726e6b657921` is the hex encoding of "Hello, Turnkey!". Using `HASH_FUNCTION_SHA256` lets the API hash the payload before signing. The response contains an activity object with the signature in `activity.result.signRawPayloadResult` (fields: `r`, `s`, `v`).
+
+Note: `HASH_FUNCTION_NO_OP` requires a pre-hashed 32-byte (64 hex character) payload. For a quick verification test, `HASH_FUNCTION_SHA256` is simpler because it accepts any payload length.
 
 If this succeeds, your setup is complete: credentials work, wallet exists, and signing is operational.
 

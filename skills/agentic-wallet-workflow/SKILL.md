@@ -11,9 +11,9 @@ metadata:
 
 # Agentic Wallet Workflow
 
-## CRITICAL: Human Review Required for Policy Steps
+## ⚠️ CRITICAL: Human Review Required for Policy Steps
 
-**This workflow creates policies that control what an AI agent can and cannot do with real wallets and real funds. Policy misconfiguration can grant unintended signing access or lock out legitimate operations permanently.**
+🚨 **This workflow creates policies that control what an AI agent can and cannot do with real wallets and real funds. Policy misconfiguration can grant unintended signing access or lock out legitimate operations permanently.**
 
 Before executing any policy creation step in this workflow, you MUST:
 

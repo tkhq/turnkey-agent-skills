@@ -11,9 +11,9 @@ metadata:
 
 # Treasury Operations Workflow
 
-## CRITICAL: Human Review Required for Policy Steps
+## ⚠️ CRITICAL: Human Review Required for Policy Steps
 
-**This workflow creates policies that govern access to treasury wallets holding real funds. Spending limits, multi-sig thresholds, and address allowlists are all enforced by policies. A misconfigured policy can allow unauthorized withdrawals, bypass multi-sig requirements, or permanently lock treasury funds with no recovery path except root quorum.**
+🚨 **This workflow creates policies that govern access to treasury wallets holding real funds. Spending limits, multi-sig thresholds, and address allowlists are all enforced by policies. A misconfigured policy can allow unauthorized withdrawals, bypass multi-sig requirements, or permanently lock treasury funds with no recovery path except root quorum.**
 
 Before executing any policy creation step in this workflow, you MUST:
 

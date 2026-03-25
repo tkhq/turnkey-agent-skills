@@ -9,9 +9,9 @@ metadata:
   tags: ["policy", "api", "access-control", "governance", "security", "allowlist", "deny", "consensus", "smart-contract", "abi", "policy-evaluation", "debug"]
 ---
 
-## CRITICAL: Human Review Required
+## ⚠️ CRITICAL: Human Review Required
 
-**Policies control access to real wallets holding real funds. A misconfigured policy can permanently lock funds, grant unintended access to signing keys, or allow unauthorized transactions. There is no undo.**
+🚨 **Policies control access to real wallets holding real funds. A misconfigured policy can permanently lock funds, grant unintended access to signing keys, or allow unauthorized transactions. There is no undo.**
 
 Before creating, updating, or deleting ANY policy, you MUST:
 
@@ -22,7 +22,7 @@ Before creating, updating, or deleting ANY policy, you MUST:
 
 The human is solely responsible for ensuring policies are correct and safe. AI-generated policy conditions may contain subtle errors (wrong field names, missing edge cases, incorrect operator precedence) that pass validation but fail to protect against the intended threat. Policies that have not been carefully reviewed by a human and do not follow deny-first methodology can have severe unintended consequences, including total loss of funds.
 
-**When in doubt, do not create the policy. Ask the human.**
+⚠️ **When in doubt, do not create the policy. Ask the human.**
 
 ## Quick Start
 

@@ -1,0 +1,24 @@
+{
+  "should_trigger": [
+    "Set up an agent wallet on Turnkey with scoped access",
+    "Give my AI agent wallet access with least-privilege policies",
+    "Create a scoped wallet for my trading bot agent",
+    "I need to provision agent credentials for a payment processing bot",
+    "How do I onboard an agent with its own sub-org and wallet?",
+    "Rotate the API key for my agent's Turnkey wallet",
+    "Revoke my agent's wallet access immediately",
+    "My agent's transaction was denied, how do I debug it?",
+    "Monitor my agent's wallet activity for anomalies",
+    "Add Solana support to my existing agent wallet"
+  ],
+  "should_not_trigger": [
+    "Create a wallet using the Turnkey API",
+    "Sign an Ethereum transaction with Turnkey",
+    "Create a spending limit policy for my wallet",
+    "List all users in my organization",
+    "Set up a treasury with hot and cold wallets",
+    "Create a standalone private key with the Turnkey API",
+    "How do I export my wallet mnemonic?",
+    "Check the status of my Turnkey activity"
+  ]
+}

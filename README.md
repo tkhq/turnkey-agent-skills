@@ -24,13 +24,15 @@ An agent operating with a scoped API key inside a sub-organization.
 
 - Should not have a root key
 - Permissions come from policies (deny-by-default)
-- Use `managing-policies-api` and `managing-organizations-api` to set up scoped access, policies, and hardened quorum before giving an agent access
+- Use `agentic-wallet-workflow` to set up scoped access, policies, and credentials before giving an agent access
 
 ## Skill Routing
 
 | User asks about... | Skill to load |
 |---|---|
 | Getting started, no API key yet | `managing-users-api` |
+| Setting up an agent wallet with scoped access | `agentic-wallet-workflow` |
+| Setting up a company treasury | `treasury-operations-workflow` |
 | Creating or managing HD wallets | `managing-wallets-api` |
 | Standalone private keys or key tags | `managing-private-keys-api` |
 | Signing or broadcasting transactions | `signing-transactions-api` |
@@ -80,6 +82,15 @@ cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skil
 | `monitoring-activities-api` | 5 | Activity lifecycle, consensus approval, audit trails |
 | `managing-users-api` | 18 | User lifecycle, API keys, user tags |
 | `managing-organizations-api` | 9 | Sub-orgs, root quorum, org features |
+
+### Workflows (multi-step orchestration)
+
+Compose multiple primitives into end-to-end guides covering onboarding, management, and monitoring.
+
+| Skill | Description |
+|-------|-------------|
+| `agentic-wallet-workflow` | Give an AI agent scoped wallet access: sub-org, wallet, policies, credentials |
+| `treasury-operations-workflow` | Set up and operate a company treasury: hot/cold wallets, multi-sig, payments |
 
 ### Meta
 
@@ -151,6 +162,8 @@ turnkey-agent-skills/
     monitoring-activities-api/    # Activity lifecycle and consensus (5 endpoints)
     managing-users-api/           # Users, API keys, user tags (18 endpoints)
     managing-organizations-api/   # Orgs, sub-orgs, quorum (9 endpoints)
+    agentic-wallet-workflow/      # Agent wallet setup and lifecycle
+    treasury-operations-workflow/ # Treasury setup and operations
     creating-skills/              # Meta skill for contributors
   template/                       # Skeleton for new skills
 ```

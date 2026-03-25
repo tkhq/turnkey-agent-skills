@@ -1,0 +1,62 @@
+[
+  {
+    "skills": ["agentic-wallet-workflow"],
+    "query": "Set up a new agent wallet from scratch for my Ethereum trading bot",
+    "expected_behavior": [
+      "Creates a sub-organization with an HD wallet atomically using POST /public/v1/submit/create_sub_organization",
+      "Creates a non-root agent user with the 'agent' tag using POST /public/v1/submit/create_users",
+      "Creates an ALLOW policy scoped to signing with the agent's wallet",
+      "Creates DENY guardrail policies for admin operations and spending limits",
+      "Verifies the setup with a test signature",
+      "Outputs the agent credentials (public key, private key, org ID, wallet address)"
+    ]
+  },
+  {
+    "skills": ["agentic-wallet-workflow"],
+    "query": "Rotate the API key for my existing agent on Turnkey",
+    "expected_behavior": [
+      "Generates a new P-256 key pair locally",
+      "Registers the new public key via POST /public/v1/submit/create_api_keys",
+      "Verifies the new key works with POST /public/v1/query/whoami",
+      "Deletes the old key via POST /public/v1/submit/delete_api_keys using the new key",
+      "Instructs the admin to update the agent's runtime environment"
+    ]
+  },
+  {
+    "skills": ["agentic-wallet-workflow"],
+    "query": "Revoke all access for my agent immediately",
+    "expected_behavior": [
+      "Deletes the agent's API keys via POST /public/v1/submit/delete_api_keys as the first step",
+      "Explains that API key deletion is instant and the agent can no longer authenticate",
+      "Suggests optional cleanup: delete policies, delete the agent user, or delete the sub-org entirely"
+    ]
+  },
+  {
+    "skills": ["agentic-wallet-workflow", "managing-policies-api"],
+    "query": "My agent's transaction got denied. How do I figure out which policy blocked it?",
+    "expected_behavior": [
+      "Uses POST /public/v1/query/get_policy_evaluations with the denied activity ID",
+      "Explains the evaluation trace showing which policy denied and which condition matched",
+      "Suggests fixing the policy or adjusting the agent's transaction parameters"
+    ]
+  },
+  {
+    "skills": ["agentic-wallet-workflow"],
+    "query": "Add Solana support to my existing agent's wallet on Turnkey",
+    "expected_behavior": [
+      "Uses POST /public/v1/submit/create_wallet_accounts to derive a Solana account on the existing wallet",
+      "Uses CURVE_ED25519, PATH_FORMAT_BIP32, path m/44'/501'/0'/0', ADDRESS_FORMAT_SOLANA",
+      "Mentions that existing EVM policies will not apply to Solana and new chain-specific policies may be needed"
+    ]
+  },
+  {
+    "skills": ["agentic-wallet-workflow"],
+    "query": "I want to set up an agent but it only needs read-only access, no signing",
+    "expected_behavior": [
+      "Explains the read-only access scope from the decision gates",
+      "Creates the agent user but does NOT create an ALLOW signing policy",
+      "Explains that all users can read data in their own organization by default (implicit read permission)",
+      "Still creates DENY guardrails to block admin operations"
+    ]
+  }
+]

@@ -129,7 +129,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
   "policyName": "agent-can-sign",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN_RAW_PAYLOAD_V2' && wallet.id == '<WALLET_ID>'",
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'",
   "notes": "Allow agent to sign with its designated wallet"
 }
 ```
@@ -150,7 +150,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
     {
       "policyName": "agent-deny-admin-ops",
       "effect": "EFFECT_DENY",
-      "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_WALLETS', 'UPDATE_ROOT_QUORUM', 'DELETE_POLICY', 'CREATE_POLICY']",
+      "condition": "activity.resource in ['USER', 'POLICY', 'ORGANIZATION'] || (activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT'])",
       "notes": "Block agent from admin operations"
     },
     {

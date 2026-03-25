@@ -258,7 +258,7 @@ POST https://api.turnkey.com/public/v1/submit/update_policy
 
 ```json
 {
-  "type": "ACTIVITY_TYPE_UPDATE_POLICY",
+  "type": "ACTIVITY_TYPE_UPDATE_POLICY_V2",
   "timestampMs": "1234567890300",
   "organizationId": "<ORG_ID>",
   "parameters": {

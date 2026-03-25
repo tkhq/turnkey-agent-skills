@@ -338,8 +338,8 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
   "parameters": {
     "policyName": "treasury-global-deny-dangerous-ops",
     "effect": "EFFECT_DENY",
-    "condition": "activity.action in ['DELETE_WALLETS', 'EXPORT_WALLET', 'UPDATE_ROOT_QUORUM']",
-    "notes": "Block wallet deletion, export, and root quorum changes. Only root quorum (which bypasses policies) can perform these."
+    "condition": "activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT']",
+    "notes": "Block wallet deletion and export. Only root quorum (which bypasses policies) can perform these. Root quorum changes bypass the policy engine entirely and do not need a DENY policy."
   }
 }
 ```

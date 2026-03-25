@@ -21,7 +21,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
   "policyName": "worker-agent-allow-signing",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('worker-agent'))",
-  "condition": "activity.action in ['SIGN_RAW_PAYLOAD_V2', 'SIGN_TRANSACTION_V2']",
+  "condition": "activity.action == 'SIGN'",
   "notes": "Allow worker agent to sign transactions and raw payloads"
 }
 ```
@@ -39,8 +39,8 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
       "policyName": "worker-agent-deny-admin-ops",
       "effect": "EFFECT_DENY",
       "consensus": "approvers.any(user, user.tags.contains('worker-agent'))",
-      "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_USERS', 'CREATE_POLICY', 'DELETE_POLICY', 'UPDATE_POLICY', 'UPDATE_ROOT_QUORUM', 'DELETE_WALLETS', 'EXPORT_WALLET', 'EXPORT_WALLET_ACCOUNT', 'CREATE_SUB_ORGANIZATION']",
-      "notes": "Block worker agent from all administrative operations"
+      "condition": "activity.resource in ['USER', 'POLICY', 'ORGANIZATION'] || (activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT'])",
+      "notes": "Block worker agent from user, policy, org, and wallet delete/export operations"
     }
   ]
 }
@@ -86,28 +86,28 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
       "policyName": "observer-agent-deny-signing",
       "effect": "EFFECT_DENY",
       "consensus": "approvers.any(user, user.tags.contains('observer-agent'))",
-      "condition": "activity.action in ['SIGN_RAW_PAYLOAD_V2', 'SIGN_TRANSACTION_V2']",
+      "condition": "activity.action == 'SIGN'",
       "notes": "Block observer agent from signing transactions"
     },
     {
       "policyName": "observer-agent-deny-wallet-mutations",
       "effect": "EFFECT_DENY",
       "consensus": "approvers.any(user, user.tags.contains('observer-agent'))",
-      "condition": "activity.action in ['CREATE_WALLET', 'DELETE_WALLETS', 'EXPORT_WALLET', 'EXPORT_WALLET_ACCOUNT', 'CREATE_WALLET_ACCOUNTS', 'IMPORT_WALLET']",
+      "condition": "activity.resource == 'WALLET' && activity.action in ['CREATE', 'DELETE', 'EXPORT', 'IMPORT']",
       "notes": "Block observer agent from wallet mutations"
     },
     {
       "policyName": "observer-agent-deny-user-mutations",
       "effect": "EFFECT_DENY",
       "consensus": "approvers.any(user, user.tags.contains('observer-agent'))",
-      "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_USERS', 'CREATE_API_KEYS', 'DELETE_API_KEYS', 'UPDATE_USER_TAG']",
+      "condition": "activity.resource in ['USER', 'CREDENTIAL'] && activity.action in ['CREATE', 'DELETE', 'UPDATE']",
       "notes": "Block observer agent from user mutations"
     },
     {
       "policyName": "observer-agent-deny-policy-mutations",
       "effect": "EFFECT_DENY",
       "consensus": "approvers.any(user, user.tags.contains('observer-agent'))",
-      "condition": "activity.action in ['CREATE_POLICY', 'DELETE_POLICY', 'UPDATE_POLICY', 'CREATE_SUB_ORGANIZATION', 'UPDATE_ROOT_QUORUM']",
+      "condition": "activity.resource in ['POLICY', 'ORGANIZATION'] && activity.action in ['CREATE', 'DELETE', 'UPDATE']",
       "notes": "Block observer agent from policy and org mutations"
     }
   ]
@@ -152,28 +152,28 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
       "policyName": "admin-agent-allow-signing",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('admin-agent'))",
-      "condition": "activity.action in ['SIGN_RAW_PAYLOAD_V2', 'SIGN_TRANSACTION_V2']",
+      "condition": "activity.action == 'SIGN'",
       "notes": "Allow admin agent to sign transactions"
     },
     {
       "policyName": "admin-agent-allow-user-management",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('admin-agent'))",
-      "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_USERS', 'CREATE_API_KEYS', 'DELETE_API_KEYS', 'UPDATE_USER_TAG']",
+      "condition": "activity.resource in ['USER', 'CREDENTIAL'] && activity.action in ['CREATE', 'DELETE', 'UPDATE']",
       "notes": "Allow admin agent to manage users and API keys"
     },
     {
       "policyName": "admin-agent-allow-policy-management",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('admin-agent'))",
-      "condition": "activity.action in ['CREATE_POLICY', 'DELETE_POLICY', 'UPDATE_POLICY']",
+      "condition": "activity.resource == 'POLICY' && activity.action in ['CREATE', 'DELETE', 'UPDATE']",
       "notes": "Allow admin agent to manage policies"
     },
     {
       "policyName": "admin-agent-allow-wallet-management",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('admin-agent'))",
-      "condition": "activity.action in ['CREATE_WALLET', 'CREATE_WALLET_ACCOUNTS']",
+      "condition": "activity.resource == 'WALLET' && activity.action == 'CREATE'",
       "notes": "Allow admin agent to create wallets and accounts"
     }
   ]
@@ -193,8 +193,8 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
   "policyName": "admin-agent-deny-critical-ops",
   "effect": "EFFECT_DENY",
   "consensus": "approvers.any(user, user.tags.contains('admin-agent'))",
-  "condition": "activity.action in ['UPDATE_ROOT_QUORUM', 'DELETE_WALLETS', 'EXPORT_WALLET']",
-  "notes": "Block admin agent from quorum changes, wallet deletion, and wallet export"
+  "condition": "activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT']",
+  "notes": "Block admin agent from wallet deletion and wallet export. Root quorum changes bypass the policy engine entirely and do not need a DENY policy."
 }
 ```
 

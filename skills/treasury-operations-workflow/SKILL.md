@@ -149,10 +149,12 @@ Create these policies in order. See [references/treasury-setup-walkthrough.md](r
    - condition: `private_key.tags.contains('cold-storage')`
 
 4. **Cold wallet address allowlist**: cold wallet can only send to approved destinations.
-   - effect: ALLOW, condition: `eth.tx.to in ['<HOT_WALLET_ADDR>', '<EXCHANGE_ADDR>'] && private_key.tags.contains('cold-storage')`
+   - effect: DENY, condition: `!(eth.tx.to in ['<HOT_WALLET_ADDR>', '<EXCHANGE_ADDR>']) && private_key.tags.contains('cold-storage')`
+   - Uses DENY with negated condition because DENY always takes precedence, making it safer than an ALLOW allowlist.
 
 5. **Global DENY guardrails**: block dangerous operations from non-root users.
-   - condition: `activity.action in ['DELETE_WALLETS', 'EXPORT_WALLET', 'UPDATE_ROOT_QUORUM']`
+   - condition: `activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT']`
+   - Root quorum changes bypass the policy engine entirely and do not need a DENY policy.
 
 **Step 6: Verify the setup**
 

@@ -155,7 +155,7 @@ POST /public/v1/submit/create_policy
     "policyName": "agent-can-sign",
     "effect": "EFFECT_ALLOW",
     "consensus": "approvers.any(user, user.tags.contains('agent'))",
-    "condition": "activity.action == 'SIGN_RAW_PAYLOAD_V2' && wallet.id == 'wallet-agent-9012'",
+    "condition": "activity.action == 'SIGN' && wallet.id == 'wallet-agent-9012'",
     "notes": "Allow agent to sign payloads with its designated wallet"
   }
 }
@@ -199,7 +199,7 @@ POST /public/v1/submit/create_policies
       {
         "policyName": "agent-deny-admin-ops",
         "effect": "EFFECT_DENY",
-        "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_WALLETS', 'UPDATE_ROOT_QUORUM', 'DELETE_POLICY', 'CREATE_POLICY']",
+        "condition": "activity.resource in ['USER', 'POLICY', 'ORGANIZATION'] || (activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT'])",
         "notes": "Block agent from administrative operations"
       },
       {
@@ -329,7 +329,7 @@ POST /public/v1/query/get_policy_evaluations
       "policyId": "policy-deny-large-eth-001",
       "policyName": "agent-deny-large-eth-transfers",
       "effect": "EFFECT_DENY",
-      "consensusMatched": false,
+      "consensusMatched": true,
       "conditionMatched": true
     }
   ],
@@ -348,15 +348,25 @@ These are working policy expressions for common agent scenarios.
 ```
 effect: EFFECT_ALLOW
 consensus: approvers.any(user, user.tags.contains('agent'))
-condition: activity.action == 'SIGN_RAW_PAYLOAD_V2' && wallet.id == '<WALLET_ID>'
+condition: activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'
 ```
 
 ### Sign + manage wallet accounts
 
+These require two separate policies because `activity.action == 'SIGN'` applies to signing contexts (where `wallet.id` is available), while `activity.resource == 'WALLET' && activity.action == 'CREATE'` applies to wallet management contexts. Combining them with `||` in one condition would cause evaluation errors due to the policy engine not short-circuiting.
+
+**Policy 1: signing**
 ```
 effect: EFFECT_ALLOW
 consensus: approvers.any(user, user.tags.contains('agent'))
-condition: activity.action in ['SIGN_RAW_PAYLOAD_V2', 'CREATE_WALLET_ACCOUNTS'] && wallet.id == '<WALLET_ID>'
+condition: activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'
+```
+
+**Policy 2: wallet account creation**
+```
+effect: EFFECT_ALLOW
+consensus: approvers.any(user, user.tags.contains('agent'))
+condition: activity.resource == 'WALLET' && activity.action == 'CREATE'
 ```
 
 ### Address allowlist (EVM)
@@ -378,7 +388,7 @@ condition: eth.tx.value > 100000000000000000
 
 ```
 effect: EFFECT_DENY
-condition: activity.action in ['CREATE_USERS_V2', 'DELETE_WALLETS', 'UPDATE_ROOT_QUORUM', 'DELETE_POLICY', 'CREATE_POLICY', 'DELETE_USERS']
+condition: activity.resource in ['USER', 'POLICY', 'ORGANIZATION'] || (activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT'])
 ```
 
 ### Solana program restriction

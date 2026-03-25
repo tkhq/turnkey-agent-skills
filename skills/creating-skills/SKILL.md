@@ -19,13 +19,26 @@ To create a new skill, follow these steps in order: Study, Research, Draft, Eval
 
 ### Step 1: Study Existing Skills
 
-Before writing anything, read 1-2 existing skills to understand the pattern. Good references:
+Before writing anything, read 1-2 existing skills to understand the pattern.
 
-- `skills/managing-wallets-api/SKILL.md` is the simplest skill (wallet CRUD)
+**Primitives** (7 skills, named `managing-{resource}-api` or `{action}-{resource}-api`):
+- `skills/managing-wallets-api/SKILL.md` is a solid primitive example (wallet CRUD with descriptive headings)
 - `skills/signing-transactions-api/SKILL.md` shows multi-chain support with progressive disclosure
-- `skills/managing-users-api/SKILL.md` shows credential management and user provisioning
+- `skills/managing-policies-api/SKILL.md` shows complex rule-based logic
+- Also: `managing-private-keys-api`, `monitoring-activities-api`, `managing-users-api`, `managing-organizations-api`
+
+**Workflows** (3 skills, named `{purpose}-workflow`):
+- `skills/agentic-wallet-workflow/SKILL.md` shows phased structure (Phase 1/2/3) and agent personas (Worker, Observer, Admin)
+- `skills/getting-started-workflow/SKILL.md` shows first-time onboarding flow
+- `skills/treasury-operations-workflow/SKILL.md` shows fund management operations
 
 Read the SKILL.md, one reference file, and the evals for whichever skill is closest to what you are building. This gives you the exact pattern to follow.
+
+Key patterns to note:
+- Primitives use **descriptive headings** ("Query Wallets", "Create a Wallet"), not numbered steps ("Step 1:", "Step 2:")
+- Workflows use **phases** ("Phase 1: Onboarding", "Phase 2: Management", "Phase 3: Monitoring")
+- All primitives include an **activity envelope note** at the top of Instructions explaining the request body format
+- Descriptions include both **positive trigger phrases** ("Use when asked to...") and **negative trigger phrases** ("Do NOT use for... (use X instead)")
 
 ### Step 2: Research the Turnkey Feature
 
@@ -67,7 +80,7 @@ Use `llms-full.txt` only when you need to search across all docs at once (it is 
 mkdir -p skills/your-skill-name/{references,evals}
 ```
 
-Use kebab-case gerund naming (e.g., `creating-wallets`, `signing-transactions`, `managing-policies`).
+Use the naming convention: `managing-{resource}-api` for primitives (e.g., `managing-wallets-api`, `managing-policies-api`), `{purpose}-workflow` for workflows (e.g., `agentic-wallet-workflow`, `treasury-operations-workflow`).
 
 **3b. Write the SKILL.md frontmatter:**
 
@@ -86,23 +99,26 @@ metadata:
 **Frontmatter rules:**
 - `name`: kebab-case, max 64 chars, must match directory name exactly
 - `description`: third person, max 1024 chars, must include trigger phrases
-- `description` structure: [What it does] + [What it covers] + "Use when asked to 'phrase 1', 'phrase 2', 'phrase 3'."
+- `description` structure: [What it does] + [What it covers] + "Use when asked to 'phrase 1', 'phrase 2', 'phrase 3'." + "Do NOT use for X (use Y), Z (use W)."
+- Include both positive triggers ("Use when asked to...") and negative triggers ("Do NOT use for...")
 - No XML tags (`<` or `>`) in name or description
 - Do not use "claude" or "anthropic" in the name
 
 **3c. Write the SKILL.md body following this structure:**
 
 1. **Quick Start** (1 sentence: simplest way to use this skill)
-2. **Prerequisites** (`npm install` command)
-3. **Environment Variables** (env block with comments)
-4. **Instructions** (step-by-step with brief code patterns)
-5. **Rules** (mandatory guardrails specific to this feature)
-6. **Related Skills** (cross-references to other skills)
+2. **Prerequisites** (reference managing-users-api for auth)
+3. **Instructions** (descriptive headings with brief API patterns; start with the activity envelope note)
+4. **Rules** (mandatory guardrails specific to this feature)
+5. **Related Skills** (cross-references to other skills using current names)
 
 **Body rules:**
 - Under 300 lines preferred, 500 max
 - Only include context the LLM does not already know (Turnkey-specific APIs, gotchas, required ordering)
 - Every skill starts with a reference to managing-users-api for authentication
+- Use descriptive headings in Instructions ("### Query Wallets", "### Create a Wallet"), not numbered steps ("### Step 1:")
+- For primitives, include the activity envelope note at the top of Instructions (see skill-template.md for the exact text)
+- For workflows, use phases ("## Phase 1: Onboarding", "## Phase 2: Management")
 - Keep code in SKILL.md to brief patterns (10-15 lines max per block)
 - Delegate full, self-contained examples to `references/` files
 

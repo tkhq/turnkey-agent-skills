@@ -39,6 +39,8 @@ POST https://api.turnkey.com/public/v1/query/get_configs
 }
 ```
 
+Note: Unlike most query endpoints, the SDK does not auto-inject `organizationId` for this call. You must pass `{ organizationId: "<ORG_ID>" }` explicitly.
+
 Returns the current quorum settings (threshold, user IDs) and enabled features.
 
 ### Create a sub-organization

@@ -35,13 +35,29 @@ POST /public/v1/submit/create_wallet
 }
 ```
 
-Example activity response:
+The SDK unwraps the activity result and returns the fields directly:
+
+```json
+{
+  "walletId": "a871eb7e-f0eb-5955-9852-3b2f90e2d24b",
+  "addresses": [
+    "0xb3163E2E3c21c6e07FCDE4414B63e2d6a9Cb53bc",
+    "6f7cmH2s43Xuc6xQZeKkrvwe4e7VYrjxvNgExB5yED6t",
+    "bc1q8qcdemyzzmrhxjgzywk0nr322la9d368nl780m"
+  ],
+  "activity": { ... }
+}
+```
+
+The `addresses` array contains plain strings, ordered to match the `accounts` array from the request. The first address corresponds to the first account specification, and so on. The full activity object is available in the `activity` field.
+
+Raw activity response (for reference, the SDK extracts from this):
 
 ```json
 {
   "activity": {
     "id": "act_...",
-    "status": "COMPLETED",
+    "status": "ACTIVITY_STATUS_COMPLETED",
     "type": "ACTIVITY_TYPE_CREATE_WALLET",
     "result": {
       "createWalletResult": {
@@ -191,28 +207,33 @@ POST /public/v1/query/get_wallet
 }
 ```
 
-Example response:
+Example response (SDK unwraps the `wallet` envelope):
 
 ```json
 {
-  "wallet": {
-    "walletId": "wlt_...",
-    "walletName": "multi-chain-wallet",
-    "createdAt": { "seconds": "1700000000", "nanos": "0" },
-    "updatedAt": { "seconds": "1700000000", "nanos": "0" },
-    "exported": false,
-    "imported": false,
-    "accounts": [
-      {
-        "walletAccountId": "wac_...",
-        "address": "0x1234...abcd",
-        "path": "m/44'/60'/0'/0/0",
-        "curve": "CURVE_SECP256K1",
-        "addressFormat": "ADDRESS_FORMAT_ETHEREUM",
-        "createdAt": { "seconds": "1700000000", "nanos": "0" }
-      }
-    ]
-  }
+  "walletId": "wlt_...",
+  "walletName": "multi-chain-wallet",
+  "createdAt": { "seconds": "1700000000", "nanos": "0" },
+  "updatedAt": { "seconds": "1700000000", "nanos": "0" },
+  "exported": false,
+  "imported": false
+}
+```
+
+Note: `get_wallet` does not return accounts. To get account details, use `list_wallet_accounts`:
+
+```json
+{
+  "accounts": [
+    {
+      "walletAccountId": "wac_...",
+      "address": "0x1234...abcd",
+      "path": "m/44'/60'/0'/0/0",
+      "curve": "CURVE_SECP256K1",
+      "addressFormat": "ADDRESS_FORMAT_ETHEREUM",
+      "createdAt": { "seconds": "1700000000", "nanos": "0" }
+    }
+  ]
 }
 ```
 

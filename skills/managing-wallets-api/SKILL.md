@@ -41,7 +41,7 @@ POST /public/v1/query/list_wallets
 
 **Get a single wallet by ID:**
 
-Use this to inspect a specific wallet's details (name, creation time, accounts) without fetching the full list.
+Use this to inspect a specific wallet's metadata (name, creation time, export status). Note: `get_wallet` does not return the wallet's accounts. Use `list_wallet_accounts` to get account details (addresses, paths, formats).
 
 ```
 POST /public/v1/query/get_wallet
@@ -82,7 +82,9 @@ POST /public/v1/submit/create_wallet
 }
 ```
 
-The activity result contains `walletId` and an `addresses` array with the derived addresses.
+The `mnemonicLength` field is optional (defaults to 12). Valid values are 12 (128-bit) or 24 (256-bit).
+
+The SDK returns `walletId` and an `addresses` array of plain strings (e.g. `["0xABC...", "7nYB..."]`), ordered to match the `accounts` array in the request. To get detailed account metadata (address format, path, account ID), call `list_wallet_accounts` after creation.
 
 ### Supported Address Formats
 

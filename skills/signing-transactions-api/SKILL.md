@@ -155,6 +155,8 @@ Check asset balances for an address before sending a transaction. Returns only n
 
 Returns an array of balance objects with `caip19`, `symbol`, `balance` (atomic units), `decimals`, and `display` (USD and crypto values for presentation only). Beta feature, contact support for access.
 
+Note: The SDK method name for this endpoint may not be available in all SDK versions. If `client.getBalances` is not a function, this endpoint requires direct HTTP calls or a newer SDK version.
+
 ### get_nonces
 
 Fetch on-chain nonce and/or gas station nonce for an EVM address. Use `gasStationNonce` with sponsored transactions for replay protection.
@@ -232,8 +234,8 @@ For complete query examples, see [references/balance-query-examples.md](referenc
 |---------------|-------|---------|
 | SHA-256 | HASH_FUNCTION_SHA256 | TRON, Cosmos, general secp256k1 signing |
 | Keccak-256 | HASH_FUNCTION_KECCAK256 | Ethereum message signing |
-| No hash | HASH_FUNCTION_NOT_APPLICABLE | Ed25519 signing (Sui, TON). Payload signed directly. |
-| No-op | HASH_FUNCTION_NO_OP | Bitcoin Taproot (Schnorr). Payload must be pre-hashed. |
+| No hash | HASH_FUNCTION_NOT_APPLICABLE | Ed25519 signing (Solana, Sui, TON). Payload signed directly. Using any other hash function with Ed25519 keys will fail. |
+| No-op | HASH_FUNCTION_NO_OP | Bitcoin Taproot (Schnorr). Payload must be exactly 32 bytes (64 hex chars) and pre-hashed with tagged SHA-256. The API rejects payloads of any other length. |
 
 For complete per-chain examples, see [references/chain-signing-examples.md](references/chain-signing-examples.md).
 For raw payload and batch signing patterns, see [references/raw-payload-examples.md](references/raw-payload-examples.md).

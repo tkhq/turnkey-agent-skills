@@ -195,8 +195,12 @@ POST /public/v1/query/list_private_key_tags
 ```
 
 ```json
-{}
+{
+  "organizationId": "<ORGANIZATION_ID>"
+}
 ```
+
+Note: The SDK requires `organizationId` to be passed explicitly for this endpoint (unlike most query endpoints that auto-inject it).
 
 **Create a tag and attach it to keys:**
 

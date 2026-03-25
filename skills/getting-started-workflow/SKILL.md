@@ -123,10 +123,24 @@ If this succeeds, your setup is complete: credentials work, wallet exists, and s
 
 ## What's Next?
 
-- Give an agent scoped wallet access: `agentic-wallet-workflow`
-- Set up a company treasury: `treasury-operations-workflow`
-- Add access control and spending limits: `managing-policies-api`
-- Manage users and API keys: `managing-users-api`
+Now that your credentials, wallet, and signing are working, decide what kind of agent you are building. Turnkey supports three standard personas, each with a different trust level and policy set:
+
+| Persona | Can sign | Can manage users/policies | Can delete wallets | Best for |
+|---------|----------|--------------------------|-------------------|----------|
+| Worker  | Yes      | No                       | No                | Trading bots, payment processors, DeFi agents |
+| Observer| No       | No                       | No                | Monitoring dashboards, compliance auditors, balance trackers |
+| Admin   | Yes      | Yes                      | No                | Org automation, onboarding flows, policy lifecycle |
+
+Start with the **Worker** persona for most production agents. Escalate to **Admin** only when the agent needs to provision users or manage policies. Use **Observer** for read-only monitoring.
+
+Each persona comes with complete policy templates you can deploy directly. See [references/agent-personas.md](references/agent-personas.md) for the full setup including ALLOW/DENY policies and user tag configuration.
+
+**Next steps by persona:**
+
+- **Worker/Admin agent**: Set up scoped wallet access with `agentic-wallet-workflow`
+- **Treasury management**: Set up hot/cold wallet tiers with `treasury-operations-workflow`
+- **Access control**: Add spending limits and address allowlists with `managing-policies-api`
+- **User management**: Create additional users and API keys with `managing-users-api`
 
 For the complete walkthrough with full request/response JSON for every step, see [references/first-wallet-walkthrough.md](references/first-wallet-walkthrough.md).
 

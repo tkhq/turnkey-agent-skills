@@ -35,6 +35,7 @@ jobs:
           - managing-organizations-api
           - agentic-wallet-workflow
           - treasury-operations-workflow
+          - getting-started-workflow
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

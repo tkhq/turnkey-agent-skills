@@ -24,13 +24,14 @@ An agent operating with a scoped API key inside a sub-organization.
 
 - Should not have a root key
 - Permissions come from policies (deny-by-default)
-- Use `agentic-wallet-workflow` to set up scoped access, policies, and credentials before giving an agent access
+- Three agent personas define access levels: **Worker** (sign only), **Observer** (read only), **Admin** (sign + manage)
+- Use `agentic-wallet-workflow` to provision an agent with the appropriate persona. See the [agent personas reference](skills/agentic-wallet-workflow/references/agent-personas.md) for policy templates.
 
 ## Skill Routing
 
 | User asks about... | Skill to load |
 |---|---|
-| Getting started, no API key yet | `managing-users-api` |
+| Getting started, first wallet, new to Turnkey | `getting-started-workflow` |
 | Setting up an agent wallet with scoped access | `agentic-wallet-workflow` |
 | Setting up a company treasury | `treasury-operations-workflow` |
 | Creating or managing HD wallets | `managing-wallets-api` |
@@ -89,6 +90,7 @@ Compose multiple primitives into end-to-end guides covering onboarding, manageme
 
 | Skill | Description |
 |-------|-------------|
+| `getting-started-workflow` | Day-0 onboarding: verify credentials, create first wallet, sign first transaction |
 | `agentic-wallet-workflow` | Give an AI agent scoped wallet access: sub-org, wallet, policies, credentials |
 | `treasury-operations-workflow` | Set up and operate a company treasury: hot/cold wallets, multi-sig, payments |
 
@@ -162,6 +164,7 @@ turnkey-agent-skills/
     monitoring-activities-api/    # Activity lifecycle and consensus (5 endpoints)
     managing-users-api/           # Users, API keys, user tags (18 endpoints)
     managing-organizations-api/   # Orgs, sub-orgs, quorum (9 endpoints)
+    getting-started-workflow/     # Day-0 onboarding
     agentic-wallet-workflow/      # Agent wallet setup and lifecycle
     treasury-operations-workflow/ # Treasury setup and operations
     creating-skills/              # Meta skill for contributors

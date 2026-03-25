@@ -1,0 +1,41 @@
+[
+  {
+    "skills": ["getting-started-workflow"],
+    "query": "I just got my Turnkey API credentials. Help me verify they work and create my first wallet.",
+    "expected_behavior": [
+      "Starts by calling POST /public/v1/query/whoami to verify credentials",
+      "Creates a wallet using POST /public/v1/submit/create_wallet with at least one account",
+      "Lists wallet accounts using POST /public/v1/query/list_wallet_accounts to confirm creation",
+      "Signs a test payload using POST /public/v1/submit/sign_raw_payload to verify end-to-end setup"
+    ]
+  },
+  {
+    "skills": ["getting-started-workflow"],
+    "query": "Set up Turnkey for the first time with only Ethereum support",
+    "expected_behavior": [
+      "Verifies credentials with whoami first",
+      "Creates a wallet with a single CURVE_SECP256K1 account using ADDRESS_FORMAT_ETHEREUM",
+      "Does not include Solana or other chain accounts since only Ethereum was requested",
+      "Confirms setup with a test signature"
+    ]
+  },
+  {
+    "skills": ["getting-started-workflow"],
+    "query": "I want to skip credential verification and just create a wallet directly",
+    "expected_behavior": [
+      "Advises against skipping credential verification",
+      "Explains that whoami should be called first to confirm API keys work before creating resources",
+      "Proceeds with the full workflow starting from whoami"
+    ]
+  },
+  {
+    "skills": ["getting-started-workflow", "managing-wallets-api"],
+    "query": "Get started with Turnkey and set up a wallet that supports Ethereum, Solana, and Bitcoin",
+    "expected_behavior": [
+      "Verifies credentials with whoami",
+      "Creates a wallet with three accounts: Ethereum (CURVE_SECP256K1, ADDRESS_FORMAT_ETHEREUM), Solana (CURVE_ED25519, ADDRESS_FORMAT_SOLANA), and Bitcoin (CURVE_SECP256K1, ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH)",
+      "Uses the correct derivation paths for each chain",
+      "Verifies wallet creation by listing accounts"
+    ]
+  }
+]

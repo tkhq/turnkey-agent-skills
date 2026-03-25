@@ -1,0 +1,22 @@
+{
+  "should_trigger": [
+    "Get started with Turnkey",
+    "Create my first wallet on Turnkey",
+    "Set up Turnkey for the first time",
+    "Verify my Turnkey API key works",
+    "Hello world with the Turnkey API",
+    "Onboard to Turnkey",
+    "I just got my API credentials, what do I do next?",
+    "New to Turnkey, help me set up",
+    "I want to test that my Turnkey credentials work and create a wallet",
+    "Walk me through getting started with the Turnkey API"
+  ],
+  "should_not_trigger": [
+    "Set up an agent wallet with scoped access on Turnkey",
+    "Create a treasury with hot and cold wallets",
+    "Manage policies and spending limits on Turnkey",
+    "Rotate my API keys on Turnkey",
+    "Sign an Ethereum transaction to send 1 ETH",
+    "Create a sub-organization for my end users"
+  ]
+}

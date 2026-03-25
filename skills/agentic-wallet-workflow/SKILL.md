@@ -1,6 +1,6 @@
 ---
 name: agentic-wallet-workflow
-description: "Gives an AI agent scoped wallet access on Turnkey by composing organizations, wallets, users, policies, and activity monitoring into a multi-step workflow. Covers agent onboarding (sub-org creation, wallet provisioning, policy setup), day-2 management (add chains, rotate keys, change permissions, revoke access, debug denied transactions), and monitoring (anomaly detection, audit). Use when asked to 'set up an agent wallet', 'give my agent wallet access', 'create scoped wallet for agent', 'agentic wallet', 'provision agent credentials', 'agent wallet onboarding', 'rotate agent key', 'revoke agent access', 'debug denied agent transaction', or 'monitor agent wallet activity'. Do NOT use for manual wallet creation (use managing-wallets-api), treasury management (use treasury-operations-workflow), or standalone key creation (use managing-private-keys-api)."
+description: "Gives an AI agent scoped wallet access on Turnkey. Covers onboarding (sub-org, wallet, policies), day-2 management (rotate keys, change permissions, revoke access, debug denials), and monitoring. Includes persona templates: worker agent (sign only), observer agent (read only), admin agent (sign + manage). Use when asked to 'set up agent wallet', 'scoped wallet for agent', 'provision agent credentials', 'rotate agent key', 'revoke agent access', 'debug denied agent transaction', 'monitor agent activity', 'worker agent', 'observer agent', 'admin agent', or 'agent persona'. Not for manual wallets, treasury, or standalone keys."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
 metadata:
@@ -37,10 +37,12 @@ Onboarding creates an isolated environment for your agent with a wallet and scop
 - Determines which wallet accounts to derive (Ethereum, Solana, Bitcoin, etc.).
 - Affects policy conditions: EVM policies use `eth.tx.*` fields, Solana uses `solana.tx.*`, Bitcoin uses `bitcoin.tx.*`.
 
-**4. Access scope**
-- Sign only (most common): Agent can sign transactions but cannot create or delete wallets, users, or policies.
-- Sign + manage: Agent can also create wallet accounts or update its own API key.
-- Read only: Agent can query data but not sign. Use for monitoring agents.
+**4. Agent persona**
+- Worker (most common): Signs transactions. Cannot mutate guardrails or expand authority. Use for trading bots, payment processors, DeFi agents.
+- Observer: Read-only. Monitors balances, activities, and policies. Cannot sign or mutate anything. Use for dashboards and compliance.
+- Admin: Signs and manages users/policies. Cannot modify quorum or delete wallets. Use for organizational automation.
+
+See [references/agent-personas.md](references/agent-personas.md) for complete policy templates for each persona.
 
 ### Onboarding Flow (Sub-Org Path)
 

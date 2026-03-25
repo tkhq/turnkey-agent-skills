@@ -9,7 +9,9 @@
     "Revoke my agent's wallet access immediately",
     "My agent's transaction was denied, how do I debug it?",
     "Monitor my agent's wallet activity for anomalies",
-    "Add Solana support to my existing agent wallet"
+    "Add Solana support to my existing agent wallet",
+    "Set up a worker agent on Turnkey with signing-only access",
+    "Create an observer agent that can monitor but not sign"
   ],
   "should_not_trigger": [
     "Create a wallet using the Turnkey API",

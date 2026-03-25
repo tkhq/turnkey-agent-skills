@@ -38,6 +38,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policies
     {
       "policyName": "worker-agent-deny-admin-ops",
       "effect": "EFFECT_DENY",
+      "consensus": "approvers.any(user, user.tags.contains('worker-agent'))",
       "condition": "activity.action in ['CREATE_USERS_V2', 'DELETE_USERS', 'CREATE_POLICY', 'DELETE_POLICY', 'UPDATE_POLICY', 'UPDATE_ROOT_QUORUM', 'DELETE_WALLETS', 'EXPORT_WALLET', 'EXPORT_WALLET_ACCOUNT', 'CREATE_SUB_ORGANIZATION']",
       "notes": "Block worker agent from all administrative operations"
     }

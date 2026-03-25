@@ -27,6 +27,19 @@ An agent operating with a scoped API key inside a sub-organization.
 - Three agent personas define access levels: **Worker** (sign only), **Observer** (read only), **Admin** (sign + manage)
 - Use `agentic-wallet-workflow` to provision an agent with the appropriate persona. See the [agent personas reference](skills/agentic-wallet-workflow/references/agent-personas.md) for policy templates.
 
+### Policy Safety Warning
+
+**Policies control access to real wallets holding real funds. AI-generated policy conditions can contain subtle errors that pass validation but create unintended access or lock out legitimate operations. There is no undo for a policy that grants the wrong access to a signing key.**
+
+These skills instruct the AI assistant to stop and confirm with the human before creating, updating, or deleting any policy. However, the human is solely responsible for:
+
+- **Reviewing every policy** before it is submitted. Do not approve policies you do not fully understand.
+- **Following deny-first methodology.** DENY guardrails must be in place before ALLOW policies are created. Skipping this order creates a window of unintended access.
+- **Verifying the full policy set** after changes. Individual policies may be correct but combine to produce unintended behavior (e.g., a broad ALLOW that overrides a narrow DENY, or missing coverage for a resource type).
+- **Testing on testnet first.** A misconfigured policy on mainnet can permanently lock funds or allow unauthorized withdrawals, recoverable only through root quorum intervention.
+
+These skills are tools, not substitutes for human judgment on security-critical decisions.
+
 ## Skill Routing
 
 | User asks about... | Skill to load |

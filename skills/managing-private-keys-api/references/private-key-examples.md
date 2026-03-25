@@ -190,7 +190,7 @@ The response activity result contains:
 Decrypt the `exportBundle` using HPKE with your local private key. The output format depends on the key type:
 
 - **Default (hex):** Raw key bytes as a hexadecimal string. Works with most blockchain tooling.
-- **Solana:** 64-byte array containing both private and public key bytes. Required for Solana CLI tools.
+- **Solana:** 64-byte array containing both private and public key bytes. Required for Solana tooling.
 
 ## Private key import flow (HPKE)
 

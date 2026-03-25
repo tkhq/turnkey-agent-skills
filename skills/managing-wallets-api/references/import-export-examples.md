@@ -146,4 +146,4 @@ When exporting or importing keys, the format determines how the key material is 
 
 - **mnemonic** (default for wallets): BIP-39 seed phrase (12, 15, 18, 21, or 24 words). Used for HD wallet export and import.
 - **hexadecimal** (default for private keys and wallet accounts): Raw key bytes as a hex string. Standard format for most blockchain tooling.
-- **solana**: Solana-specific format that includes both the private and public key in a single 64-byte array. Required when importing or exporting keys for use with Solana CLI tools.
+- **solana**: Solana-specific format that includes both the private and public key in a single 64-byte array. Required when importing or exporting keys for use with Solana tooling.

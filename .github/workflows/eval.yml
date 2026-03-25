@@ -49,7 +49,7 @@ jobs:
           fi
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      - name: Install Claude CLI
+      - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
       - name: Run trigger eval
         env:

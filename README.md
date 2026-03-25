@@ -164,7 +164,6 @@ turnkey-agent-skills/
     setup-account-workflow/       # Organization bootstrapping
     wallet-governance-workflow/   # Governance and access control
     creating-skills/              # Meta skill for contributors
-  docs/                           # API resource mapping and architecture
   template/                       # Skeleton for new skills
 ```
 

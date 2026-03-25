@@ -294,4 +294,3 @@ For complete examples organized by use case, see [references/policy-api-examples
 - `managing-wallets-api` for wallet setup (policies govern wallet operations)
 - `signing-transactions-api` for signing transactions (policies govern signing)
 - `managing-users-api` for user and organization management
-- `wallet-governance-workflow` for production hardening (policies, scoped users, governance)

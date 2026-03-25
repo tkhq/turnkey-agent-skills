@@ -6,7 +6,7 @@ For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
 
 ## Before You Start
 
-Check your environment variables. If `TURNKEY_API_PUBLIC_KEY` is unset, start with the `setup-account-workflow` skill to bootstrap your organization, generate API keys, and create your first wallet.
+Check your environment variables. If `TURNKEY_API_PUBLIC_KEY` is unset, start with the `managing-users-api` skill to generate API keys, then use `managing-wallets-api` to create your first wallet.
 
 ## How These Skills Get Used
 
@@ -24,14 +24,13 @@ An agent operating with a scoped API key inside a sub-organization.
 
 - Should not have a root key
 - Permissions come from policies (deny-by-default)
-- Use `wallet-governance-workflow` to set up scoped access, policies, and hardened quorum before giving an agent access
+- Use `managing-policies-api` and `managing-organizations-api` to set up scoped access, policies, and hardened quorum before giving an agent access
 
 ## Skill Routing
 
 | User asks about... | Skill to load |
 |---|---|
-| Getting started, no API key yet | `setup-account-workflow` |
-| Setting up agent wallets with governance | `wallet-governance-workflow` |
+| Getting started, no API key yet | `managing-users-api` |
 | Creating or managing HD wallets | `managing-wallets-api` |
 | Standalone private keys or key tags | `managing-private-keys-api` |
 | Signing or broadcasting transactions | `signing-transactions-api` |
@@ -81,15 +80,6 @@ cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skil
 | `monitoring-activities-api` | 5 | Activity lifecycle, consensus approval, audit trails |
 | `managing-users-api` | 18 | User lifecycle, API keys, user tags |
 | `managing-organizations-api` | 9 | Sub-orgs, root quorum, org features |
-
-### Workflows (multi-step orchestration)
-
-Compose multiple primitives into end-to-end guides.
-
-| Skill | Description |
-|-------|-------------|
-| `setup-account-workflow` | Bootstrap a Turnkey org from zero: API keys, wallets, first signature |
-| `wallet-governance-workflow` | Add governance, policies, scoped users, and root quorum hardening |
 
 ### Meta
 
@@ -161,8 +151,6 @@ turnkey-agent-skills/
     monitoring-activities-api/    # Activity lifecycle and consensus (5 endpoints)
     managing-users-api/           # Users, API keys, user tags (18 endpoints)
     managing-organizations-api/   # Orgs, sub-orgs, quorum (9 endpoints)
-    setup-account-workflow/       # Organization bootstrapping
-    wallet-governance-workflow/   # Governance and access control
     creating-skills/              # Meta skill for contributors
   template/                       # Skeleton for new skills
 ```

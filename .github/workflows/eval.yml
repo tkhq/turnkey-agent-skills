@@ -33,8 +33,6 @@ jobs:
           - monitoring-activities-api
           - managing-users-api
           - managing-organizations-api
-          - setup-account-workflow
-          - wallet-governance-workflow
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

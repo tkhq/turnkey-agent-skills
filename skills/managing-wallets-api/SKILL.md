@@ -297,4 +297,3 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 - `managing-private-keys-api` for standalone private keys (single-purpose keys not derived from an HD wallet)
 - `signing-transactions-api` for signing transactions with wallet addresses
 - `managing-policies-api` for access control on wallets
-- `setup-account-workflow` for end-to-end organization bootstrapping (install, keys, wallets, first signature)

@@ -155,4 +155,5 @@ For detailed examples of each workflow, see [references/activity-examples.md](re
 - `signing-transactions-api` for signing transactions (returns activities)
 - `managing-policies-api` for creating consensus policies that trigger approval workflows
 - `managing-users-api` for user management and authentication setup
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-organizations-api` for organization management

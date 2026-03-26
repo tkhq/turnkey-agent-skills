@@ -287,4 +287,5 @@ See [references/treasury-operations-examples.md](references/treasury-operations-
 - `signing-transactions-api` for signing and broadcasting transactions
 - `managing-policies-api` for policy creation, evaluation, and smart contract interfaces
 - `managing-users-api` for user creation, API keys, and user tags
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `monitoring-activities-api` for activity status, consensus approval, and audit proofs

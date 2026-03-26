@@ -308,6 +308,7 @@ For the complete end-to-end walkthrough with full request/response JSON, see [re
 - `managing-organizations-api` for sub-org creation and deletion
 - `managing-wallets-api` for wallet and account management
 - `managing-users-api` for agent user provisioning and API key rotation
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-policies-api` for access control and transaction governance
 - `monitoring-activities-api` for activity tracking and audit
 - `signing-transactions-api` for transaction signing

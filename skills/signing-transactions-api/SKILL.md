@@ -288,3 +288,4 @@ If a policy requires multi-party approval, status will be `ACTIVITY_STATUS_CONSE
 - `managing-wallets-api` for wallet setup and address derivation.
 - `managing-policies-api` for transaction governance and spending limits.
 - `managing-users-api` for API key setup and authentication.
+- `stamping-api` for constructing X-Stamp authentication headers manually.

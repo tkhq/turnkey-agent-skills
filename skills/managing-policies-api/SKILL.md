@@ -312,3 +312,4 @@ For complete examples organized by use case, see [references/policy-api-examples
 - `managing-wallets-api` for wallet setup (policies govern wallet operations)
 - `signing-transactions-api` for signing transactions (policies govern signing)
 - `managing-users-api` for user and organization management
+- `stamping-api` for constructing X-Stamp authentication headers manually

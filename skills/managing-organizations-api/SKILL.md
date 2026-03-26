@@ -228,6 +228,7 @@ All mutation endpoints (`submit/`) return an activity object with `status`, `typ
 ## Related Skills
 
 - `managing-users-api` for user provisioning, API key management, and authentication setup
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-wallets-api` for wallet creation and address derivation
 - `managing-policies-api` for access control and transaction governance
 - `monitoring-activities-api` for tracking activity status and history

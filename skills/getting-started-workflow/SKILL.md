@@ -23,7 +23,7 @@ Requires API credentials configured via the managing-users-api skill. You need t
 - `TURNKEY_API_PRIVATE_KEY`: Your P-256 private key (hex)
 - `TURNKEY_ORGANIZATION_ID`: Your organization ID
 
-All requests must be signed with your P-256 key pair using Turnkey's stamp authentication.
+All requests must be signed with your P-256 key pair using Turnkey's stamp authentication (see `stamping-api` for construction details).
 
 ## Phase 1: Verify Your Credentials
 
@@ -155,6 +155,7 @@ For the complete walkthrough with full request/response JSON for every step, see
 ## Related Skills
 
 - `managing-users-api` for API key setup and authentication
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-wallets-api` for wallet and account management
 - `signing-transactions-api` for transaction signing
 - `agentic-wallet-workflow` for setting up agent wallets with scoped access

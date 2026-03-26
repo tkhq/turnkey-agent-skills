@@ -23,7 +23,7 @@ Every submit endpoint returns an activity object: `{ activity: { id, status, typ
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. All requests must be signed with your P-256 key pair using Turnkey's stamp authentication.
+Requires API credentials configured via the managing-users-api skill. All requests must be signed with your P-256 key pair using Turnkey's stamp authentication (see `stamping-api` for construction details).
 
 ## Instructions
 
@@ -299,6 +299,7 @@ For multi-chain wallet creation examples and all supported chains, see [referenc
 ## Related Skills
 
 - `managing-users-api` for API key setup and authentication (required before wallet operations)
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-private-keys-api` for standalone private keys (single-purpose keys not derived from an HD wallet)
 - `signing-transactions-api` for signing transactions with wallet addresses
 - `managing-policies-api` for access control on wallets

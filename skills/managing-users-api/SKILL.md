@@ -17,7 +17,7 @@ Use the Turnkey API to manage users, API keys, and user tags within your organiz
 
 ## Authentication
 
-Every request must include an `X-Stamp` header containing a Base64URL-encoded JSON stamp with your hex-encoded public key, a hex-encoded DER ECDSA signature of the request body, and `"scheme": "SIGNATURE_SCHEME_TK_API_P256"`. All examples below assume this header is present.
+Every request must include an `X-Stamp` header containing a Base64URL-encoded JSON stamp with your hex-encoded public key, a hex-encoded DER ECDSA signature of the request body, and `"scheme": "SIGNATURE_SCHEME_TK_API_P256"`. For step-by-step stamp construction details, see the `stamping-api` skill. All examples below assume this header is present.
 
 ## Instructions
 
@@ -343,6 +343,7 @@ All submit endpoints return an activity object. Poll the activity status if it i
 
 ## Related Skills
 
+- `stamping-api` for constructing X-Stamp authentication headers manually
 - `managing-wallets-api` for wallet creation and address derivation
 - `signing-transactions-api` for signing transactions
 - `managing-policies-api` for access control and governance

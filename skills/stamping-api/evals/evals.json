@@ -1,0 +1,51 @@
+[
+  {
+    "skills": ["stamping-api"],
+    "query": "How do I construct an X-Stamp header for the Turnkey API manually?",
+    "expected_behavior": [
+      "Describes the 5-step stamp construction process: sign body, hex-encode DER, build JSON, base64url encode, attach header",
+      "Specifies ECDSA P-256 with SHA-256 digest",
+      "Shows the stamp JSON structure with publicKey, signature, and scheme fields",
+      "Mentions SIGNATURE_SCHEME_TK_API_P256 as the scheme value"
+    ]
+  },
+  {
+    "skills": ["stamping-api"],
+    "query": "I want to sign Turnkey API requests in Python without using the SDK. Show me how to construct the stamp.",
+    "expected_behavior": [
+      "Provides a Python code example using the cryptography library",
+      "Shows ECDSA P-256 signing of the request body with SHA-256",
+      "Shows hex encoding of the DER signature",
+      "Shows base64url encoding of the stamp JSON without padding"
+    ]
+  },
+  {
+    "skills": ["stamping-api"],
+    "query": "My Turnkey API requests keep failing with 'invalid stamp'. How do I debug this?",
+    "expected_behavior": [
+      "Suggests verifying the signed bytes match the exact request body",
+      "Suggests checking that the public key in the stamp matches the registered key",
+      "Mentions checking DER hex encoding vs raw signature format",
+      "Mentions verifying base64url encoding has no padding characters"
+    ]
+  },
+  {
+    "skills": ["stamping-api"],
+    "query": "What is the difference between X-Stamp and X-Stamp-Webauthn headers in Turnkey?",
+    "expected_behavior": [
+      "Explains X-Stamp is for API key authentication with base64url-encoded stamp JSON",
+      "Explains X-Stamp-Webauthn is for WebAuthn authentication with plain JSON",
+      "Describes the WebAuthn stamp structure with credentialId, authenticatorData, clientDataJson, signature",
+      "Notes that WebAuthn stamps are not base64url encoded"
+    ]
+  },
+  {
+    "skills": ["stamping-api", "managing-users-api"],
+    "query": "I need to generate a P-256 key pair and then use it to stamp Turnkey API requests manually",
+    "expected_behavior": [
+      "References managing-users-api for key generation and registration",
+      "Shows how to construct the stamp with the generated key pair",
+      "Explains the public key must be registered with Turnkey before stamps will be accepted"
+    ]
+  }
+]

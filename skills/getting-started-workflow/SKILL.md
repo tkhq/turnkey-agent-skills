@@ -23,13 +23,13 @@ Requires API credentials configured via the managing-users-api skill. You need t
 - `TURNKEY_API_PRIVATE_KEY`: Your P-256 private key (hex)
 - `TURNKEY_ORGANIZATION_ID`: Your organization ID
 
-All requests must be signed with your P-256 key pair using Turnkey's stamp authentication (see `stamping-api` for construction details).
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Phase 1: Verify Your Credentials
 
 Confirm your API key works before creating any resources.
 
-> Skill: managing-users-api
+Full API key setup reference: `managing-users-api`
 
 ```
 POST https://api.turnkey.com/public/v1/query/whoami
@@ -51,7 +51,7 @@ Before creating a wallet, decide which chains you need:
 - **EVM + Solana**: Most common for multi-chain apps. Two accounts.
 - **Custom**: See managing-wallets-api for all supported chains and address formats.
 
-> Skill: managing-wallets-api
+Full wallet reference: `managing-wallets-api`
 
 **Create the wallet (EVM + Solana example):**
 
@@ -100,7 +100,7 @@ This returns all derived addresses for your wallet. Save the Ethereum address fo
 
 Confirm your full setup works end to end by signing a test message.
 
-> Skill: signing-transactions-api
+Full signing reference: `signing-transactions-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/sign_raw_payload
@@ -154,9 +154,8 @@ For the complete walkthrough with full request/response JSON for every step, see
 
 ## Related Skills
 
-- `managing-users-api` for API key setup and authentication
-- `stamping-api` for constructing X-Stamp authentication headers manually
-- `managing-wallets-api` for wallet and account management
-- `signing-transactions-api` for transaction signing
-- `agentic-wallet-workflow` for setting up agent wallets with scoped access
-- `managing-policies-api` for access control and transaction governance
+- Full API key setup reference: `managing-users-api`
+- Full wallet reference: `managing-wallets-api`
+- Full signing reference: `signing-transactions-api`
+- Full agent wallet workflow reference: `agentic-wallet-workflow`
+- Full policy reference: `managing-policies-api`

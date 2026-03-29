@@ -35,6 +35,7 @@ Request bodies below show the `parameters` object for clarity. The full API enve
 ## Prerequisites
 
 Requires API keys configured (see managing-users-api skill).
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## How Policies Work
 
@@ -309,7 +310,6 @@ For complete examples organized by use case, see [references/policy-api-examples
 
 ## Related Skills
 
-- `managing-wallets-api` for wallet setup (policies govern wallet operations)
-- `signing-transactions-api` for signing transactions (policies govern signing)
-- `managing-users-api` for user and organization management
-- `stamping-api` for constructing X-Stamp authentication headers manually
+- Full wallet reference: `managing-wallets-api`
+- Full signing reference: `signing-transactions-api`
+- Full user and organization reference: `managing-users-api`

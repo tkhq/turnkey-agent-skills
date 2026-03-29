@@ -30,6 +30,7 @@ Give an AI agent its own isolated wallet on Turnkey with least-privilege policie
 ## Prerequisites
 
 Requires API credentials configured via the managing-users-api skill. You need a parent organization ID from the Turnkey dashboard (app.turnkey.com). The agent's P-256 key pair must be generated locally before onboarding.
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Phase 1: Onboarding
 
@@ -64,7 +65,7 @@ This is the recommended path. Each step references the primitive skill it comes 
 
 Create the sub-org, root user, and wallet in a single API call. This is the atomic pattern, and it prevents partial failures where a sub-org exists without a wallet.
 
-> Skill: managing-organizations-api
+Full organization reference: `managing-organizations-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/create_sub_organization
@@ -103,7 +104,7 @@ Save the `subOrganizationId` and `walletId` from the response. All subsequent ca
 
 The agent must not be a root user. Root users bypass all policies, which defeats the purpose of scoped access.
 
-> Skill: managing-users-api
+Full user management reference: `managing-users-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/create_users
@@ -130,7 +131,7 @@ Use the `organizationId` of the sub-org (not the parent). The `agent` tag is use
 
 Grant the agent permission to sign with its wallet. Without this, the agent is denied by default (implicit deny).
 
-> Skill: managing-policies-api
+Full policy reference: `managing-policies-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/create_policy
@@ -150,7 +151,7 @@ POST https://api.turnkey.com/public/v1/submit/create_policy
 
 Block the agent from dangerous operations. DENY always overrides ALLOW, so these act as hard limits.
 
-> Skill: managing-policies-api
+Full policy reference: `managing-policies-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/create_policies
@@ -181,7 +182,7 @@ Split conditions into separate policies. The policy engine does not short-circui
 
 Confirm the agent can actually sign by attempting a test payload with the agent's credentials.
 
-> Skill: signing-transactions-api
+Full signing reference: `signing-transactions-api`
 
 ```
 POST https://api.turnkey.com/public/v1/submit/sign_raw_payload
@@ -215,7 +216,7 @@ Day-2 operations organized by what the admin or agent needs to do.
 
 ### Add a new chain to the agent's wallet
 
-> Skill: managing-wallets-api
+Full wallet reference: `managing-wallets-api`
 
 Derive new accounts on the existing wallet, then update policies if the new chain needs chain-specific conditions.
 
@@ -227,7 +228,7 @@ Add Solana example: `{"walletId": "<WALLET_ID>", "accounts": [{"curve": "CURVE_E
 
 ### Rotate the agent's API key
 
-> Skill: managing-users-api
+Full user management reference: `managing-users-api`
 
 1. Generate a new P-256 key pair locally.
 2. Register the new public key: `POST /public/v1/submit/create_api_keys` with the agent's userId.
@@ -237,19 +238,19 @@ Add Solana example: `{"walletId": "<WALLET_ID>", "accounts": [{"curve": "CURVE_E
 
 ### Change agent permissions
 
-> Skill: managing-policies-api
+Full policy reference: `managing-policies-api`
 
 List current policies with `POST /public/v1/query/list_policies`, then update or replace as needed with `POST /public/v1/submit/update_policy`. To add DeFi access, upload the contract's ABI via `create_smart_contract_interface`, then create function-level policies.
 
 ### Revoke agent access immediately
 
-> Skill: managing-users-api
+Full user management reference: `managing-users-api`
 
 Delete the agent's API keys to cut access instantly: `POST /public/v1/submit/delete_api_keys`. The agent can no longer authenticate. Optionally delete the agent user and policies for cleanup. To fully decommission, delete the sub-org via `POST /public/v1/submit/delete_sub_organization`.
 
 ### Debug a denied transaction
 
-> Skill: managing-policies-api
+Full policy reference: `managing-policies-api`
 
 When the agent gets a denied transaction, use policy evaluations to find out why:
 
@@ -269,7 +270,7 @@ The response shows which policy denied the request and which condition matched. 
 
 ### Routine checks
 
-> Skill: monitoring-activities-api
+Full activity monitoring reference: `monitoring-activities-api`
 
 - List agent activities: `POST /public/v1/query/list_activities` filtered by the agent's sub-org `organizationId`
 - Check for FAILED activities (agent errors)
@@ -305,10 +306,9 @@ For the complete end-to-end walkthrough with full request/response JSON, see [re
 
 ## Related Skills
 
-- `managing-organizations-api` for sub-org creation and deletion
-- `managing-wallets-api` for wallet and account management
-- `managing-users-api` for agent user provisioning and API key rotation
-- `stamping-api` for constructing X-Stamp authentication headers manually
-- `managing-policies-api` for access control and transaction governance
-- `monitoring-activities-api` for activity tracking and audit
-- `signing-transactions-api` for transaction signing
+- Full organization reference: `managing-organizations-api`
+- Full wallet reference: `managing-wallets-api`
+- Full user management reference: `managing-users-api`
+- Full policy reference: `managing-policies-api`
+- Full activity monitoring reference: `monitoring-activities-api`
+- Full signing reference: `signing-transactions-api`

@@ -39,7 +39,7 @@ A private key is one key, one address. An HD wallet derives unlimited addresses 
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. All requests must be signed with your P-256 key pair using Turnkey's stamp authentication (see `stamping-api` for construction details).
+Requires API credentials configured via the managing-users-api skill. All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Instructions
 
@@ -275,8 +275,7 @@ Extract the endpoint-specific result from `activity.result`. For `create_private
 
 ## Related Skills
 
-- `managing-wallets-api` for HD wallets with multi-chain address derivation from a single seed
-- `signing-transactions-api` for signing transactions or raw payloads with private keys
-- `managing-policies-api` for writing access control policies that reference private key tags
-- `managing-users-api` for API key setup and user management (required before key operations)
-- `stamping-api` for constructing X-Stamp authentication headers manually
+- Full wallet reference: `managing-wallets-api`
+- Full signing reference: `signing-transactions-api`
+- Full policy reference: `managing-policies-api`
+- Full API key setup reference: `managing-users-api`

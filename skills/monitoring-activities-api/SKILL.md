@@ -16,6 +16,7 @@ Use the Turnkey API to monitor activity status, approve or reject activities req
 ## Prerequisites
 
 Requires API keys configured (see managing-users-api skill).
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Key Concept: Activities Are Universal
 
@@ -151,9 +152,8 @@ For detailed examples of each workflow, see [references/activity-examples.md](re
 
 ## Related Skills
 
-- `managing-wallets-api` for wallet creation and management (returns activities)
-- `signing-transactions-api` for signing transactions (returns activities)
-- `managing-policies-api` for creating consensus policies that trigger approval workflows
-- `managing-users-api` for user management and authentication setup
-- `stamping-api` for constructing X-Stamp authentication headers manually
-- `managing-organizations-api` for organization management
+- Full wallet reference: `managing-wallets-api`
+- Full signing reference: `signing-transactions-api`
+- Full policy reference: `managing-policies-api`
+- Full API key setup reference: `managing-users-api`
+- Full organization reference: `managing-organizations-api`

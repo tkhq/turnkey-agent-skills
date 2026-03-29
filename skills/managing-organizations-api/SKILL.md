@@ -16,6 +16,7 @@ Use the Turnkey API to create and manage organizations, sub-organizations, root 
 ## Prerequisites
 
 Requires API keys configured (see managing-users-api skill). You need your parent organization ID from the Turnkey dashboard (app.turnkey.com).
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Key Concept: Sub-Organization Isolation
 
@@ -227,8 +228,7 @@ All mutation endpoints (`submit/`) return an activity object with `status`, `typ
 
 ## Related Skills
 
-- `managing-users-api` for user provisioning, API key management, and authentication setup
-- `stamping-api` for constructing X-Stamp authentication headers manually
-- `managing-wallets-api` for wallet creation and address derivation
-- `managing-policies-api` for access control and transaction governance
-- `monitoring-activities-api` for tracking activity status and history
+- Full API key setup reference: `managing-users-api`
+- Full wallet reference: `managing-wallets-api`
+- Full policy reference: `managing-policies-api`
+- Full activity monitoring reference: `monitoring-activities-api`

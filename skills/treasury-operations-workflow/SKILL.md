@@ -35,6 +35,7 @@ Request bodies below show the `parameters` object. The full API envelope wraps t
 ## Prerequisites
 
 Requires API credentials configured via the managing-users-api skill. You need root or admin-level access to create wallets, users, and policies.
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Phase 1: Treasury Onboarding
 
@@ -282,10 +283,9 @@ See [references/treasury-operations-examples.md](references/treasury-operations-
 
 ## Related Skills
 
-- `managing-wallets-api` for wallet creation and account derivation
-- `managing-private-keys-api` for key tagging and key management
-- `signing-transactions-api` for signing and broadcasting transactions
-- `managing-policies-api` for policy creation, evaluation, and smart contract interfaces
-- `managing-users-api` for user creation, API keys, and user tags
-- `stamping-api` for constructing X-Stamp authentication headers manually
-- `monitoring-activities-api` for activity status, consensus approval, and audit proofs
+- Full wallet reference: `managing-wallets-api`
+- Full standalone key reference: `managing-private-keys-api`
+- Full signing reference: `signing-transactions-api`
+- Full policy reference: `managing-policies-api`
+- Full user management reference: `managing-users-api`
+- Full activity monitoring reference: `monitoring-activities-api`

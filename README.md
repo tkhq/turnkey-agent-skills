@@ -1,45 +1,59 @@
 # Turnkey Agent Skills
 
-Agent skills that teach AI assistants how to use [Turnkey](https://turnkey.com) for wallet management, transaction signing, authentication, and access control. Skills are structured markdown files that AI assistants load contextually to provide accurate, up-to-date guidance for Turnkey development. Built following the [Agent Skills open standard](https://agentskills.io/specification).
+Agent skills that teach AI assistants how to use [Turnkey](https://turnkey.com) to manage wallets, sign transactions, and author rules in Turnkey's policy engine.
 
-For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
+These skills serve two personas: humans using AI tools to administer their Turnkey organization, and autonomous agents operating with scoped, policy-constrained wallet access.
 
-## Before You Start
-
-Check your environment variables. If `TURNKEY_API_PUBLIC_KEY` is unset, start with the `managing-users-api` skill to generate API keys, then use `managing-wallets-api` to create your first wallet.
+Built following the [Agent Skills open standard](https://agentskills.io/specification). For more on Turnkey, see the [Turnkey documentation](https://docs.turnkey.com).
 
 ## How These Skills Get Used
 
 ### AI-assisted administrator
 
-A human using Claude Code with their own API key to manage a Turnkey organization.
+A human using Claude Code with their own API key to manage a Turnkey organization — set policies, make wallets, and manage users.
 
-- Root key is fine here, the human owns the org
+- You can provide Claude with your root-user or personal API key.
 - The assistant should confirm before destructive operations (policy deletion, quorum changes, user removal)
 - The assistant should explain what an action will do before executing it
 
 ### Autonomous agent
 
-An agent operating with a scoped API key inside a sub-organization.
+An agent operating with a scoped API key, typically using a Turnkey wallet to transact.
 
-- Should not have a root key
+- Should not have a root key — instead, should use an API key which is tightly scoped. For example, the autonomous agent should not have permissions to change policies.
 - Permissions come from policies (deny-by-default)
-- Three agent personas define access levels: **Worker** (sign only), **Observer** (read only), **Admin** (sign + manage)
-- Use `agentic-wallet-workflow` to provision an agent with the appropriate persona. See the [agent personas reference](skills/agentic-wallet-workflow/references/agent-personas.md) for policy templates.
+- If you have been using an AI assistant to manage your Turnkey organization, use `agentic-wallet-workflow` to set up an agentic wallet from scratch. The workflow creates a wallet, non-root agent user, and least-privilege policies — then outputs scoped API credentials for the admin to inject into the agent's runtime.
+- The workflow applies one of two personas that control what the agent can do:
+  - **Worker** (default) — can sign transactions, nothing else. Use for trading bots, payment processors, DeFi agents.
+  - **Observer** — read-only. Use for dashboards, compliance monitoring, balance tracking.
+- See [agent personas reference](skills/agentic-wallet-workflow/references/agent-personas.md) for the complete policy templates behind each persona.
 
-### ⚠️ Policy Safety Warning
+### ⚠️ Safety Warning
 
 > [!CAUTION]
-> **Policies control access to real wallets holding real funds.** AI-generated policy conditions can contain subtle errors that pass validation but create unintended access or lock out legitimate operations. There is no undo for a policy that grants the wrong access to a signing key.
+> **These skills control access to real wallets holding real funds.** A misconfigured policy or overly broad permission can allow an agent to irreversibly send funds. AI-generated policy conditions can contain subtle errors that pass validation but create unintended access.
 
 These skills instruct the AI assistant to stop and confirm with the human before creating, updating, or deleting any policy. However, the human is solely responsible for:
 
 - **Reviewing every policy** before it is submitted. Do not approve policies you do not fully understand.
-- **Following deny-first methodology.** DENY guardrails must be in place before ALLOW policies are created. Skipping this order creates a window of unintended access.
+- **Keeping ALLOW policies narrow.** Turnkey denies everything by default — each ALLOW policy you add is an exception. Broad exceptions (wide address allowlists, high spending limits) compound risk.
 - **Verifying the full policy set** after changes. Individual policies may be correct but combine to produce unintended behavior (e.g., a broad ALLOW that overrides a narrow DENY, or missing coverage for a resource type).
-- **Testing on testnet first.** A misconfigured policy on mainnet can permanently lock funds or allow unauthorized withdrawals, recoverable only through root quorum intervention.
 
 These skills are tools, not substitutes for human judgment on security-critical decisions.
+
+## Before You Start
+
+All skills require Turnkey API credentials. If you are an **AI-assisted administrator**, set them in your environment:
+
+```env
+TURNKEY_API_PUBLIC_KEY=    # API key public component (hex)
+TURNKEY_API_PRIVATE_KEY=   # API key private component (P-256 hex)
+TURNKEY_ORGANIZATION_ID=   # Organization UUID
+```
+
+If you don't have credentials yet, use `getting-started-workflow` to walk through account setup, API key generation, and creating your first wallet.
+
+To set up an autonomous agent, you'll use these same credentials to run `agentic-wallet-workflow`, which generates a separate set of scoped credentials for the agent.
 
 ## Skill Routing
 
@@ -47,7 +61,6 @@ These skills are tools, not substitutes for human judgment on security-critical 
 |---|---|
 | Getting started, first wallet, new to Turnkey | `getting-started-workflow` |
 | Setting up an agent wallet with scoped access | `agentic-wallet-workflow` |
-| Setting up a company treasury | `treasury-operations-workflow` |
 | Creating or managing HD wallets | `managing-wallets-api` |
 | Standalone private keys or key tags | `managing-private-keys-api` |
 | Signing or broadcasting transactions | `signing-transactions-api` |
@@ -58,9 +71,7 @@ These skills are tools, not substitutes for human judgment on security-critical 
 | Why a transaction was denied | `managing-policies-api` |
 | Pending approvals, activity status | `monitoring-activities-api` |
 | Creating users, API keys, key rotation | `managing-users-api` |
-| Sub-organizations, multi-tenancy | `managing-organizations-api` |
 | Root quorum or org feature flags | `managing-organizations-api` |
-| Building a new skill for this repo | `creating-skills` |
 
 ## Quick Start
 
@@ -69,7 +80,6 @@ These skills are tools, not substitutes for human judgment on security-critical 
 ```bash
 git clone https://github.com/tkhq/turnkey-agent-skills.git
 cd turnkey-agent-skills
-npm install  # installs eval/validation tooling
 ```
 
 Then start Claude Code from the repo directory. Skills are automatically discovered from the `skills/` folder.
@@ -86,109 +96,28 @@ cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skil
 
 ### Primitives (Turnkey HTTP API)
 
-7 skills covering 78 endpoints at `https://api.turnkey.com`.
-
-| Skill | Endpoints | Description |
-|-------|-----------|-------------|
-| `managing-wallets-api` | 13 | HD wallet creation, account derivation, import/export |
-| `managing-private-keys-api` | 11 | Standalone private keys, tags for policy targeting |
-| `signing-transactions-api` | 10 | Signing, sponsored broadcasts, balance/nonce queries |
-| `managing-policies-api` | 12 | Policy CRUD, smart contract interfaces, evaluation debugging |
-| `monitoring-activities-api` | 5 | Activity lifecycle, consensus approval, audit trails |
-| `managing-users-api` | 18 | User lifecycle, API keys, user tags |
-| `managing-organizations-api` | 9 | Sub-orgs, root quorum, org features |
+| Skill | Description |
+|-------|-------------|
+| `managing-wallets-api` | HD wallet creation, account derivation, import/export |
+| `managing-private-keys-api` | Standalone private keys, tags for policy targeting |
+| `signing-transactions-api` | Signing, sponsored broadcasts, balance/nonce queries |
+| `managing-policies-api` | Policy CRUD, smart contract interfaces, evaluation debugging |
+| `monitoring-activities-api` | Activity lifecycle, consensus approval, audit trails |
+| `managing-users-api` | User lifecycle, API keys, user tags |
+| `managing-organizations-api` | Root quorum, org features |
 
 ### Workflows (multi-step orchestration)
 
-Compose multiple primitives into end-to-end guides covering onboarding, management, and monitoring.
+Compose multiple primitives into end-to-end guides.
 
 | Skill | Description |
 |-------|-------------|
 | `getting-started-workflow` | Day-0 onboarding: verify credentials, create first wallet, sign first transaction |
-| `agentic-wallet-workflow` | Give an AI agent scoped wallet access: sub-org, wallet, policies, credentials |
-| `treasury-operations-workflow` | Set up and operate a company treasury: hot/cold wallets, multi-sig, payments |
+| `agentic-wallet-workflow` | Give an AI agent scoped wallet access: wallet, policies, credentials |
 
-### Meta
-
-| Skill | Description |
-|-------|-------------|
-| `creating-skills` | For contributors: create, evaluate, and improve Turnkey agent skills |
-
-## Environment Setup
-
-All skills require Turnkey API credentials. Get them from the [Turnkey Dashboard](https://app.turnkey.com) under **Settings > API Keys**.
-
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-```env
-TURNKEY_API_PUBLIC_KEY=    # API key public component (hex)
-TURNKEY_API_PRIVATE_KEY=   # API key private component (P-256 hex)
-TURNKEY_ORGANIZATION_ID=   # Organization UUID
-SIGN_WITH=                 # Address or public key of the wallet account to sign with
-```
-
-Skills reference these credentials in API request bodies.
-
-## Creating Your Own Skills
-
-Use the `creating-skills` skill to build new skills with eval-driven development:
-
-```
-Create a new skill for Cosmos chain signing
-```
-
-Or follow the manual workflow:
-
-1. Copy `template/` to `skills/your-skill-name/`
-2. Edit `SKILL.md` with frontmatter and instructions
-3. Add code examples in `references/`
-4. Write evals in `evals/evals.json` and `evals/triggers.json`
-5. Validate: `npm run validate -- skills/your-skill-name`
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
-
-## Running Evals
-
-```bash
-# Validate all skills
-npm run validate
-
-# Test trigger accuracy for a skill
-npm run eval -- --skill managing-wallets-api
-
-# Run improvement loop
-npm run eval:loop -- --skill managing-wallets-api
-
-# Generate HTML report
-npm run report -- --skill managing-wallets-api
-```
-
-## Project Structure
-
-```
-turnkey-agent-skills/
-  skills/
-    managing-wallets-api/         # HD wallets and accounts (13 endpoints)
-    managing-private-keys-api/    # Standalone keys and tags (11 endpoints)
-    signing-transactions-api/     # Signing, broadcasting, queries (10 endpoints)
-    managing-policies-api/        # Policies and smart contracts (12 endpoints)
-    monitoring-activities-api/    # Activity lifecycle and consensus (5 endpoints)
-    managing-users-api/           # Users, API keys, user tags (18 endpoints)
-    managing-organizations-api/   # Orgs, sub-orgs, quorum (9 endpoints)
-    getting-started-workflow/     # Day-0 onboarding
-    agentic-wallet-workflow/      # Agent wallet setup and lifecycle
-    treasury-operations-workflow/ # Treasury setup and operations
-    creating-skills/              # Meta skill for contributors
-  template/                       # Skeleton for new skills
-```
-
-Each skill contains:
-- `SKILL.md` - Main instructions with YAML frontmatter (loaded when skill triggers)
-- `references/` - Detailed code examples (loaded on demand)
-- `evals/` - Trigger tests and functional evaluations
+Each skill folder contains:
+- `SKILL.md` — main instructions with YAML frontmatter (loaded when skill triggers)
+- `references/` — detailed code examples (loaded on demand)
 
 ## License
 

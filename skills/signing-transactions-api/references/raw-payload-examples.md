@@ -66,7 +66,7 @@ Hash the transaction bytes with blake2b externally before passing to Turnkey. Th
 
 ```json
 {
-  "signWith": "7Hk2VMKXGT2Rbhf5JVbMQ9ysNBqKRfGLHs8gZSBw2k34",
+  "signWith": "0x4f3c5d9b7a1e2c4d6f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
   "payload": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6abcd",
   "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
   "hashFunction": "HASH_FUNCTION_NOT_APPLICABLE"

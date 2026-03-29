@@ -3,7 +3,7 @@
  * Analyzes trigger eval failures and generates improved descriptions.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/improve-description.ts --skill creating-wallets
+ *   npx tsx scripts/improve-description.ts --skill creating-wallets
  *
  * Adapted from Anthropic's skill-creator improve_description.py (Apache 2.0).
  */

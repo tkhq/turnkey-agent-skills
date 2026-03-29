@@ -4,7 +4,7 @@
     "Give my AI agent wallet access with least-privilege policies",
     "Create a scoped wallet for my trading bot agent",
     "I need to provision agent credentials for a payment processing bot",
-    "How do I onboard an agent with its own sub-org and wallet?",
+    "How do I onboard an agent in my parent org with a scoped wallet?",
     "Rotate the API key for my agent's Turnkey wallet",
     "Revoke my agent's wallet access immediately",
     "My agent's transaction was denied, how do I debug it?",

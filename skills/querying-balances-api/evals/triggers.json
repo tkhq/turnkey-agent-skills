@@ -1,0 +1,15 @@
+{
+  "should_trigger": [
+    "Check the balance of my wallet address using the Turnkey API",
+    "How do I get wallet address balances for an Ethereum address via Turnkey?",
+    "What assets are supported on Base using the Turnkey API?",
+    "List supported assets for Solana via Turnkey",
+    "What does this address hold on Base?"
+  ],
+  "should_not_trigger": [
+    "Sign an Ethereum transaction using the Turnkey API",
+    "How do I send a sponsored transaction with Turnkey?",
+    "Create a new wallet with the Turnkey API",
+    "Set up a policy to restrict signing"
+  ]
+}

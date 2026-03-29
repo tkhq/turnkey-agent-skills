@@ -6,7 +6,7 @@ Turnkey can sponsor gas fees so users pay nothing. Unlike sign_transaction and s
 
 ## EVM: Send Sponsored Transaction
 
-Turnkey handles gas estimation, nonce management, signing, and broadcasting.
+Turnkey handles sponsored execution, signing, and broadcasting. For sponsored EVM requests, do not send `gasLimit`, `maxFeePerGas`, or `maxPriorityFeePerGas`; those fields are only used for non-sponsored requests.
 
 **Step 1: Check gas usage (recommended before large batches)**
 
@@ -203,7 +203,7 @@ Sponsored transactions are async. After submitting, poll until confirmed or fail
 | `INCLUDED` | Transaction confirmed on-chain |
 | `FAILED` | Transaction failed (check `txError` and `error` fields) |
 
-Poll every 2 seconds until status is `INCLUDED` or `FAILED`. The `error` field contains detailed revert information for failed EVM transactions, including decoded custom errors and panic codes. For Solana failures, the `error.solana` field includes program logs and RPC error details.
+Poll every 2 seconds until status is `INCLUDED` or `FAILED`. Stop after a bounded timeout window that matches the caller's UX needs, then surface the last known status and `sendTransactionStatusId` so they can resume polling without resubmitting. The `error` field contains detailed revert information for failed EVM transactions, including decoded custom errors and panic codes. For Solana failures, the `error.solana` field includes program logs and RPC error details.
 
 ### Polling Pattern
 

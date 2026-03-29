@@ -2,7 +2,7 @@
 name: managing-private-keys-api
 description: "Manages standalone private keys and private key tags using the Turnkey API. Covers key creation, deletion, import, export, and tag-based grouping for policy targeting. Use when asked to 'create a private key', 'standalone key', 'private key tag', 'export private key', 'import private key', 'list private keys via API', 'delete a private key', 'tag a private key for policy', or 'create a signing key with Turnkey API'. Do NOT use for HD wallets or multi-chain address derivation (use managing-wallets-api), signing transactions or raw payloads (use signing-transactions-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -39,7 +39,7 @@ A private key is one key, one address. An HD wallet derives unlimited addresses 
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+Requires API credentials. Start with `getting-started-workflow` if the caller still needs initial setup. All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Instructions
 

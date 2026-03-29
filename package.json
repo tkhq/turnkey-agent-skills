@@ -6,12 +6,12 @@
   "description": "Agent skills for Turnkey wallet infrastructure",
   "license": "Apache-2.0",
   "scripts": {
-    "validate": "tsx skills/creating-skills/scripts/validate.ts",
-    "eval": "tsx skills/creating-skills/scripts/eval-triggers.ts",
-    "eval:all": "tsx skills/creating-skills/scripts/eval-all.ts",
-    "eval:ci": "tsx skills/creating-skills/scripts/eval-triggers.ts --threshold 90 --concurrency 4",
-    "eval:loop": "tsx skills/creating-skills/scripts/eval-loop.ts",
-    "report": "tsx skills/creating-skills/scripts/generate-report.ts"
+    "validate": "tsx scripts/validate.ts",
+    "eval": "tsx scripts/eval-triggers.ts",
+    "eval:all": "tsx scripts/eval-all.ts",
+    "eval:ci": "tsx scripts/eval-triggers.ts --threshold 90 --concurrency 4",
+    "eval:loop": "tsx scripts/eval-loop.ts",
+    "report": "tsx scripts/generate-report.ts"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -3,8 +3,8 @@
  * Discovers skills automatically, runs eval-triggers.ts for each, and prints a summary.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/eval-all.ts
- *   npx tsx skills/creating-skills/scripts/eval-all.ts --threshold 90 --concurrency 4
+ *   npx tsx scripts/eval-all.ts
+ *   npx tsx scripts/eval-all.ts --threshold 90 --concurrency 4
  */
 
 import { execSync } from "child_process";
@@ -68,7 +68,7 @@ function main() {
     console.log(`--- ${skill} ---`);
     try {
       execSync(
-        `npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill ${skill} --threshold ${threshold} --concurrency ${concurrency}`,
+        `npx tsx scripts/eval-triggers.ts --skill ${skill} --threshold ${threshold} --concurrency ${concurrency}`,
         { stdio: "inherit", timeout: 600000 }
       );
 

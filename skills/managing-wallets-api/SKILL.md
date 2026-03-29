@@ -2,7 +2,7 @@
 name: managing-wallets-api
 description: "Manages HD wallets and blockchain accounts via the Turnkey HTTP API. Covers wallet creation, querying, updating, deletion, account derivation, and import/export of mnemonics and account keys. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, and Sei. Use when asked to 'create a wallet', 'list wallets', 'get wallet details', 'update wallet', 'delete wallet', 'derive an address', 'export wallet mnemonic', 'export wallet account key', 'import a wallet', 'add a chain to my wallet', or 'list wallet accounts'. Do NOT use for standalone private keys (use managing-private-keys-api), signing (use signing-transactions-api), or policies (use managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "2.0.0"
   author: turnkey
@@ -23,7 +23,7 @@ Every submit endpoint returns an activity object: `{ activity: { id, status, typ
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+Requires API credentials. Start with `getting-started-workflow` if the caller still needs initial setup. All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
 ## Instructions
 

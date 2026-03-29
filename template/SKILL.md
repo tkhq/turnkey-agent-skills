@@ -1,10 +1,11 @@
 ---
 name: your-skill-name
-description: "Does X using Turnkey's Y API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'."
+description: "Does X using the Turnkey HTTP API. Covers A, B, and C. Use when asked to 'do X', 'perform Y', or 'set up Z'. Do NOT use for X2 (use other-skill) or Y2 (use another-skill)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "1.0.0"
+  author: turnkey
   tags: ["your-tags-here"]
 ---
 
@@ -16,7 +17,17 @@ One sentence: the simplest way to accomplish this skill's task.
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. All requests must be signed with your P-256 key pair using Turnkey's X-Stamp authentication.
+Requires Turnkey API credentials and an `organizationId`. Start with `getting-started-workflow` if the caller still needs credential setup.
+
+All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the signing format.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the JSON body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
+- For submit examples below, the full envelope is `{"type":"ACTIVITY_TYPE_...","timestampMs":"<ms>","organizationId":"<ORG_ID>","parameters":{...}}`.
 
 ## Instructions
 
@@ -28,7 +39,12 @@ POST /public/v1/submit/your_endpoint
 
 ```json
 {
-  "your": "parameters"
+  "type": "ACTIVITY_TYPE_YOUR_ACTION",
+  "timestampMs": "<current-time-ms>",
+  "organizationId": "<ORGANIZATION_ID>",
+  "parameters": {
+    "your": "parameters"
+  }
 }
 ```
 

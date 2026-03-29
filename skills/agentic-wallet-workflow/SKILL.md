@@ -1,8 +1,8 @@
 ---
 name: agentic-wallet-workflow
-description: "Gives an AI agent scoped wallet access on Turnkey. Covers onboarding (sub-org, wallet, policies), day-2 management (rotate keys, change permissions, revoke access, debug denials), and monitoring. Includes persona templates: worker agent (sign only), observer agent (read only), admin agent (sign + manage). Use when asked to 'set up agent wallet', 'scoped wallet for agent', 'provision agent credentials', 'rotate agent key', 'revoke agent access', 'debug denied agent transaction', 'monitor agent activity', 'worker agent', 'observer agent', 'admin agent', or 'agent persona'. Not for manual wallets, treasury, or standalone keys."
+description: "Gives an AI agent scoped wallet access on Turnkey. Covers onboarding in the parent org, wallet creation, policy design, key rotation, revocation, and monitoring. Includes Worker and Observer persona guidance with human-chosen constraints. Use when asked to 'set up agent wallet', 'scoped wallet for agent', 'provision agent credentials', 'rotate agent key', 'revoke agent access', 'debug denied agent transaction', 'monitor agent activity', 'worker agent', 'observer agent', or 'agent persona'. Do NOT use for manual wallets (use managing-wallets-api), treasury workflows, or standalone private keys (use managing-private-keys-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -25,22 +25,30 @@ The human is solely responsible for verifying that policies match their security
 
 ## Quick Start
 
-Give an AI agent its own isolated wallet on Turnkey with least-privilege policies, then manage and monitor it over time. This workflow composes five primitive skills (managing-organizations-api, managing-wallets-api, managing-users-api, managing-policies-api, monitoring-activities-api) into three phases: onboarding, management, and monitoring.
+Give an AI agent a non-root user, a wallet, and the narrowest set of permissions it needs. The default path keeps the agent in the parent org for simplicity; sub-org isolation is an advanced option.
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. You need a parent organization ID from the Turnkey dashboard (app.turnkey.com). The agent's P-256 key pair must be generated locally before onboarding.
+Requires a parent `organizationId` and a locally generated P-256 key pair for the agent. Start with `getting-started-workflow` if the caller still needs to verify credentials.
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` with `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return activities.
+- For policy creation, always show the human the exact policy before submitting it.
 
 ## Phase 1: Onboarding
 
-Onboarding creates an isolated environment for your agent with a wallet and scoped permissions. Before making any API calls, answer four decision gates that determine the setup path.
+Before making API calls, answer the decision gates below with the human.
 
 ### Decision Gates
 
 **1. Isolation model**
-- Sub-org (recommended): The agent gets its own sub-organization with full isolation. It cannot see other wallets, users, or policies. Use this for production agents.
-- Same-org: The agent lives in the parent org. Simpler but requires tighter policies because the agent shares namespace with everything else. Use only for development or trusted internal agents.
+- Parent org (recommended default): simplest setup for MVP agents and the preferred default here.
+- Sub-org: advanced isolation option when the team explicitly wants separate namespace boundaries.
 
 **2. Wallet type**
 - HD wallet (recommended): Derives unlimited addresses from a single seed. Supports multiple chains from one wallet.
@@ -52,53 +60,38 @@ Onboarding creates an isolated environment for your agent with a wallet and scop
 
 **4. Agent persona**
 - Worker (most common): Signs transactions. Cannot mutate guardrails or expand authority. Use for trading bots, payment processors, DeFi agents.
-- Observer: Read-only. Monitors balances, activities, and policies. Cannot sign or mutate anything. Use for dashboards and compliance.
-- Admin: Signs and manages users/policies. Cannot modify quorum or delete wallets. Use for organizational automation.
+- Observer: Read-only. Monitors balances, activities, and policies. Query access is usually enough.
 
-See [references/agent-personas.md](references/agent-personas.md) for complete policy templates for each persona.
+See [references/agent-personas.md](references/agent-personas.md) for guided Worker and Observer templates.
 
-### Onboarding Flow (Sub-Org Path)
+### Default Onboarding Flow (Parent Org Path)
 
-This is the recommended path. Each step references the primitive skill it comes from.
+Each step references the primitive skill it comes from.
 
-**Step 1: Create sub-organization with wallet (atomic)**
+**Step 1: Create the wallet**
 
-Create the sub-org, root user, and wallet in a single API call. This is the atomic pattern, and it prevents partial failures where a sub-org exists without a wallet.
-
-Full organization reference: `managing-organizations-api`
+Full wallet reference: `managing-wallets-api`
 
 ```
-POST https://api.turnkey.com/public/v1/submit/create_sub_organization
+POST https://api.turnkey.com/public/v1/submit/create_wallet
 ```
 
 ```json
 {
-  "subOrganizationName": "agent-<AGENT_NAME>",
-  "rootUsers": [{
-    "userName": "admin",
-    "apiKeys": [{
-      "apiKeyName": "admin-key",
-      "publicKey": "<ADMIN_PUBLIC_KEY>",
-      "curveType": "API_KEY_CURVE_P256"
-    }],
-    "authenticators": []
-  }],
-  "rootQuorumThreshold": 1,
-  "wallet": {
-    "walletName": "agent-wallet",
-    "accounts": [
-      {
-        "curve": "CURVE_SECP256K1",
-        "pathFormat": "PATH_FORMAT_BIP32",
-        "path": "m/44'/60'/0'/0/0",
-        "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
-      }
-    ]
-  }
+  "walletName": "agent-wallet",
+  "accounts": [
+    {
+      "curve": "CURVE_SECP256K1",
+      "pathFormat": "PATH_FORMAT_BIP32",
+      "path": "m/44'/60'/0'/0/0",
+      "addressFormat": "ADDRESS_FORMAT_ETHEREUM"
+    }
+  ],
+  "mnemonicLength": 12
 }
 ```
 
-Save the `subOrganizationId` and `walletId` from the response. All subsequent calls target the sub-org.
+Save the `walletId` and any derived addresses from the activity result.
 
 **Step 2: Create the agent user (non-root)**
 
@@ -125,60 +118,23 @@ POST https://api.turnkey.com/public/v1/submit/create_users
 }
 ```
 
-Use the `organizationId` of the sub-org (not the parent). The `agent` tag is used in policy expressions.
+Use a unique user name and keep the agent non-root.
 
-**Step 3: Create ALLOW policy for signing**
+**Step 3: Choose the constraint set before writing any policy**
 
-Grant the agent permission to sign with its wallet. Without this, the agent is denied by default (implicit deny).
+Before you create a Worker policy, ask the human to lock these decisions:
 
-Full policy reference: `managing-policies-api`
+- which wallet or address can sign
+- which destinations are allowed
+- whether there are spend caps
+- whether contract calls must be restricted by contract address or function name
+- whether raw payload signing is allowed or only chain-aware transaction signing
 
-```
-POST https://api.turnkey.com/public/v1/submit/create_policy
-```
-
-```json
-{
-  "policyName": "agent-can-sign",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'",
-  "notes": "Allow agent to sign with its designated wallet"
-}
-```
-
-**Step 4: Create DENY guardrails**
-
-Block the agent from dangerous operations. DENY always overrides ALLOW, so these act as hard limits.
+Use [references/agent-personas.md](references/agent-personas.md) to turn those choices into a Worker or Observer policy set.
 
 Full policy reference: `managing-policies-api`
 
-```
-POST https://api.turnkey.com/public/v1/submit/create_policies
-```
-
-```json
-{
-  "policies": [
-    {
-      "policyName": "agent-deny-admin-ops",
-      "effect": "EFFECT_DENY",
-      "condition": "activity.resource in ['USER', 'POLICY', 'ORGANIZATION'] || (activity.resource == 'WALLET' && activity.action in ['DELETE', 'EXPORT'])",
-      "notes": "Block agent from admin operations"
-    },
-    {
-      "policyName": "agent-deny-large-transfers",
-      "effect": "EFFECT_DENY",
-      "condition": "eth.tx.value > 1000000000000000000",
-      "notes": "Block transfers above 1 ETH (1e18 wei)"
-    }
-  ]
-}
-```
-
-Split conditions into separate policies. The policy engine does not short-circuit: if a condition references `eth.tx.value` on a non-EVM action, it errors. Separate policies avoid this.
-
-**Step 5: Verify with a test signature**
+**Step 4: Verify with a test signature**
 
 Confirm the agent can actually sign by attempting a test payload with the agent's credentials.
 
@@ -197,15 +153,15 @@ POST https://api.turnkey.com/public/v1/submit/sign_raw_payload
 }
 ```
 
-Sign this request with the agent's API key. If it succeeds, the agent is correctly provisioned. If it fails, check policy evaluations (see Phase 2, "Debug denied transaction").
+Sign this request with the agent's API key. If it fails, inspect policy evaluations before broadening access.
 
-**Step 6: Output credentials**
+**Step 5: Output credentials**
 
 Hand the following to the admin for injection into the agent's runtime environment:
 
 - Agent API public key (hex)
 - Agent API private key (hex, generated locally in Step 2)
-- Organization ID (the sub-org ID from Step 1)
+- Organization ID (the parent org by default)
 - Wallet ID and wallet address
 
 The admin provisions these as environment variables (`TURNKEY_API_PUBLIC_KEY`, `TURNKEY_API_PRIVATE_KEY`, `TURNKEY_ORGANIZATION_ID`, `SIGN_WITH`).
@@ -240,13 +196,13 @@ Full user management reference: `managing-users-api`
 
 Full policy reference: `managing-policies-api`
 
-List current policies with `POST /public/v1/query/list_policies`, then update or replace as needed with `POST /public/v1/submit/update_policy`. To add DeFi access, upload the contract's ABI via `create_smart_contract_interface`, then create function-level policies.
+List current policies with `POST /public/v1/query/list_policies`, then update or replace as needed with `POST /public/v1/submit/update_policy`. Re-run the human decision gates before widening any Worker policy.
 
 ### Revoke agent access immediately
 
 Full user management reference: `managing-users-api`
 
-Delete the agent's API keys to cut access instantly: `POST /public/v1/submit/delete_api_keys`. The agent can no longer authenticate. Optionally delete the agent user and policies for cleanup. To fully decommission, delete the sub-org via `POST /public/v1/submit/delete_sub_organization`.
+Delete the agent's API keys to cut access instantly: `POST /public/v1/submit/delete_api_keys`. The agent can no longer authenticate. Optionally delete the agent user and policies for cleanup.
 
 ### Debug a denied transaction
 
@@ -272,7 +228,7 @@ The response shows which policy denied the request and which condition matched. 
 
 Full activity monitoring reference: `monitoring-activities-api`
 
-- List agent activities: `POST /public/v1/query/list_activities` filtered by the agent's sub-org `organizationId`
+- List agent activities: `POST /public/v1/query/list_activities` filtered by the parent `organizationId`
 - Check for FAILED activities (agent errors)
 - Check for CONSENSUS_NEEDED activities (unexpected, agents should not trigger multi-sig)
 
@@ -294,14 +250,14 @@ For the complete end-to-end walkthrough with full request/response JSON, see [re
 ## Rules
 
 - **STOP before every policy step.** Present each policy (DENY guardrails and ALLOW permissions) to the human and get explicit confirmation before creating it. Do not batch policy creation without individual review.
-- Always use sub-org isolation for production agents. Same-org is acceptable only for development.
+- Use the parent org as the default path unless the human explicitly wants sub-org isolation.
 - The agent must be a non-root user. Root users bypass all policies.
-- **Deny-first, always.** Create DENY guardrails before giving the agent any credentials. DENY overrides ALLOW. Never create ALLOW policies before the corresponding DENY guardrails are in place.
-- Split policy conditions into separate policies to avoid evaluation errors from the policy engine not short-circuiting.
+- For Worker agents, choose wallet scope, destinations, spend caps, and contract/function limits before creating policies.
+- Observer agents usually need no extra ALLOW policies. Add an observer-specific DENY only when the org already has broader shared permissions.
 - Always verify the agent can sign (Step 5) before handing off credentials.
 - **After all policies are created, list the full policy set and confirm with the human that it matches their intent before proceeding to credential handoff.**
 - To revoke agent access, delete API keys first (instant), then clean up policies and users.
-- Use the `agent` user tag in policy consensus expressions so policies apply to any user tagged as an agent.
+- Prefer user-specific consensus expressions over broad shared tags when you are scoping a single agent.
 - `eth.tx.value` is in wei, `solana.tx.transfers[].amount` is in lamports, `bitcoin.tx.outputs[].value` is in satoshis.
 
 ## Related Skills

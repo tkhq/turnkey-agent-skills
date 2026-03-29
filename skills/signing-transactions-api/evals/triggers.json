@@ -20,11 +20,8 @@
     "Send a gasless Solana transaction using Turnkey",
     "How do I use eth_send_transaction with Turnkey?",
     "Send a sponsored Solana transaction via sol_send_transaction",
-    "Check the balance of my wallet address using the Turnkey API",
-    "How do I get balances for an Ethereum address via Turnkey?",
     "Get the nonce for my address using the Turnkey API",
     "How do I check gas usage for sponsored transactions on Turnkey?",
-    "List supported assets on Base using the Turnkey API",
     "Poll the status of a sponsored transaction on Turnkey",
     "How do I check if my sponsored transaction was confirmed?",
     "What is the gas station nonce and how do I get it from Turnkey?"
@@ -37,6 +34,8 @@
     "How do I create a wallet with the Turnkey API?",
     "Create a new user in my Turnkey organization",
     "How do I set up a sub-organization?",
-    "Delete a private key using the Turnkey API"
+    "Delete a private key using the Turnkey API",
+    "Check the balance of my wallet address using the Turnkey API",
+    "List supported assets on Base using the Turnkey API"
   ]
 }

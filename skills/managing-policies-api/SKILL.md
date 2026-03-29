@@ -2,12 +2,14 @@
 name: managing-policies-api
 description: "Creates and manages Turnkey policies for access control and transaction governance via HTTP API. Policies use effect (ALLOW/DENY), consensus, and condition fields. Covers spending limits, allowlists, multi-sig, smart contract interfaces (ABI upload), and policy evaluation debugging. Use when asked to 'create a policy', 'set up an allowlist', 'manage policies', 'upload a smart contract ABI', 'debug a denied transaction', or 'set up multi-sig approval'. Do NOT use for wallets (use managing-wallets-api), signing (use signing-transactions-api), or users (use managing-users-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "2.0.0"
   author: turnkey
   tags: ["policy", "api", "access-control", "governance", "security", "allowlist", "deny", "consensus", "smart-contract", "abi", "policy-evaluation", "debug"]
 ---
+
+# Managing Policies (API)
 
 ## ⚠️ CRITICAL: Human Review Required
 
@@ -34,8 +36,16 @@ Request bodies below show the `parameters` object for clarity. The full API enve
 
 ## Prerequisites
 
-Requires API keys configured (see managing-users-api skill).
+Requires API keys. Start with `getting-started-workflow` if the caller still needs credential setup.
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
+- Show the human the full policy before every submit call.
 
 ## How Policies Work
 

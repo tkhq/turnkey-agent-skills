@@ -2,12 +2,14 @@
 name: monitoring-activities-api
 description: "Monitors, approves, and audits Turnkey activities. Activities are the universal result type returned by every submit endpoint across all Turnkey skills. Covers checking activity status, listing activities with filters, consensus approval/rejection workflows, and cryptographic app proofs for audit trails. Use when asked to 'check activity status', 'list activities', 'approve a pending activity', 'reject an activity', 'consensus workflow', 'audit trail for an activity', 'why is my transaction pending', 'poll for activity completion', 'list app proofs', or 'verify an activity was executed in the enclave'. Do NOT use for creating policies (use managing-policies-api), signing transactions (use signing-transactions-api), creating wallets (use managing-wallets-api), managing users (use managing-users-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "1.0.0"
   author: turnkey
   tags: ["activity", "api", "monitoring", "consensus", "approval", "audit", "status", "app-proofs"]
 ---
+
+# Monitoring Activities (API)
 
 ## Quick Start
 
@@ -15,8 +17,15 @@ Use the Turnkey API to monitor activity status, approve or reject activities req
 
 ## Prerequisites
 
-Requires API keys configured (see managing-users-api skill).
+Requires API keys. Start with `getting-started-workflow` if the caller still needs credential setup.
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
 
 ## Key Concept: Activities Are Universal
 

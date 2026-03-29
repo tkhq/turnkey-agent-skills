@@ -26,7 +26,7 @@ An agent operating with a scoped API key, typically using a Turnkey wallet to tr
 - The workflow applies one of two personas that control what the agent can do:
   - **Worker** (default) — can sign transactions, nothing else. Use for trading bots, payment processors, DeFi agents.
   - **Observer** — read-only. Use for dashboards, compliance monitoring, balance tracking.
-- See [agent personas reference](skills/agentic-wallet-workflow/references/agent-personas.md) for the complete policy templates behind each persona.
+- See the persona references inside the workflow skills for guided policy templates that help the human choose wallet scope, destinations, and spending limits.
 
 ### ⚠️ Safety Warning
 
@@ -64,7 +64,8 @@ To set up an autonomous agent, you'll use these same credentials to run `agentic
 | Creating or managing HD wallets | `managing-wallets-api` |
 | Standalone private keys or key tags | `managing-private-keys-api` |
 | Signing or broadcasting transactions | `signing-transactions-api` |
-| Checking balances or nonces | `signing-transactions-api` |
+| Checking balances or supported assets | `querying-balances-api` |
+| Checking nonces | `signing-transactions-api` |
 | Sponsored or gasless transactions | `signing-transactions-api` |
 | Access control, spending limits, allowlists | `managing-policies-api` |
 | Smart contract ABIs for policy engine | `managing-policies-api` |
@@ -100,7 +101,8 @@ cp -r turnkey-agent-skills/skills/managing-wallets-api your-project/.claude/skil
 |-------|-------------|
 | `managing-wallets-api` | HD wallet creation, account derivation, import/export |
 | `managing-private-keys-api` | Standalone private keys, tags for policy targeting |
-| `signing-transactions-api` | Signing, sponsored broadcasts, balance/nonce queries |
+| `signing-transactions-api` | Signing, sponsored broadcasts, nonce/gas helpers |
+| `querying-balances-api` | Wallet address balances and supported asset discovery |
 | `managing-policies-api` | Policy CRUD, smart contract interfaces, evaluation debugging |
 | `monitoring-activities-api` | Activity lifecycle, consensus approval, audit trails |
 | `managing-users-api` | User lifecycle, API keys, user tags |
@@ -112,7 +114,7 @@ Compose multiple primitives into end-to-end guides.
 
 | Skill | Description |
 |-------|-------------|
-| `getting-started-workflow` | Day-0 onboarding: verify credentials, create first wallet, sign first transaction |
+| `getting-started-workflow` | Day-0 onboarding: verify credentials, create a first wallet, optionally try signing |
 | `agentic-wallet-workflow` | Give an AI agent scoped wallet access: wallet, policies, credentials |
 
 Each skill folder contains:

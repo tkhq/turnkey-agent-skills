@@ -3,8 +3,8 @@
  * Runs trigger evaluation, improves description if failing, re-evaluates.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/eval-loop.ts --skill creating-wallets
- *   npx tsx skills/creating-skills/scripts/eval-loop.ts --skill creating-wallets --max-iterations 5
+ *   npx tsx scripts/eval-loop.ts --skill creating-wallets
+ *   npx tsx scripts/eval-loop.ts --skill creating-wallets --max-iterations 5
  *
  * Adapted from Anthropic's skill-creator run_loop.py (Apache 2.0).
  */
@@ -50,7 +50,7 @@ function parseArgs(): { skill: string; maxIterations: number; targetAccuracy: nu
 function runTriggerEval(skill: string): { accuracy: number; triggerAccuracy: number; falsePositiveRate: number; passed: boolean } {
   try {
     execSync(
-      `npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill ${skill}`,
+      `npx tsx scripts/eval-triggers.ts --skill ${skill}`,
       { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }
     );
     // If it exits 0, all passed
@@ -76,7 +76,7 @@ function runTriggerEval(skill: string): { accuracy: number; triggerAccuracy: num
 function runImproveDescription(skill: string): void {
   try {
     execSync(
-      `npx tsx skills/creating-skills/scripts/improve-description.ts --skill ${skill}`,
+      `npx tsx scripts/improve-description.ts --skill ${skill}`,
       { encoding: "utf-8", stdio: "inherit" }
     );
   } catch {

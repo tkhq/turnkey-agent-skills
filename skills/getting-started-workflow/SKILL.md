@@ -1,6 +1,6 @@
 ---
 name: getting-started-workflow
-description: "Day-0 onboarding workflow that takes a user from API credentials to a working wallet and first signature. Covers credential verification, wallet creation with chain selection, and a test signature. Use when asked to 'get started with Turnkey', 'create my first wallet', 'set up Turnkey for the first time', 'verify my Turnkey API key', 'hello world with Turnkey API', 'onboard to Turnkey', 'I just got my API credentials', or 'new to Turnkey, help me set up'. Do NOT use for agent wallet setup (use agentic-wallet-workflow), treasury management (use treasury-operations-workflow), or policy management (use managing-policies-api)."
+description: "Day-0 onboarding workflow that takes a user from API credentials to a working wallet. Covers credential verification, wallet creation with chain selection, and an optional signing check. Use when asked to 'get started with Turnkey', 'create my first wallet', 'set up Turnkey for the first time', 'verify my Turnkey API key', 'hello world with Turnkey API', 'onboard to Turnkey', 'I just got my API credentials', or 'new to Turnkey, help me set up'. Do NOT use for agent wallet setup (use agentic-wallet-workflow), policy design (use managing-policies-api), or day-2 user management (use managing-users-api)."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair) from the Turnkey Dashboard (app.turnkey.com)."
 metadata:
@@ -13,11 +13,11 @@ metadata:
 
 ## Quick Start
 
-Go from "I have API keys" to "I have a wallet and signed my first transaction" in three steps: verify credentials, create a wallet, sign a test message.
+Go from "I have API keys" to "I have a wallet and know my requests are working" in two required steps: verify credentials, then create a wallet. An optional third step lets you try signing.
 
 ## Prerequisites
 
-Requires API credentials configured via the managing-users-api skill. You need three environment variables from the Turnkey Dashboard (app.turnkey.com):
+Requires three environment variables from the Turnkey Dashboard (app.turnkey.com):
 
 - `TURNKEY_API_PUBLIC_KEY`: Your P-256 public key (hex)
 - `TURNKEY_API_PRIVATE_KEY`: Your P-256 private key (hex)
@@ -25,11 +25,19 @@ Requires API credentials configured via the managing-users-api skill. You need t
 
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
 
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
+- When a primitive skill is linked below, use that skill for fuller request/response coverage.
+
 ## Phase 1: Verify Your Credentials
 
 Confirm your API key works before creating any resources.
 
-Full API key setup reference: `managing-users-api`
+If this step fails, stay in onboarding mode and fix credentials before moving on.
 
 ```
 POST https://api.turnkey.com/public/v1/query/whoami
@@ -96,9 +104,9 @@ POST https://api.turnkey.com/public/v1/query/list_wallet_accounts
 
 This returns all derived addresses for your wallet. Save the Ethereum address for the next step.
 
-## Phase 3: Sign Your First Transaction
+## Optional Phase 3: Try Signing
 
-Confirm your full setup works end to end by signing a test message.
+If you want an end-to-end signing demo, sign a test message. This is optional. `whoami` plus wallet creation already proves your credentials and org setup are working.
 
 Full signing reference: `signing-transactions-api`
 
@@ -119,28 +127,20 @@ The payload `48656c6c6f2c205475726e6b657921` is the hex encoding of "Hello, Turn
 
 Note: `HASH_FUNCTION_NO_OP` requires a pre-hashed 32-byte (64 hex character) payload. For a quick verification test, `HASH_FUNCTION_SHA256` is simpler because it accepts any payload length.
 
-If this succeeds, your setup is complete: credentials work, wallet exists, and signing is operational.
+If this succeeds, signing is operational too.
 
 ## What's Next?
 
-Now that your credentials, wallet, and signing are working, decide what kind of agent you are building. Turnkey supports three standard personas, each with a different trust level and policy set:
-
-| Persona | Can sign | Can manage users/policies | Can delete wallets | Best for |
-|---------|----------|--------------------------|-------------------|----------|
-| Worker  | Yes      | No                       | No                | Trading bots, payment processors, DeFi agents |
-| Observer| No       | No                       | No                | Monitoring dashboards, compliance auditors, balance trackers |
-| Admin   | Yes      | Yes                      | No                | Org automation, onboarding flows, policy lifecycle |
-
-Start with the **Worker** persona for most production agents. Escalate to **Admin** only when the agent needs to provision users or manage policies. Use **Observer** for read-only monitoring.
-
-Each persona comes with complete policy templates you can deploy directly. See [references/agent-personas.md](references/agent-personas.md) for the full setup including ALLOW/DENY policies and user tag configuration.
+Choose the next path based on what you are trying to do:
 
 **Next steps by persona:**
 
-- **Worker/Admin agent**: Set up scoped wallet access with `agentic-wallet-workflow`
-- **Treasury management**: Set up hot/cold wallet tiers with `treasury-operations-workflow`
-- **Access control**: Add spending limits and address allowlists with `managing-policies-api`
-- **User management**: Create additional users and API keys with `managing-users-api`
+- **Administer your org with Claude Code**: Explore `managing-wallets-api`, `managing-users-api`, `managing-policies-api`, and `managing-organizations-api`
+- **Set up an autonomous agent**: Use `agentic-wallet-workflow`
+- **Check balances or supported assets**: Use `querying-balances-api`
+- **Sign or broadcast transactions**: Use `signing-transactions-api`
+
+If you are moving into agent setup, see [references/agent-personas.md](references/agent-personas.md) for Worker and Observer planning templates.
 
 For the complete walkthrough with full request/response JSON for every step, see [references/first-wallet-walkthrough.md](references/first-wallet-walkthrough.md).
 
@@ -148,13 +148,12 @@ For the complete walkthrough with full request/response JSON for every step, see
 
 - Always verify credentials with whoami before creating resources
 - Wallet names should be descriptive and unique within the organization
-- The test signature confirms your full setup (credentials, wallet, signing) works end to end
+- The optional test signature is a demo, not a prerequisite for successful onboarding
 - One EVM account covers all EVM-compatible chains (Ethereum, Base, Polygon, Arbitrum, Optimism)
 - Check for existing wallets with `list_wallets` before creating new ones to avoid duplicates
 
 ## Related Skills
 
-- Full API key setup reference: `managing-users-api`
 - Full wallet reference: `managing-wallets-api`
 - Full signing reference: `signing-transactions-api`
 - Full agent wallet workflow reference: `agentic-wallet-workflow`

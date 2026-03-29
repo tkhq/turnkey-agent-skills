@@ -2,12 +2,14 @@
 name: managing-organizations-api
 description: "Manages Turnkey organizations, sub-organizations, root quorum, and organization features using the Turnkey HTTP API. Sub-organizations are Turnkey's multi-tenancy primitive, providing full isolation of users, wallets, and policies per tenant. Use when asked to 'create a sub-organization', 'manage organization settings', 'sub-org', 'multi-tenant setup', 'root quorum', 'update quorum threshold', 'organization features', 'update quorum', 'list sub-organizations', 'delete sub-organization', 'set organization feature', 'get organization config', or 'rename organization'. Do NOT use for user management (use managing-users-api), wallet operations (use managing-wallets-api), signing transactions (use signing-transactions-api), or policy management (use managing-policies-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "1.0.0"
   author: turnkey
   tags: ["organization", "sub-organization", "multi-tenant", "root-quorum", "features", "api", "isolation"]
 ---
+
+# Managing Organizations (API)
 
 ## Quick Start
 
@@ -15,8 +17,15 @@ Use the Turnkey API to create and manage organizations, sub-organizations, root 
 
 ## Prerequisites
 
-Requires API keys configured (see managing-users-api skill). You need your parent organization ID from the Turnkey dashboard (app.turnkey.com).
+Requires API keys and a parent organization ID from the Turnkey dashboard (app.turnkey.com). Start with `getting-started-workflow` if the caller still needs credential setup.
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
 
 ## Key Concept: Sub-Organization Isolation
 

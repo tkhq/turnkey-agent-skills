@@ -1,0 +1,20 @@
+[
+  {
+    "skills": ["querying-balances-api"],
+    "query": "Check the balance of my Ethereum address using the Turnkey API",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/get_wallet_address_balances",
+      "Includes address and caip2 in the request body",
+      "Notes the endpoint returns non-zero balances only"
+    ]
+  },
+  {
+    "skills": ["querying-balances-api"],
+    "query": "What tokens are supported on Base for Turnkey balance queries?",
+    "expected_behavior": [
+      "Shows POST /public/v1/query/list_supported_assets",
+      "Sets caip2 to eip155:8453",
+      "Notes that balance and asset queries are beta"
+    ]
+  }
+]

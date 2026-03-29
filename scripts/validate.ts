@@ -3,7 +3,7 @@
  * Checks frontmatter, naming, required files, and character limits.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/validate.ts [skills/skill-name]
+ *   npx tsx scripts/validate.ts [skills/skill-name]
  *
  * If no argument is provided, validates all skills in skills/.
  *

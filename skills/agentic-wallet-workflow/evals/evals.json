@@ -3,10 +3,11 @@
     "skills": ["agentic-wallet-workflow"],
     "query": "Set up a new agent wallet from scratch for my Ethereum trading bot",
     "expected_behavior": [
-      "Creates a sub-organization with an HD wallet atomically using POST /public/v1/submit/create_sub_organization",
-      "Creates a non-root agent user with the 'agent' tag using POST /public/v1/submit/create_users",
-      "Creates an ALLOW policy scoped to signing with the agent's wallet",
-      "Creates DENY guardrail policies for admin operations and spending limits",
+      "Uses the parent organization as the default path",
+      "Creates a wallet using POST /public/v1/submit/create_wallet",
+      "Creates a non-root agent user using POST /public/v1/submit/create_users",
+      "Collects wallet, destination, spending, and contract/function constraints before policy creation",
+      "Creates a narrowly scoped signing policy instead of a canned persona bundle",
       "Verifies the setup with a test signature",
       "Outputs the agent credentials (public key, private key, org ID, wallet address)"
     ]
@@ -28,7 +29,7 @@
     "expected_behavior": [
       "Deletes the agent's API keys via POST /public/v1/submit/delete_api_keys as the first step",
       "Explains that API key deletion is instant and the agent can no longer authenticate",
-      "Suggests optional cleanup: delete policies, delete the agent user, or delete the sub-org entirely"
+      "Suggests optional cleanup: delete policies or delete the agent user"
     ]
   },
   {
@@ -56,7 +57,7 @@
       "Explains the read-only access scope from the decision gates",
       "Creates the agent user but does NOT create an ALLOW signing policy",
       "Explains that all users can read data in their own organization by default (implicit read permission)",
-      "Still creates DENY guardrails to block admin operations"
+      "Only adds an observer-specific DENY if the broader org policy set makes it necessary"
     ]
   }
 ]

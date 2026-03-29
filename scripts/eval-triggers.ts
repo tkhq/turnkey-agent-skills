@@ -3,9 +3,9 @@
  * Tests whether a skill's description causes Claude to load it for the right queries.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets
- *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets --runs 3
- *   npx tsx skills/creating-skills/scripts/eval-triggers.ts --skill creating-wallets --threshold 90 --concurrency 4
+ *   npx tsx scripts/eval-triggers.ts --skill creating-wallets
+ *   npx tsx scripts/eval-triggers.ts --skill creating-wallets --runs 3
+ *   npx tsx scripts/eval-triggers.ts --skill creating-wallets --threshold 90 --concurrency 4
  *
  * Adapted from Anthropic's skill-creator run_eval.py (Apache 2.0).
  */

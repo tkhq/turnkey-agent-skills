@@ -1,13 +1,15 @@
 ---
 name: signing-transactions-api
-description: "Signs and broadcasts blockchain transactions using the Turnkey HTTP API. Supports signing, batch signing, sponsored/gasless transactions, balance queries, and transaction monitoring. Use when asked to 'sign a transaction via the Turnkey API', 'sign a raw payload', 'batch sign payloads', 'send a sponsored transaction', 'gasless transaction with Turnkey', 'broadcast a transaction via Turnkey', 'check balances via Turnkey API', 'get nonces', 'check gas usage', or 'list supported assets'. Do NOT use for creating wallets (use managing-wallets-api), managing policies (use managing-policies-api), managing users or API keys (use managing-users-api)."
+description: "Signs and broadcasts blockchain transactions using the Turnkey HTTP API. Supports signing, batch signing, sponsored/gasless transactions, nonce and gas queries, and transaction monitoring. Use when asked to 'sign a transaction via the Turnkey API', 'sign a raw payload', 'batch sign payloads', 'send a sponsored transaction', 'gasless transaction with Turnkey', 'broadcast a transaction via Turnkey', 'get nonces', 'check gas usage', or 'poll a send transaction status'. Do NOT use for creating wallets (use managing-wallets-api), managing policies (use managing-policies-api), managing users or API keys (use managing-users-api), or balances/assets queries (use querying-balances-api)."
 license: Apache-2.0
-compatibility: "Requires Turnkey API credentials (P-256 key pair). See managing-users-api for authentication setup."
+compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
   version: "2.0.0"
   author: turnkey
-  tags: ["signing", "api", "transactions", "ethereum", "bitcoin", "solana", "raw-payload", "multichain", "sponsored", "gasless", "balances"]
+  tags: ["signing", "api", "transactions", "ethereum", "bitcoin", "solana", "raw-payload", "multichain", "sponsored", "gasless"]
 ---
+
+# Signing Transactions (API)
 
 ## Quick Start
 
@@ -19,8 +21,16 @@ Request bodies below show the `parameters` object for clarity. The full API enve
 
 ## Prerequisites
 
-Requires API keys and a wallet with derived addresses (see managing-users-api and managing-wallets-api skills).
+Requires API keys and a wallet with derived addresses (see `getting-started-workflow` and `managing-wallets-api`).
 All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+
+## Making Requests
+
+Use direct HTTPS requests to `https://api.turnkey.com`.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
+- Examples below sometimes show only `parameters` for readability; the full submit envelope is `{"type":"ACTIVITY_TYPE_...","timestampMs":"<ms>","organizationId":"<ORG_ID>","parameters":{...}}`.
 
 ## Choosing Your Signing Method
 
@@ -97,7 +107,7 @@ Highest-level abstraction. Turnkey handles construction (EVM only), signing, bro
 }
 ```
 
-When `sponsor: true`, do not set gasLimit, maxFeePerGas, or maxPriorityFeePerGas. Turnkey estimates gas automatically. Private key IDs are not supported for `from`, only addresses.
+When `sponsor: true`, do not set `gasLimit`, `maxFeePerGas`, or `maxPriorityFeePerGas`. Those fields are only used for non-sponsored EVM sends. Private key IDs are not supported for `from`, only addresses.
 
 **Solana:** `POST /public/v1/submit/sol_send_transaction`
 
@@ -138,26 +148,6 @@ Poll every 2 seconds until `INCLUDED` or `FAILED`. For EVM, the response include
 
 ## Pre-signing Queries
 
-Before signing, you often need on-chain context. These query endpoints provide balance, nonce, gas, and asset information.
-
-### get_balances (beta)
-
-Check asset balances for an address before sending a transaction. Returns only non-zero balances.
-
-`POST /public/v1/query/get_balances`
-
-```json
-{
-  "organizationId": "<ORG_ID>",
-  "address": "0xYOUR_ADDRESS",
-  "caip2": "eip155:8453"
-}
-```
-
-Returns an array of balance objects with `caip19`, `symbol`, `balance` (atomic units), `decimals`, and `display` (USD and crypto values for presentation only). Beta feature, contact support for access.
-
-Note: The SDK method name for this endpoint may not be available in all SDK versions. If `client.getBalances` is not a function, this endpoint requires direct HTTP calls or a newer SDK version.
-
 ### get_nonces
 
 Fetch on-chain nonce and/or gas station nonce for an EVM address. Use `gasStationNonce` with sponsored transactions for replay protection.
@@ -190,22 +180,7 @@ Monitor your organization's gas sponsorship limits and current usage. Check this
 
 Returns `windowDurationMinutes`, `windowLimitUsd`, and `usageUsd`.
 
-### list_supported_assets (beta)
-
-Discover which tokens and assets are available on a given network.
-
-`POST /public/v1/query/list_supported_assets`
-
-```json
-{
-  "organizationId": "<ORG_ID>",
-  "caip2": "eip155:8453"
-}
-```
-
-Returns an array of assets with `caip19`, `symbol`, `decimals`, `name`, and `logoUrl`. Beta feature, contact support for access.
-
-For complete query examples, see [references/balance-query-examples.md](references/balance-query-examples.md).
+For balances and supported assets, use `querying-balances-api`.
 
 ## Chain-Specific Signing Guide
 
@@ -269,9 +244,8 @@ If a policy requires multi-party approval, status will be `ACTIVITY_STATUS_CONSE
 - sign_transaction enables policy engine chain-specific field inspection. sign_raw_payload(s) bypass it.
 - For Ed25519 chains (Solana, Sui, TON), use HASH_FUNCTION_NOT_APPLICABLE.
 - For Bitcoin Taproot (Schnorr), use HASH_FUNCTION_NO_OP and pre-hash the sighash yourself.
-- When `sponsor: true`, do not set gas parameters. Turnkey handles gas estimation.
+- When `sponsor: true`, do not set EVM gas fee parameters. Those fields are for non-sponsored sends.
 - Sponsored transactions are async. Always poll get_send_transaction_status after submitting.
-- Balance and asset queries (get_balances, list_supported_assets) are in beta.
 - Chain-specific units: wei (ETH), lamports (SOL), satoshis (BTC), SUN (TRX).
 
 ## Rules
@@ -289,3 +263,4 @@ If a policy requires multi-party approval, status will be `ACTIVITY_STATUS_CONSE
 - Full wallet reference: `managing-wallets-api`
 - Full policy reference: `managing-policies-api`
 - Full API key setup reference: `managing-users-api`
+- Full balances and assets reference: `querying-balances-api`

@@ -1,14 +1,14 @@
-# Balance and Query Endpoint Examples
+# Balance Query Examples
 
-Complete HTTP API examples for pre-signing query endpoints: checking balances, fetching nonces, monitoring gas usage, and discovering supported assets.
+Complete HTTP API examples for checking wallet address balances and discovering supported assets.
 
 **Base URL:** `https://api.turnkey.com`
 
-## Get Balances (beta)
+## Get Wallet Address Balances (beta)
 
 Retrieve asset balances for an address on a specific network. Returns only non-zero balances.
 
-`POST /public/v1/query/get_balances`
+`POST /public/v1/query/get_wallet_address_balances`
 
 ### EVM Balance Check
 
@@ -95,125 +95,6 @@ Retrieve asset balances for an address on a specific network. Returns only non-z
 
 Only non-zero balances are returned. If an address has no balance for an asset, it will not appear in the response. Display values are approximate and should not be used for arithmetic or transaction construction.
 
----
-
-## Get Nonces
-
-Fetch the on-chain nonce and/or gas station nonce for an EVM address. Use the gas station nonce with sponsored transactions for replay protection.
-
-`POST /public/v1/query/get_nonces`
-
-### Fetch Both Nonces
-
-```json
-{
-  "organizationId": "<ORG_ID>",
-  "address": "0x1234abcd5678ef901234abcd5678ef901234abcd",
-  "caip2": "eip155:8453",
-  "nonce": true,
-  "gasStationNonce": true
-}
-```
-
-**Response:**
-
-```json
-{
-  "nonce": "15",
-  "gasStationNonce": "42"
-}
-```
-
-### Fetch Only On-chain Nonce
-
-For non-sponsored transactions, you only need the standard on-chain nonce:
-
-```json
-{
-  "organizationId": "<ORG_ID>",
-  "address": "0x1234abcd5678ef901234abcd5678ef901234abcd",
-  "caip2": "eip155:1",
-  "nonce": true
-}
-```
-
-**Response:**
-
-```json
-{
-  "nonce": "15"
-}
-```
-
-### Fetch Only Gas Station Nonce
-
-For sponsored transactions where you want explicit replay protection:
-
-```json
-{
-  "organizationId": "<ORG_ID>",
-  "address": "0x1234abcd5678ef901234abcd5678ef901234abcd",
-  "caip2": "eip155:8453",
-  "gasStationNonce": true
-}
-```
-
-**Response:**
-
-```json
-{
-  "gasStationNonce": "42"
-}
-```
-
-### Nonce Parameters
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `organizationId` | string | Yes | Organization identifier |
-| `address` | string | Yes | EVM address to query |
-| `caip2` | enum | Yes | EVM chain identifier (eip155:*) |
-| `nonce` | boolean | No | Fetch standard on-chain nonce |
-| `gasStationNonce` | boolean | No | Fetch gas station nonce for sponsored txs |
-
-Response fields are only included when their corresponding request booleans are set to `true`. EVM chains only.
-
----
-
-## Get Gas Usage
-
-Monitor your organization's gas sponsorship usage against the configured limits. Check this before sending large batches of sponsored transactions to avoid hitting rate limits.
-
-`POST /public/v1/query/get_gas_usage`
-
-```json
-{
-  "organizationId": "<ORG_ID>"
-}
-```
-
-**Response:**
-
-```json
-{
-  "windowDurationMinutes": 1440,
-  "windowLimitUsd": "100.00",
-  "usageUsd": "12.34"
-}
-```
-
-### Gas Usage Response Fields
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `windowDurationMinutes` | number | Rolling window duration in minutes (e.g., 1440 = 24 hours) |
-| `windowLimitUsd` | string | Maximum allowed gas spend in USD for the window |
-| `usageUsd` | string | Current gas spend in USD within the window |
-
-If `usageUsd` approaches `windowLimitUsd`, sponsored transactions will be rejected until the window rolls forward. The window is a rolling window, not a fixed calendar window.
-
----
-
 ## List Supported Assets (beta)
 
 Discover which tokens and assets are available for balance queries on a given network.
@@ -293,25 +174,15 @@ Discover which tokens and assets are available for balance queries on a given ne
 | Solana Mainnet | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` | balances, assets |
 | Solana Devnet | `solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG` | balances, assets |
 
-Note: get_nonces and get_gas_usage are EVM-only endpoints.
-
 ## Common Patterns
 
 ### Check Balance Before Sending
 
 Before signing a transfer, verify the sender has sufficient funds:
 
-1. Call get_balances with the sender address and target chain.
+1. Call get_wallet_address_balances with the sender address and target chain.
 2. Find the relevant asset in the response by `symbol` or `caip19`.
 3. Compare the `balance` (atomic units) against the intended transfer amount.
 4. If sufficient, proceed with signing. If not, inform the user.
 
-### Pre-flight for Sponsored Transactions
-
-Before sending a sponsored EVM transaction:
-
-1. Call get_gas_usage to check you have headroom.
-2. Call get_nonces with `gasStationNonce: true` to get the replay protection nonce.
-3. Call get_balances to verify the sender has the tokens they intend to transfer.
-4. Call eth_send_transaction with `sponsor: true` and the `gasStationNonce` value.
-5. Poll get_send_transaction_status until terminal.
+For nonce, gas usage, and send-transaction polling, use `signing-transactions-api`.

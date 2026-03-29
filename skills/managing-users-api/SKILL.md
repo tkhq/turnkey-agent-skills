@@ -15,9 +15,16 @@ metadata:
 
 Use the Turnkey API to manage users, API keys, and user tags within your organization. Base URL: `https://api.turnkey.com`
 
-## Authentication
+## Prerequisites
+
+Requires Turnkey API credentials. Start with `getting-started-workflow` if the caller still needs initial credential setup.
+
+## Making Requests
 
 Every request must include an `X-Stamp` header containing a Base64URL-encoded JSON stamp with your hex-encoded public key, a hex-encoded DER ECDSA signature of the request body, and `"scheme": "SIGNATURE_SCHEME_TK_API_P256"`. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference. All examples below assume this header is present.
+
+- Query endpoints use `POST /public/v1/query/...` and include `organizationId` in the request body.
+- Submit endpoints use `POST /public/v1/submit/...` and return an activity object.
 
 ## Instructions
 

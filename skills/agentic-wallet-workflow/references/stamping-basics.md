@@ -15,4 +15,4 @@ Debugging basics:
 - Make sure the public key in the stamp matches the API key registered in Turnkey.
 - Use the right signature scheme for the key curve you registered.
 
-For full authentication setup, use `managing-users-api`.
+For full credential setup and your first stamped request, use `getting-started-workflow`.

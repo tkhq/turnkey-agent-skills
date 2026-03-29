@@ -75,15 +75,6 @@
   },
   {
     "skills": ["signing-transactions-api"],
-    "query": "Check the balance of my Ethereum address using the Turnkey API",
-    "expected_behavior": [
-      "Shows POST /public/v1/query/get_balances",
-      "Includes address and caip2 in the request body",
-      "Notes this is a beta feature"
-    ]
-  },
-  {
-    "skills": ["signing-transactions-api"],
     "query": "How do I get the nonce for a sponsored transaction on Turnkey?",
     "expected_behavior": [
       "Shows POST /public/v1/query/get_nonces",
@@ -107,15 +98,6 @@
       "Shows POST /public/v1/query/get_send_transaction_status",
       "Lists the status values: INITIALIZED, BROADCASTING, INCLUDED, FAILED",
       "Explains to poll every 2 seconds until INCLUDED or FAILED"
-    ]
-  },
-  {
-    "skills": ["signing-transactions-api"],
-    "query": "What tokens are supported on Base for balance queries via Turnkey?",
-    "expected_behavior": [
-      "Shows POST /public/v1/query/list_supported_assets",
-      "Sets caip2 to eip155:8453",
-      "Notes this is a beta feature"
     ]
   }
 ]

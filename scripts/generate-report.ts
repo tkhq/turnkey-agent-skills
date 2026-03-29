@@ -2,7 +2,7 @@
  * Generates HTML reports from skill evaluation results.
  *
  * Usage:
- *   npx tsx skills/creating-skills/scripts/generate-report.ts --skill creating-wallets
+ *   npx tsx scripts/generate-report.ts --skill creating-wallets
  *
  * Adapted from Anthropic's skill-creator generate_report.py (Apache 2.0).
  */

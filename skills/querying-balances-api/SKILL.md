@@ -1,6 +1,6 @@
 ---
 name: querying-balances-api
-description: "Queries wallet address balances and supported assets using the Turnkey HTTP API. Covers get_wallet_address_balances, list_supported_assets, CAIP-2 selection, and reading balance response fields. Use when asked to 'check balances via the Turnkey API', 'get wallet address balances', 'what assets are supported on this chain', 'list supported assets', or 'what does this address hold'. Do NOT use for signing or broadcasting transactions (use signing-transactions-api), wallet creation (use managing-wallets-api), or policy management (use managing-policies-api)."
+description: "Queries wallet address balances and supported assets using the Turnkey HTTP API. Covers get_wallet_address_balances, list_supported_assets, CAIP-2 selection, address holdings, and reading balance response fields. Use when asked to 'check balances via the Turnkey API', 'get wallet address balances', 'what assets are supported on this chain', 'list supported assets', 'what does this address hold', or 'show this address holdings on Base or Solana'. Do NOT use for signing or broadcasting transactions (use signing-transactions-api), wallet creation (use managing-wallets-api), or policy management (use managing-policies-api)."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:

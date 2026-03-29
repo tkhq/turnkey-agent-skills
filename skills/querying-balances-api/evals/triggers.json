@@ -4,12 +4,17 @@
     "How do I get wallet address balances for an Ethereum address via Turnkey?",
     "What assets are supported on Base using the Turnkey API?",
     "List supported assets for Solana via Turnkey",
-    "What does this address hold on Base?"
+    "What does this address hold on Base?",
+    "Show me the holdings for this Base address with Turnkey",
+    "What balances does this address have on Base via Turnkey?",
+    "Check holdings for this Solana address via Turnkey"
   ],
   "should_not_trigger": [
     "Sign an Ethereum transaction using the Turnkey API",
     "How do I send a sponsored transaction with Turnkey?",
     "Create a new wallet with the Turnkey API",
-    "Set up a policy to restrict signing"
+    "Set up a policy to restrict signing",
+    "Rotate the API key for my Turnkey user",
+    "List all wallets in my Turnkey organization"
   ]
 }

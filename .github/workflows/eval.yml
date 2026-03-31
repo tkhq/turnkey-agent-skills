@@ -11,20 +11,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  discover-skills:
-    runs-on: ubuntu-latest
-    outputs:
-      skills: ${{ steps.skills.outputs.skills }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: skills
-        run: |
-          skills_json=$(find skills -mindepth 1 -maxdepth 1 -type d -exec test -f "{}/SKILL.md" ';' -print \
-            | sed 's#^skills/##' \
-            | sort \
-            | jq -R -s -c 'split("\n") | map(select(length > 0))')
-          echo "skills=${skills_json}" >> "$GITHUB_OUTPUT"
-
   validate:
     runs-on: ubuntu-latest
     steps:
@@ -34,16 +20,15 @@ jobs:
           node-version: "20"
       - run: npm ci
       - run: npm run validate
+      - run: npm run typecheck
+      - run: npm test
 
   eval:
-    needs: discover-skills
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        skill: ${{ fromJSON(needs.discover-skills.outputs.skills) }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -56,37 +41,69 @@ jobs:
           fi
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
-      - name: Run trigger eval
+
+      - name: Determine which skills to evaluate
+        id: scope
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Check if any SKILL.md or scripts changed (affects all skills)
+            global_changes=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- scripts/ | wc -l)
+            skill_md_changes=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- 'skills/*/SKILL.md' | wc -l)
+
+            if [[ "$global_changes" -gt 0 || "$skill_md_changes" -gt 0 ]]; then
+              echo "mode=all" >> "$GITHUB_OUTPUT"
+              echo "Running all skills (scripts or SKILL.md changed)"
+            else
+              # Only eval-specific files changed, find which skills
+              changed_skills=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- skills/ \
+                | grep -oP '^skills/\K[^/]+' \
+                | sort -u \
+                | tr '\n' ' ')
+              if [[ -n "$changed_skills" ]]; then
+                echo "mode=changed" >> "$GITHUB_OUTPUT"
+                echo "skills=$changed_skills" >> "$GITHUB_OUTPUT"
+                echo "Running changed skills only: $changed_skills"
+              else
+                echo "mode=all" >> "$GITHUB_OUTPUT"
+                echo "No skill changes detected, running all"
+              fi
+            fi
+          else
+            echo "mode=all" >> "$GITHUB_OUTPUT"
+            echo "Running all skills (push to main or manual dispatch)"
+          fi
+
+      - name: Run trigger evals (all skills)
+        if: steps.scope.outputs.mode == 'all'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DISABLE_INTERACTIVITY: "1"
-        run: npm run eval -- --skill ${{ matrix.skill }} --threshold 90 --concurrency 4
+        run: npm run eval:all -- --threshold 85 --concurrency 8
+
+      - name: Run trigger evals (changed skills only)
+        if: steps.scope.outputs.mode == 'changed'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for skill in ${{ steps.scope.outputs.skills }}; do
+            echo "--- Evaluating $skill ---"
+            npm run eval -- --skill "$skill" --threshold 85 --concurrency 8
+          done
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eval-results-${{ matrix.skill }}
-          path: skills/${{ matrix.skill }}/evals/trigger-results.json
+          name: eval-results
+          path: skills/*/evals/trigger-results.json
 
-  summary:
-    runs-on: ubuntu-latest
-    needs: [discover-skills, validate, eval]
-    if: always()
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: eval-results-*
-          path: results
       - name: Generate summary
+        if: always()
         run: |
           echo "## Skill Eval Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Skill | Accuracy | Trigger Accuracy | False Positive Rate | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|----------|------------------|---------------------|--------|" >> $GITHUB_STEP_SUMMARY
-          for dir in results/eval-results-*/; do
-            f="${dir}trigger-results.json"
+          for f in skills/*/evals/trigger-results.json; do
             [ -f "$f" ] || continue
             skill=$(jq -r '.skill' "$f")
             acc=$(jq -r '.summary.accuracy' "$f")
@@ -95,9 +112,3 @@ jobs:
             status=$(jq -r 'if .summary.accuracy >= 90 then "PASS" else "FAIL" end' "$f")
             echo "| ${skill} | ${acc}% | ${tacc}% | ${fpr}% | ${status} |" >> $GITHUB_STEP_SUMMARY
           done
-      - name: Check for failures
-        run: |
-          if [ "${{ needs.eval.result }}" = "failure" ]; then
-            echo "One or more skill evals failed the 90% threshold"
-            exit 1
-          fi

@@ -10,5 +10,5 @@
     "declaration": false,
     "noEmit": true
   },
-  "include": ["skills/**/*.ts", "scripts/**/*.ts"]
+  "include": ["skills/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
 }

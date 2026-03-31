@@ -26,20 +26,32 @@ function findSkillDirs(baseDir: string): string[] {
     });
 }
 
-function parseArgs(): { threshold: number; concurrency: number } {
+function parseArgs(): { threshold: number; concurrency: number; model: string; batch: boolean; saveBaseline: boolean; checkBaseline: boolean } {
   const args = process.argv.slice(2);
   let threshold = 90;
   let concurrency = 1;
+  let model = "";
+  let batch = false;
+  let saveBaseline = false;
+  let checkBaseline = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--threshold" && args[i + 1]) {
       threshold = parseFloat(args[++i]);
     } else if (args[i] === "--concurrency" && args[i + 1]) {
       concurrency = parseInt(args[++i], 10);
+    } else if (args[i] === "--model" && args[i + 1]) {
+      model = args[++i];
+    } else if (args[i] === "--batch") {
+      batch = true;
+    } else if (args[i] === "--save-baseline") {
+      saveBaseline = true;
+    } else if (args[i] === "--check-baseline") {
+      checkBaseline = true;
     }
   }
 
-  return { threshold, concurrency };
+  return { threshold, concurrency, model, batch, saveBaseline, checkBaseline };
 }
 
 interface SkillResult {
@@ -50,7 +62,7 @@ interface SkillResult {
 }
 
 function main() {
-  const { threshold, concurrency } = parseArgs();
+  const { threshold, concurrency, model, batch, saveBaseline, checkBaseline } = parseArgs();
   const skills = findSkillDirs("skills");
 
   if (skills.length === 0) {
@@ -67,8 +79,14 @@ function main() {
   for (const skill of skills) {
     console.log(`--- ${skill} ---`);
     try {
+      const extraFlags = [
+        model ? `--model ${model}` : "",
+        batch ? "--batch" : "",
+        saveBaseline ? "--save-baseline" : "",
+        checkBaseline ? "--check-baseline" : "",
+      ].filter(Boolean).join(" ");
       execSync(
-        `npx tsx scripts/eval-triggers.ts --skill ${skill} --threshold ${threshold} --concurrency ${concurrency}`,
+        `npx tsx scripts/eval-triggers.ts --skill ${skill} --threshold ${threshold} --concurrency ${concurrency} ${extraFlags}`.trim(),
         { stdio: "inherit", timeout: 600000 }
       );
 

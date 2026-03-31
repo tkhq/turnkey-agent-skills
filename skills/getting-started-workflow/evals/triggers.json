@@ -9,7 +9,12 @@
     "I just got my API credentials, what do I do next?",
     "New to Turnkey, help me set up",
     "I want to test that my Turnkey credentials work and create a wallet",
-    "Walk me through getting started with the Turnkey API"
+    "Walk me through getting started with the Turnkey API",
+    "How do I construct an X-Stamp header for the Turnkey API?",
+    "Build a Turnkey API stamp manually",
+    "How do I sign a Turnkey API request body with my P-256 key?",
+    "Show me how to create the X-Stamp authentication header",
+    "What is the format of the X-Stamp header for Turnkey?"
   ],
   "should_not_trigger": [
     "Set up an agent wallet with scoped access on Turnkey",

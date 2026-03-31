@@ -1,6 +1,6 @@
 ---
 name: querying-balances-api
-description: "Queries wallet address balances, holdings, and supported assets using the Turnkey HTTP API. Covers get_wallet_address_balances, list_supported_assets, CAIP-2 selection, and reading balance response fields. Use when asked to 'what does this address hold on Base', 'what does this address hold', 'show this address holdings', 'check balances via the Turnkey API', 'get wallet address balances', 'what assets are supported on this chain', or 'list supported assets'. Do NOT use for signing or broadcasting transactions (use signing-transactions-api), wallet creation (use managing-wallets-api), or policy management (use managing-policies-api)."
+description: "Queries wallet address balances, holdings, and supported assets using the Turnkey HTTP API. Covers get_wallet_address_balances, list_supported_assets, CAIP-2 selection, and reading balance response fields. Use when asked to 'check holdings for an address', 'what does this address hold', 'what balances does this address have', 'show holdings for this address', 'check balances via the Turnkey API', 'get wallet address balances', 'what assets are supported on this chain', 'list supported assets', or any query about address balances or holdings on a specific chain. Do NOT use for signing or broadcasting transactions (use signing-transactions-api), wallet creation (use managing-wallets-api), or policy management (use managing-policies-api)."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair). Start with getting-started-workflow for credential setup."
 metadata:
@@ -19,7 +19,16 @@ Use the Turnkey HTTP API to query an address's balances and discover which asset
 
 Requires Turnkey API credentials and a wallet address to inspect. Start with `getting-started-workflow` if the caller still needs initial credential setup.
 
-All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+### Stamping (X-Stamp header)
+
+Every request must include an `X-Stamp` header. Build it with standard CLI tools:
+
+1. **Convert hex private key to PEM** (one-time): `echo "30310201010420${TURNKEY_API_PRIVATE_KEY}a00a06082a8648ce3d030107" | xxd -r -p | openssl ec -inform der -outform pem -out /tmp/tk_stamp.pem 2>/dev/null`
+2. **Sign the request body**: `SIG_HEX=$(echo -n "$BODY" | openssl dgst -sha256 -sign /tmp/tk_stamp.pem | xxd -p -c 256)`
+3. **Build stamp JSON**: `{"publicKey":"$TURNKEY_API_PUBLIC_KEY","signature":"$SIG_HEX","scheme":"SIGNATURE_SCHEME_TK_API_P256"}`
+4. **Base64URL-encode and send**: `STAMP=$(echo -n "$STAMP_JSON" | base64 | tr '+/' '-_' | tr -d '=')` then add `-H "X-Stamp: $STAMP"` to curl.
+
+Sign the **exact** body bytes. The public key must match a registered API key.
 
 ## Making Requests
 

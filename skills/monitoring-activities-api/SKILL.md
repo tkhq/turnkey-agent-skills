@@ -18,7 +18,16 @@ Use the Turnkey API to monitor activity status, approve or reject activities req
 ## Prerequisites
 
 Requires API keys. Start with `getting-started-workflow` if the caller still needs credential setup.
-All requests must include an `X-Stamp` header. See [references/stamping-basics.md](references/stamping-basics.md) for the lightweight stamping reference.
+### Stamping (X-Stamp header)
+
+Every request must include an `X-Stamp` header. Build it with standard CLI tools:
+
+1. **Convert hex private key to PEM** (one-time): `echo "30310201010420${TURNKEY_API_PRIVATE_KEY}a00a06082a8648ce3d030107" | xxd -r -p | openssl ec -inform der -outform pem -out /tmp/tk_stamp.pem 2>/dev/null`
+2. **Sign the request body**: `SIG_HEX=$(echo -n "$BODY" | openssl dgst -sha256 -sign /tmp/tk_stamp.pem | xxd -p -c 256)`
+3. **Build stamp JSON**: `{"publicKey":"$TURNKEY_API_PUBLIC_KEY","signature":"$SIG_HEX","scheme":"SIGNATURE_SCHEME_TK_API_P256"}`
+4. **Base64URL-encode and send**: `STAMP=$(echo -n "$STAMP_JSON" | base64 | tr '+/' '-_' | tr -d '=')` then add `-H "X-Stamp: $STAMP"` to curl.
+
+Sign the **exact** body bytes. The public key must match a registered API key.
 
 ## Making Requests
 

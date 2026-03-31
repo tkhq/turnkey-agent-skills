@@ -9,3 +9,4 @@ dist/
 **/evals/loop-history.json
 **/evals/description-history.json
 **/evals/report.html
+evals-workspace/

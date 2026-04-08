@@ -1,0 +1,84 @@
+{
+  "skill_name": "provisioning-agent",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a Turnkey agent that can sign Ethereum transactions.",
+      "expected_output": "Follows the correct sequence: list wallets, create wallet, create non-root user with agent tag, create wallet-scoped ALLOW policy, verify with agent credentials, output agent credentials",
+      "files": ["skills/provisioning-agent/references/provisioning-walkthrough.md"],
+      "assertions": [
+        { "type": "contains", "value": "list_wallets" },
+        { "type": "contains", "value": "create_wallet" },
+        { "type": "contains", "value": "create_users" },
+        { "type": "contains", "value": "create_policy" },
+        { "type": "order", "before": "list_wallets", "after": "create_wallet" },
+        { "type": "order", "before": "create_wallet", "after": "create_users" },
+        { "type": "order", "before": "create_users", "after": "create_policy" },
+        { "type": "contains", "value": "userTags" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create an agent user and make it root so it doesn't need policies.",
+      "expected_output": "Refuses to make the agent root. Explains that root users bypass all policies, defeating scoped access.",
+      "files": [],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(should not|must not|cannot|never|refuse).*root", "flags": "i" },
+        { "type": "regex", "value": "(?i)(bypass|skip|ignore).*polic", "flags": "i" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a signing policy for my agent. Just let it sign anything.",
+      "expected_output": "Warns about unscoped signing and recommends adding wallet.id scope. Does not create an ALLOW with only activity.action == 'SIGN'.",
+      "files": ["skills/provisioning-agent/references/agent-personas.md"],
+      "assertions": [
+        { "type": "contains", "value": "wallet.id" },
+        { "type": "regex", "value": "(?i)(scope|dangerous|too broad|recommend|warn|must include)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I've provisioned the agent. Output the credentials for its runtime.",
+      "expected_output": "Outputs agent credentials (not root). Labels them clearly as agent credentials. Includes TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH.",
+      "files": ["skills/provisioning-agent/references/provisioning-walkthrough.md"],
+      "assertions": [
+        { "type": "contains", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "contains", "value": "TURNKEY_API_PRIVATE_KEY" },
+        { "type": "contains", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "contains", "value": "SIGN_WITH" },
+        { "type": "regex", "value": "(?i)(agent.*(credential|key)|not root|not your)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Set up an observer agent that only monitors balances and activities. It should not be able to sign.",
+      "expected_output": "Creates a non-root user with observer tag. Does NOT create an ALLOW policy for signing. Explains that default-deny handles read-only access.",
+      "files": ["skills/provisioning-agent/references/agent-personas.md"],
+      "assertions": [
+        { "type": "contains", "value": "observer" },
+        { "type": "contains", "value": "create_users" },
+        { "type": "regex", "value": "(?i)(default.deny|no.*(allow|signing).polic|read.only|implicit)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "The agent verification step failed. The test signature returned ACTIVITY_STATUS_FAILED. What do I do?",
+      "expected_output": "Uses get_policy_evaluations with the activity ID to debug. Does not suggest broadening the ALLOW without reviewing decision gates.",
+      "files": ["skills/provisioning-agent/references/provisioning-walkthrough.md"],
+      "assertions": [
+        { "type": "contains", "value": "get_policy_evaluations" },
+        { "type": "contains", "value": "activityId" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I need to rotate my agent's key after provisioning.",
+      "expected_output": "Routes to the managing-agent skill for day-2 operations, does not handle key rotation inline",
+      "files": [],
+      "assertions": [
+        { "type": "regex", "value": "(?i)managing.agent", "flags": "i" }
+      ]
+    }
+  ]
+}

@@ -1,77 +1,46 @@
 ---
 name: turnkey
-description: "Wallet infrastructure skills for Turnkey: create HD wallets, derive blockchain addresses, and sign transactions on Ethereum/EVM, Solana, Bitcoin, Cosmos, and other chains. Keys stay in hardware-backed secure enclaves and are never exposed to application code."
+description: "Use when working with Turnkey wallet infrastructure — creating wallets, signing blockchain transactions, managing users and policies, provisioning agents, or monitoring activities. Supports Ethereum/EVM, Solana, Bitcoin, and 10+ other chains. Keys stay in hardware-backed secure enclaves."
 license: Apache-2.0
-compatibility: "Requires Node.js. Set TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars. Chain-specific skills may also require SIGN_WITH."
+compatibility: "Requires TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
 metadata:
   version: "1.0.0"
-  tags: ["turnkey", "wallet", "signing", "blockchain", "ethereum", "evm", "solana", "bitcoin", "cosmos", "crypto", "key-management", "defi", "web3", "ethers", "viem"]
   author: turnkey
-  openclaw:
-    requires:
-      env: [TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID]
-      bins: [node]
+  tags: ["turnkey", "wallet", "signing", "blockchain", "ethereum", "solana", "bitcoin", "crypto", "policy", "agent"]
 ---
 
-# Turnkey Agent Skills
+# Turnkey Skills
 
-Skills for AI agents that need to manage wallets and sign transactions using [Turnkey](https://turnkey.com) — a wallet infrastructure platform that stores private keys in hardware-backed secure enclaves. Keys are never exposed to application code; every operation is cryptographically stamped by your API key pair.
+Wallet infrastructure skills for [Turnkey](https://turnkey.com). Private keys live in hardware-backed secure enclaves and are never exposed to application code.
 
-## Skills Included
+## Skills
 
-### Core
-
-| Skill | Path | Use when… |
-|-------|------|-----------|
-| Wallet Management | `skills/core/turnkey-wallet-management/SKILL.md` | creating a wallet, deriving addresses, or retrieving an existing wallet |
-| Transaction Signing | `skills/core/turnkey-transaction-signing/SKILL.md` | signing on unsupported chains, signing raw payloads, or understanding how Turnkey stamping works |
-
-### Signing
+### Primitives
 
 | Skill | Path | Use when… |
 |-------|------|-----------|
-| Ethereum / EVM | `skills/signing/turnkey-ethereum-evm/SKILL.md` | signing or broadcasting on Ethereum, Polygon, Base, Arbitrum, Optimism, or any EVM chain |
-| Solana | `skills/signing/turnkey-solana-signing/SKILL.md` | signing or broadcasting on Solana |
-| Bitcoin | `skills/signing/turnkey-bitcoin-signing/SKILL.md` | signing or broadcasting on Bitcoin (P2WPKH SegWit or P2TR Taproot) |
+| Signing Transactions | `skills/signing-transactions/SKILL.md` | signing, broadcasting, gasless/sponsored transactions on any chain |
+| Managing Wallets | `skills/managing-wallets/SKILL.md` | creating wallets, deriving addresses, adding chains, import/export |
+| Managing Private Keys | `skills/managing-private-keys/SKILL.md` | standalone keys, key tags for policy targeting, import/export |
+| Managing Users | `skills/managing-users/SKILL.md` | creating users, API key rotation, user tags |
+| Managing Policies | `skills/managing-policies/SKILL.md` | access control, spending limits, allowlists, multi-sig, policy debugging |
+| Monitoring Activities | `skills/monitoring-activities/SKILL.md` | activity status, consensus approvals, automated agent approver, audit |
 
-### Auth
-
-| Skill | Path | Use when… |
-|-------|------|-----------|
-| OTP Authentication | `skills/auth/turnkey-otp-auth/SKILL.md` | adding email OTP login, passwordless auth, or sub-organization user management |
-
-### Meta
+### Workflows
 
 | Skill | Path | Use when… |
 |-------|------|-----------|
-| Skill Making | `skills/meta/turnkey-skill-making/SKILL.md` | creating a new skill for this repo — covers SKILL.md authoring, references, evals, and validation |
+| Getting Started | `skills/getting-started/SKILL.md` | new to Turnkey, verifying credentials, creating first wallet |
+| Provisioning Agent | `skills/provisioning-agent/SKILL.md` | giving an agent a scoped wallet with constrained credentials |
+| Managing Agent | `skills/managing-agent/SKILL.md` | debugging denied transactions, changing agent policies, key rotation, revocation |
 
 ## Environment Variables
-
-All skills share these three variables:
 
 ```env
 TURNKEY_API_PUBLIC_KEY=    # API key — public component (hex)
 TURNKEY_API_PRIVATE_KEY=   # API key — private component (P-256 hex)
 TURNKEY_ORGANIZATION_ID=   # Organization UUID
+SIGN_WITH=                 # Address or public key to sign with (signing skills only)
 ```
 
-Signing skills also require:
-
-```env
-SIGN_WITH=                 # Address or public key of the wallet account to sign with
-```
-
-Get credentials from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**.
-
-## Skill Load Order
-
-For **signing tasks**, load skills in this order:
-
-1. `skills/core/turnkey-wallet-management/SKILL.md` — create or retrieve a wallet and get the `SIGN_WITH` address
-2. `skills/core/turnkey-transaction-signing/SKILL.md` — understand the stamping model; required for raw payload signing
-3. Chain-specific skill — `turnkey-ethereum-evm`, `turnkey-solana-signing`, or `turnkey-bitcoin-signing`
-
-For **wallet-only tasks** (no signing), only step 1 is needed.
-
-For **authentication tasks**, load `skills/auth/turnkey-otp-auth/SKILL.md` directly — it depends on wallet management internally.
+Get credentials from the [Turnkey Dashboard](https://app.turnkey.com) under **Settings → API Keys**.

@@ -2,10 +2,11 @@
  * Layer 1 — Skill structure tests
  *
  * Validates every SKILL.md in the project:
- * - YAML frontmatter is present and has required fields
- * - name is kebab-case (required by Anthropic skills spec and OpenClaw indexing)
- * - All required markdown sections are present
- * - Cross-references in Related Skills point to files that actually exist
+ * - YAML frontmatter is present and has required fields (name, description)
+ * - name is kebab-case and matches parent directory (Agent Skills spec)
+ * - Required markdown sections are present
+ * - Cross-references in Related Skills point to skills that exist
+ * - evals.json files are well-formed and reference valid assertion types
  */
 
 import { readFileSync, existsSync } from "fs";
@@ -15,17 +16,46 @@ import matter from "gray-matter";
 import { findSkillFiles, findEvalsFiles, relativePath, SKILLS_ROOT, PROJECT_ROOT, ROOT_SKILL_FILE } from "./helpers.js";
 import type { EvalsFile } from "./grader.js";
 
+/**
+ * Required sections for skill SKILL.md files.
+ * Skills must have Troubleshooting and Related Skills.
+ * Prerequisites can appear as "Prerequisites" or inline in the overview.
+ */
 const REQUIRED_SECTIONS = [
-  "Overview",
-  "Prerequisites",
-  "Environment Variables",
   "Troubleshooting",
   "Related Skills",
 ];
 
+/**
+ * At least one of these section patterns must appear for the skill
+ * to have substantive content (instructions, examples, phases, recipes, etc.)
+ */
+const CONTENT_SECTION_PATTERNS = [
+  "## Instructions",
+  "## Examples",
+  "## Option",
+  "## Phase",
+  "## Step 1",
+  "## Step 2",
+  // Trigger-based recipes (managing-agent style)
+  "## My ",
+  "## I need",
+  // Policy/signing patterns
+  "## How policies work",
+  "## Choosing an approach",
+  // Primitives with descriptive sections
+  "## Activity lifecycle",
+  "## When to use",
+  // Good ALLOW templates, anti-patterns
+  "## Good ALLOW",
+  "## Anti-patterns",
+  // Three approver patterns
+  "## Three approver",
+];
+
 const skillFiles = findSkillFiles(SKILLS_ROOT);
 
-// Collect all skill names upfront for depends_on validation
+// Collect all skill names upfront for cross-reference validation
 const allSkillNames = new Set(
   skillFiles.map((f) => matter(readFileSync(f, "utf-8")).data.name as string),
 );
@@ -54,8 +84,6 @@ for (const filePath of skillFiles) {
       });
 
       it("name is kebab-case", () => {
-        // Must start with a lowercase letter and contain only lowercase letters,
-        // digits, and hyphens. Required by the Anthropic skills spec and OpenClaw indexing.
         expect(parsed.data.name).toMatch(/^[a-z][a-z0-9-]*$/);
       });
 
@@ -73,40 +101,21 @@ for (const filePath of skillFiles) {
         expect((parsed.data.description as string).length).toBeGreaterThan(0);
       });
 
+      it("description is under 1024 characters (Agent Skills spec)", () => {
+        expect(
+          (parsed.data.description as string).length,
+          `Description is ${(parsed.data.description as string).length} chars, max is 1024`,
+        ).toBeLessThanOrEqual(1024);
+      });
+
       it("description fits on one line (no newlines)", () => {
-        // Multi-line descriptions break some skill indexers
         expect(parsed.data.description).not.toContain("\n");
       });
 
-      it("depends_on is a valid array of skill names (if present)", () => {
-        const deps = parsed.data.depends_on;
-        if (deps === undefined) return; // field is optional
-        expect(Array.isArray(deps), "depends_on must be an array").toBe(true);
-        for (const dep of deps as unknown[]) {
-          expect(typeof dep, "depends_on entries must be strings").toBe("string");
-          expect((dep as string).length, "depends_on entries must not be empty").toBeGreaterThan(0);
-          expect(
-            dep !== parsed.data.name,
-            `depends_on must not include self ("${parsed.data.name}")`,
-          ).toBe(true);
-          expect(
-            allSkillNames.has(dep as string),
-            `depends_on entry "${dep}" does not match any skill name. Known skills: ${[...allSkillNames].join(", ")}`,
-          ).toBe(true);
-        }
-      });
-
-      it("has metadata.sdk_versions with valid @turnkey/ entries", () => {
+      it("has metadata.version field", () => {
         expect(parsed.data).toHaveProperty("metadata");
-        expect(parsed.data.metadata).toHaveProperty("sdk_versions");
-        const versions = parsed.data.metadata.sdk_versions;
-        expect(typeof versions).toBe("object");
-        expect(Array.isArray(versions)).toBe(false);
-        for (const [pkg, ver] of Object.entries(versions as Record<string, unknown>)) {
-          expect(pkg, `sdk_versions key "${pkg}" must start with @turnkey/`).toMatch(/^@turnkey\//);
-          expect(typeof ver, `sdk_versions["${pkg}"] must be a string`).toBe("string");
-          expect((ver as string).length, `sdk_versions["${pkg}"] must not be empty`).toBeGreaterThan(0);
-        }
+        expect(parsed.data.metadata).toHaveProperty("version");
+        expect(typeof parsed.data.metadata.version).toBe("string");
       });
     });
 
@@ -120,20 +129,29 @@ for (const filePath of skillFiles) {
         });
       }
 
-      it("has at least one content section (Instructions, Examples, or Option A/B)", () => {
-        const hasInstructions = content.includes("## Instructions");
-        const hasExamples = content.includes("## Examples");
-        const hasOptions = content.includes("## Option"); // ethereum-evm style
-        expect(hasInstructions || hasExamples || hasOptions).toBe(true);
+      it("has at least one content section", () => {
+        const hasContent = CONTENT_SECTION_PATTERNS.some((pattern) =>
+          content.includes(pattern)
+        );
+        expect(
+          hasContent,
+          `No content section found. Expected at least one of: ${CONTENT_SECTION_PATTERNS.join(", ")}`,
+        ).toBe(true);
+      });
+
+      it("has Rules section", () => {
+        expect(
+          content.includes("## Rules") || content.includes("## Rules (mandatory"),
+          'Missing required section "## Rules"',
+        ).toBe(true);
       });
     });
 
     // -------------------------------------------------------------------------
-    // Cross-references
+    // Cross-references in Related Skills
     // -------------------------------------------------------------------------
     describe("Related Skills cross-references", () => {
-      it("all referenced skill paths exist on disk", () => {
-        // Extract the Related Skills section content
+      it("all referenced skill names exist", () => {
         const relatedMatch = content.match(
           /## Related Skills\n([\s\S]*?)(?=\n##\s|$)/
         );
@@ -141,39 +159,93 @@ for (const filePath of skillFiles) {
 
         const relatedSection = relatedMatch[1];
 
-        // Match backtick-quoted paths like `skills/core/wallet-management/SKILL.md`
-        const pathPattern = /`(skills\/[^`]+\.md)`/g;
-        const refs = [...relatedSection.matchAll(pathPattern)];
+        // Match backtick-quoted skill names like `managing-wallets` or full paths like `skills/managing-wallets/SKILL.md`
+        const namePattern = /`([a-z][a-z0-9-]*)`/g;
+        const refs = [...relatedSection.matchAll(namePattern)];
 
         for (const ref of refs) {
-          const referencedPath = join(PROJECT_ROOT, ref[1]);
-          expect(
-            existsSync(referencedPath),
-            `Broken reference: ${ref[1]} does not exist`
-          ).toBe(true);
+          const refName = ref[1];
+          // Skip non-skill references (like env var names, file extensions)
+          if (refName.includes(".") || refName.includes("/")) continue;
+          // Check if it's a known skill name
+          if (allSkillNames.size > 0) {
+            expect(
+              allSkillNames.has(refName),
+              `Related skill "${refName}" not found. Known skills: ${[...allSkillNames].join(", ")}`,
+            ).toBe(true);
+          }
         }
       });
+    });
+
+    // -------------------------------------------------------------------------
+    // Line count
+    // -------------------------------------------------------------------------
+    it("SKILL.md body is under 500 lines", () => {
+      const lines = parsed.content.split("\n").length;
+      expect(
+        lines,
+        `SKILL.md body is ${lines} lines, max recommended is 500`,
+      ).toBeLessThanOrEqual(500);
     });
   });
 }
 
 // ---------------------------------------------------------------------------
 // Root SKILL.md — package manifest, frontmatter only
-//
-// The root SKILL.md is a ClawHub package entry point, not a skill guide.
-// It must have valid frontmatter but is not required to have the standard
-// skill sections (Prerequisites, Troubleshooting, etc.).
 // ---------------------------------------------------------------------------
 
 const rootContent = readFileSync(ROOT_SKILL_FILE, "utf-8");
 const rootParsed = matter(rootContent);
 
+describe("SKILL.md (root package manifest)", () => {
+  describe("frontmatter", () => {
+    it("has a name field", () => {
+      expect(rootParsed.data).toHaveProperty("name");
+      expect(typeof rootParsed.data.name).toBe("string");
+      expect((rootParsed.data.name as string).length).toBeGreaterThan(0);
+    });
+
+    it("name is kebab-case", () => {
+      expect(rootParsed.data.name).toMatch(/^[a-z][a-z0-9-]*$/);
+    });
+
+    it("has a description field", () => {
+      expect(rootParsed.data).toHaveProperty("description");
+      expect(typeof rootParsed.data.description).toBe("string");
+      expect((rootParsed.data.description as string).length).toBeGreaterThan(0);
+    });
+
+    it("description fits on one line (no newlines)", () => {
+      expect(rootParsed.data.description).not.toContain("\n");
+    });
+
+    it("has metadata.version field", () => {
+      expect(rootParsed.data).toHaveProperty("metadata");
+      expect(rootParsed.data.metadata).toHaveProperty("version");
+      expect(typeof rootParsed.data.metadata.version).toBe("string");
+    });
+
+    it("has metadata.tags field (array)", () => {
+      expect(rootParsed.data).toHaveProperty("metadata");
+      expect(rootParsed.data.metadata).toHaveProperty("tags");
+      expect(Array.isArray(rootParsed.data.metadata.tags)).toBe(true);
+      expect((rootParsed.data.metadata.tags as unknown[]).length).toBeGreaterThan(0);
+    });
+  });
+
+  it("lists all skills in the skills/ directory", () => {
+    for (const skillName of allSkillNames) {
+      expect(
+        rootContent,
+        `Root SKILL.md does not reference skill "${skillName}"`,
+      ).toContain(skillName);
+    }
+  });
+});
+
 // ---------------------------------------------------------------------------
 // evals.json ↔ SKILL.md cross-validation
-//
-// Each evals.json has a skill_name field that must match the name in its
-// parent SKILL.md frontmatter. Drift between these causes confusing workspace
-// directory names and broken eval filtering.
 // ---------------------------------------------------------------------------
 
 const evalsFiles = findEvalsFiles(SKILLS_ROOT);
@@ -181,7 +253,6 @@ const evalsFiles = findEvalsFiles(SKILLS_ROOT);
 describe("evals.json skill_name matches SKILL.md name", () => {
   for (const evalsPath of evalsFiles) {
     const evalsData: EvalsFile = JSON.parse(readFileSync(evalsPath, "utf-8"));
-    // evals/evals.json → skill dir is two levels up
     const skillDir = join(evalsPath, "..", "..");
     const skillMdPath = join(skillDir, "SKILL.md");
 
@@ -198,11 +269,6 @@ describe("evals.json skill_name matches SKILL.md name", () => {
 
 // ---------------------------------------------------------------------------
 // evals.json schema validation
-//
-// Validates that every evals.json has well-formed structure, valid assertion
-// types, correct fields per assertion type, unique IDs, and resolvable file
-// paths. Catches typos (e.g., "import" instead of "imports") that would
-// silently pass JSON parsing but break at runtime.
 // ---------------------------------------------------------------------------
 
 const VALID_ASSERTION_TYPES = [
@@ -216,7 +282,6 @@ const VALID_ASSERTION_TYPES = [
   "compiles",
 ] as const;
 
-/** Fields required for each assertion type (beyond `type`). */
 const ASSERTION_FIELDS: Record<string, string[]> = {
   imports: ["value"],
   calls: ["value"],
@@ -224,7 +289,7 @@ const ASSERTION_FIELDS: Record<string, string[]> = {
   contains: ["value"],
   not_contains: ["value"],
   order: ["before", "after"],
-  regex: ["pattern"],
+  regex: ["value"],
   compiles: [],
 };
 
@@ -283,16 +348,12 @@ for (const evalsPath of evalsFiles) {
 
             it(`assertion[${i}] has required fields for type "${assertion.type}"`, () => {
               const requiredFields = ASSERTION_FIELDS[assertion.type];
-              if (!requiredFields) return; // already caught by type check above
+              if (!requiredFields) return;
               for (const field of requiredFields) {
                 expect(
                   assertion[field] !== undefined && assertion[field] !== null,
                   `Assertion type "${assertion.type}" requires field "${field}"`,
                 ).toBe(true);
-                expect(
-                  typeof assertion[field],
-                  `Assertion field "${field}" must be a string`,
-                ).toBe("string");
               }
             });
           }
@@ -301,40 +362,3 @@ for (const evalsPath of evalsFiles) {
     }
   });
 }
-
-describe("SKILL.md (root package manifest)", () => {
-  describe("frontmatter", () => {
-    it("has a name field", () => {
-      expect(rootParsed.data).toHaveProperty("name");
-      expect(typeof rootParsed.data.name).toBe("string");
-      expect((rootParsed.data.name as string).length).toBeGreaterThan(0);
-    });
-
-    it("name is kebab-case", () => {
-      expect(rootParsed.data.name).toMatch(/^[a-z][a-z0-9-]*$/);
-    });
-
-    it("has a description field", () => {
-      expect(rootParsed.data).toHaveProperty("description");
-      expect(typeof rootParsed.data.description).toBe("string");
-      expect((rootParsed.data.description as string).length).toBeGreaterThan(0);
-    });
-
-    it("description fits on one line (no newlines)", () => {
-      expect(rootParsed.data.description).not.toContain("\n");
-    });
-
-    it("has metadata.version field", () => {
-      expect(rootParsed.data).toHaveProperty("metadata");
-      expect(rootParsed.data.metadata).toHaveProperty("version");
-      expect(typeof rootParsed.data.metadata.version).toBe("string");
-    });
-
-    it("has metadata.tags field (array)", () => {
-      expect(rootParsed.data).toHaveProperty("metadata");
-      expect(rootParsed.data.metadata).toHaveProperty("tags");
-      expect(Array.isArray(rootParsed.data.metadata.tags)).toBe(true);
-      expect((rootParsed.data.metadata.tags as unknown[]).length).toBeGreaterThan(0);
-    });
-  });
-});

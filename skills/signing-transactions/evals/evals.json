@@ -1,0 +1,134 @@
+{
+  "skill_name": "signing-transactions",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Send 0.001 ETH to 0xRecipient on Base. Use the simplest approach possible.",
+      "expected_output": "Uses eth_send_transaction with caip2 eip155:8453, not SDK signing",
+      "files": ["skills/signing-transactions/references/evm-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "eth_send_transaction" },
+        { "type": "contains", "value": "eip155:8453" },
+        { "type": "not_contains", "value": "TurnkeySigner" },
+        { "type": "not_contains", "value": "createAccount" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Send a sponsored (gasless) USDC transfer on Base using Turnkey. The recipient is 0xRecipient and the amount is 10 USDC.",
+      "expected_output": "Uses eth_send_transaction with sponsor: true, encodes ERC-20 transfer in data field",
+      "files": ["skills/signing-transactions/references/evm-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "eth_send_transaction" },
+        { "type": "contains", "value": "sponsor" },
+        { "type": "contains", "value": "true" },
+        { "type": "contains", "value": "data" },
+        { "type": "contains", "value": "a9059cbb" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Sign and send an ERC-20 transfer using ethers.js with Turnkey. Transfer 10 USDC to 0xRecipient on Sepolia.",
+      "expected_output": "Uses @turnkey/ethers with TurnkeySigner, contract interaction via ethers",
+      "files": ["skills/signing-transactions/references/evm-examples.md"],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/ethers" },
+        { "type": "imports", "value": "ethers" },
+        { "type": "calls", "value": "TurnkeySigner" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to interact with a smart contract on Base using viem and Turnkey. Call the transfer function on an ERC-20 token.",
+      "expected_output": "Uses @turnkey/viem with createAccount and writeContract",
+      "files": ["skills/signing-transactions/references/evm-examples.md"],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/viem" },
+        { "type": "imports", "value": "viem" },
+        { "type": "calls", "value": "createAccount" },
+        { "type": "calls", "value": "writeContract" },
+        { "type": "env_var", "value": "SIGN_WITH" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Send 0.001 SOL on devnet using the Turnkey Solana SDK.",
+      "expected_output": "Uses @turnkey/solana with TurnkeySigner, fetches fresh blockhash before signing, passes address to signTransaction",
+      "files": ["skills/signing-transactions/references/solana-examples.md"],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "imports", "value": "@solana/web3.js" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "calls", "value": "getLatestBlockhash" },
+        { "type": "order", "before": "getLatestBlockhash", "after": "signTransaction" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Send SOL to 3 recipients in a batch using Turnkey.",
+      "expected_output": "Uses signAllTransactions to batch sign, fetches one blockhash for all transactions",
+      "files": ["skills/signing-transactions/references/solana-examples.md"],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/solana" },
+        { "type": "calls", "value": "signAllTransactions" },
+        { "type": "calls", "value": "getLatestBlockhash" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Send 1000 satoshis of BTC on testnet using Turnkey with a P2WPKH (SegWit) address.",
+      "expected_output": "Constructs PSBT with bitcoinjs-lib, fetches UTXOs, signs via signTransaction with TRANSACTION_TYPE_BITCOIN, finalizes and broadcasts",
+      "files": ["skills/signing-transactions/references/bitcoin-examples.md"],
+      "assertions": [
+        { "type": "imports", "value": "bitcoinjs-lib" },
+        { "type": "contains", "value": "Psbt" },
+        { "type": "contains", "value": "TRANSACTION_TYPE_BITCOIN" },
+        { "type": "calls", "value": "signTransaction" },
+        { "type": "calls", "value": "finalizeAllInputs" },
+        { "type": "env_var", "value": "BITCOIN_COMPRESSED_PUBLIC_KEY" },
+        { "type": "order", "before": "signTransaction", "after": "finalizeAllInputs" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Sign a Cosmos transaction with Turnkey. My wallet uses a secp256k1 key.",
+      "expected_output": "Uses signRawPayload with HASH_FUNCTION_SHA256 and hex encoding",
+      "files": ["skills/signing-transactions/references/raw-payload-examples.md"],
+      "assertions": [
+        { "type": "calls", "value": "signRawPayload" },
+        { "type": "contains", "value": "HASH_FUNCTION_SHA256" },
+        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" },
+        { "type": "not_contains", "value": "HASH_FUNCTION_KECCAK256" }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "I need to sign on Sui using Turnkey. My wallet has an Ed25519 key.",
+      "expected_output": "Uses signRawPayload with HASH_FUNCTION_NOT_APPLICABLE for Ed25519",
+      "files": ["skills/signing-transactions/references/raw-payload-examples.md"],
+      "assertions": [
+        { "type": "calls", "value": "signRawPayload" },
+        { "type": "contains", "value": "HASH_FUNCTION_NOT_APPLICABLE" },
+        { "type": "not_contains", "value": "HASH_FUNCTION_SHA256" },
+        { "type": "not_contains", "value": "HASH_FUNCTION_KECCAK256" }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "I want to send SOL as simply as possible. Don't make me install any extra packages.",
+      "expected_output": "Uses sol_send_transaction (Turnkey-managed), not @turnkey/solana SDK",
+      "files": ["skills/signing-transactions/references/solana-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "sol_send_transaction" },
+        { "type": "not_contains", "value": "TurnkeySigner" },
+        { "type": "not_contains", "value": "@turnkey/solana" }
+      ]
+    }
+  ]
+}

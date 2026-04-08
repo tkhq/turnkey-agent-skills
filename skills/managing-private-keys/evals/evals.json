@@ -1,0 +1,86 @@
+{
+  "skill_name": "managing-private-keys",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a standalone Ethereum signing key using Turnkey.",
+      "expected_output": "Calls list_private_keys before create_private_keys, uses CURVE_SECP256K1 and ADDRESS_FORMAT_ETHEREUM, includes privateKeyTags",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "list_private_keys" },
+        { "type": "contains", "value": "create_private_keys" },
+        { "type": "order", "before": "list_private_keys", "after": "create_private_keys" },
+        { "type": "contains", "value": "CURVE_SECP256K1" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "contains", "value": "privateKeyTags" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need a Solana signing key for my oracle service. Create one with Turnkey.",
+      "expected_output": "Uses CURVE_ED25519 and ADDRESS_FORMAT_SOLANA, not CURVE_SECP256K1",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "CURVE_ED25519" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" },
+        { "type": "not_contains", "value": "CURVE_SECP256K1" },
+        { "type": "contains", "value": "list_private_keys" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need a key that works on both Ethereum and Cosmos. Can I use one key for both?",
+      "expected_output": "Creates one key with CURVE_SECP256K1 and multiple addressFormats: ADDRESS_FORMAT_ETHEREUM and ADDRESS_FORMAT_COSMOS",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_COSMOS" },
+        { "type": "contains", "value": "CURVE_SECP256K1" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to create multiple addresses on different chains. Should I use a private key or a wallet?",
+      "expected_output": "Recommends HD wallet (managing-wallets) for multi-chain, not standalone private keys",
+      "files": [],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(hd wallet|managing-wallets|create_wallet)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a private key tag called 'treasury' and assign my existing keys pk_abc and pk_def to it.",
+      "expected_output": "Uses create_private_key_tag with the tag name and key IDs",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "create_private_key_tag" },
+        { "type": "contains", "value": "treasury" },
+        { "type": "contains", "value": "pk_abc" },
+        { "type": "contains", "value": "pk_def" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Delete my private key pk_abc123. It hasn't been exported and I don't need it anymore.",
+      "expected_output": "Uses delete_private_keys with deleteWithoutExport but warns about permanent fund loss and asks for confirmation",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "delete_private_keys" },
+        { "type": "contains", "value": "deleteWithoutExport" },
+        { "type": "regex", "value": "(?i)(irrecoverable|permanent|lost forever|cannot be undone|confirm|are you sure)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Import an existing Ethereum private key into Turnkey.",
+      "expected_output": "Uses the 3-step import flow: init_import_private_key, encrypt client-side, import_private_key",
+      "files": ["skills/managing-private-keys/references/private-key-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "init_import_private_key" },
+        { "type": "contains", "value": "import_private_key" },
+        { "type": "contains", "value": "encryptedBundle" },
+        { "type": "contains", "value": "CURVE_SECP256K1" }
+      ]
+    }
+  ]
+}

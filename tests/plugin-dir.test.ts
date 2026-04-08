@@ -2,15 +2,11 @@
  * Integration test: Claude --plugin-dir skill discovery
  *
  * Verifies that `claude --plugin-dir` accepts the repo as a plugin and that
- * nested skill directories (skills/core/, skills/signing/) are resolved.
+ * skill directories are resolved.
  *
  * Skipped automatically when:
  *   - Running inside a Claude Code session (CLAUDECODE env var is set)
  *   - `claude` CLI is not found in PATH
- *
- * If skill names are missing from the output the test warns rather than fails,
- * because it indicates nested paths are not resolved and the skill directories
- * should be flattened — it's actionable signal, not a hard breakage.
  */
 
 import { spawnSync } from "child_process";
@@ -20,11 +16,15 @@ import { resolve } from "path";
 const PLUGIN_DIR = resolve(process.cwd());
 
 const SKILL_NAMES = [
-  "turnkey-wallet-management",
-  "turnkey-transaction-signing",
-  "turnkey-ethereum-evm",
-  "turnkey-solana-signing",
-  "turnkey-bitcoin-signing",
+  "signing-transactions",
+  "managing-wallets",
+  "managing-private-keys",
+  "managing-users",
+  "managing-policies",
+  "monitoring-activities",
+  "getting-started",
+  "provisioning-agent",
+  "managing-agent",
 ];
 
 function claudeAvailable(): boolean {
@@ -55,14 +55,14 @@ describe("claude --plugin-dir", () => {
     ).toBe(0);
   });
 
-  it.skipIf(shouldSkip)("all five skill names appear in output (nested path resolution)", () => {
+  it.skipIf(shouldSkip)("all skill names appear in output", () => {
     const result = runPluginDir();
     const output = String(result.stdout ?? "") + String(result.stderr ?? "");
 
     for (const name of SKILL_NAMES) {
       expect(
         output,
-        `Skill "${name}" not found in --plugin-dir output. Nested skill directories may not be resolved — consider flattening skills/ to a single level.`
+        `Skill "${name}" not found in --plugin-dir output.`
       ).toContain(name);
     }
   });

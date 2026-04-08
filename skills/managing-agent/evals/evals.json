@@ -1,0 +1,84 @@
+{
+  "skill_name": "managing-agent",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My agent's signing request was denied. The activity ID is act_xyz789. Help me debug it.",
+      "expected_output": "Uses get_policy_evaluations with the activity ID, explains how to interpret the outcomes",
+      "files": ["skills/managing-agent/references/policy-debugging-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "get_policy_evaluations" },
+        { "type": "contains", "value": "act_xyz789" },
+        { "type": "regex", "value": "(?i)(OUTCOME_DENY|DENY_EXPLICIT|DENY_IMPLICIT|outcome)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Increase my agent's spending cap from 0.1 ETH to 1 ETH.",
+      "expected_output": "Lists policies first to find the DENY, then updates with new wei value (1000000000000000000). Confirms with human before updating.",
+      "files": ["skills/managing-agent/references/policy-update-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "list_policies" },
+        { "type": "contains", "value": "update_policy" },
+        { "type": "contains", "value": "1000000000000000000" },
+        { "type": "order", "before": "list_policies", "after": "update_policy" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add address 0xNewAddr to my agent's allowlist.",
+      "expected_output": "Lists policies, finds the allowlist ALLOW, updates with the full address list including the new one. Notes that update_policy replaces the condition entirely.",
+      "files": ["skills/managing-agent/references/policy-update-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "list_policies" },
+        { "type": "contains", "value": "update_policy" },
+        { "type": "contains", "value": "0xNewAddr" },
+        { "type": "contains", "value": "eth.tx.to" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Rotate my agent's API key. The agent user ID is usr_agent and the new public key is 04def456.",
+      "expected_output": "Follows correct rotation order: create new key, verify with whoami (signed with new key), delete old key (signed with new key), update runtime",
+      "files": ["skills/managing-agent/references/key-rotation-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "create_api_keys" },
+        { "type": "contains", "value": "whoami" },
+        { "type": "contains", "value": "delete_api_keys" },
+        { "type": "order", "before": "create_api_keys", "after": "whoami" },
+        { "type": "order", "before": "whoami", "after": "delete_api_keys" },
+        { "type": "contains", "value": "04def456" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "My agent is compromised. Shut it down immediately.",
+      "expected_output": "Deletes all API keys for the agent user immediately. Emphasizes this is instant. Optionally suggests cleanup of policies and user after.",
+      "files": [],
+      "assertions": [
+        { "type": "contains", "value": "delete_api_keys" },
+        { "type": "regex", "value": "(?i)(immediate|instant|right away|cannot.*authenticate)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Add Solana support to my agent's wallet. The wallet ID is wlt_abc.",
+      "expected_output": "Creates a Solana wallet account with create_wallet_accounts, AND warns that policies need to be updated for the new chain since EVM policies don't cover Solana",
+      "files": ["skills/managing-agent/references/policy-update-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "create_wallet_accounts" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" },
+        { "type": "regex", "value": "(?i)(polic|solana.tx|new.*chain.*polic|doesn't.*cover|separate.*polic)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "The policy evaluation shows OUTCOME_ERROR for my agent's policy. What's wrong?",
+      "expected_output": "Explains the no-short-circuit rule — likely mixing wallet.id and private_key.id in one condition. Recommends splitting into separate policies.",
+      "files": ["skills/managing-agent/references/policy-debugging-examples.md"],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(short.circuit|split|separate|two polic|error.*evaluat)", "flags": "i" }
+      ]
+    }
+  ]
+}

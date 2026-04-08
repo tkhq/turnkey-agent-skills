@@ -1,0 +1,105 @@
+{
+  "skill_name": "managing-policies",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a policy that lets my agent (user tag 'agent') sign transactions with wallet wlt_abc123.",
+      "expected_output": "EFFECT_ALLOW with consensus targeting agent tag, condition scoped to activity.action == 'SIGN' AND wallet.id. Asks human for confirmation before creating.",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "EFFECT_ALLOW" },
+        { "type": "contains", "value": "agent" },
+        { "type": "contains", "value": "wlt_abc123" },
+        { "type": "contains", "value": "activity.action" },
+        { "type": "contains", "value": "SIGN" },
+        { "type": "contains", "value": "wallet.id" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a policy that allows my agent to sign any transaction.",
+      "expected_output": "Should warn that an unscoped signing ALLOW is dangerous and recommend adding wallet.id scope. Should NOT produce an ALLOW with only activity.action == 'SIGN' and no wallet scope.",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(wallet.id|scope|dangerous|too broad|recommend|warn)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Set a spending limit of 0.5 ETH per transaction for all users.",
+      "expected_output": "Creates a DENY policy with condition eth.tx.value > 500000000000000000 (0.5 ETH in wei). No consensus (applies to all).",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "EFFECT_DENY" },
+        { "type": "contains", "value": "eth.tx.value" },
+        { "type": "contains", "value": "500000000000000000" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create one policy that allows signing with either wallet wlt_123 OR private key pk_456.",
+      "expected_output": "Should warn about the no-short-circuit rule and recommend splitting into two separate policies instead of using || between wallet.id and private_key.id",
+      "files": ["skills/managing-policies/references/policy-language.md"],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(short.circuit|split|separate|two polic)", "flags": "i" },
+        { "type": "not_contains", "value": "wallet.id == 'wlt_123' || private_key.id == 'pk_456'" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "My agent's transaction was denied. The activity ID is act_xyz789. Help me figure out why.",
+      "expected_output": "Uses get_policy_evaluations with the activity ID to retrieve the evaluation trace",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "get_policy_evaluations" },
+        { "type": "contains", "value": "act_xyz789" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Create a policy that only allows my agent to send ETH to addresses 0xAAA and 0xBBB on Base (chain ID 8453).",
+      "expected_output": "EFFECT_ALLOW with address allowlist using 'in' syntax and chain_id condition",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "EFFECT_ALLOW" },
+        { "type": "contains", "value": "eth.tx.to" },
+        { "type": "contains", "value": "0xAAA" },
+        { "type": "contains", "value": "0xBBB" },
+        { "type": "contains", "value": "8453" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Set a spending limit of 1 ETH. Use a value of 1 for the cap.",
+      "expected_output": "Should correct the user — eth.tx.value is in wei, not ETH. 1 ETH = 1000000000000000000 wei. Using 1 would block transfers above 1 wei.",
+      "files": ["skills/managing-policies/references/policy-language.md"],
+      "assertions": [
+        { "type": "regex", "value": "(?i)(wei|1000000000000000000|10\\^18|unit)", "flags": "i" },
+        { "type": "not_contains", "value": "eth.tx.value > 1\n" }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "I want to restrict my agent's Solana transactions to only the System Program. Also block any transactions that use address table lookups.",
+      "expected_output": "Two policies: ALLOW with program_keys restriction, DENY with address_table_lookups.count() > 0",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "program_keys" },
+        { "type": "contains", "value": "11111111111111111111111111111111" },
+        { "type": "contains", "value": "address_table_lookups" }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Require that two users with the 'admin' tag approve any signing request above 1 ETH.",
+      "expected_output": "ALLOW with consensus using filter + count >= 2 on admin tag, condition on eth.tx.value",
+      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "filter" },
+        { "type": "contains", "value": "admin" },
+        { "type": "contains", "value": "count()" },
+        { "type": "contains", "value": ">= 2" }
+      ]
+    }
+  ]
+}

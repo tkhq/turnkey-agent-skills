@@ -88,6 +88,7 @@ Agents that load the root `SKILL.md` first will follow this order automatically.
 | Skill | Path | Description |
 |-------|------|-------------|
 | Wallet Management | `skills/core/turnkey-wallet-management/` | Create wallets, derive addresses, manage accounts |
+| Sub-Organization Management | `skills/core/turnkey-suborg-management/` | Create sub-orgs with root users, API keys, and an initial wallet |
 | Transaction Signing | `skills/core/turnkey-transaction-signing/` | Stamping overview; directs to chain-specific skills |
 
 ### Signing
@@ -122,6 +123,7 @@ cp .env.example .env
 
 # Run an example (requires tsx)
 npx tsx examples/wallet-management.ts
+npx tsx examples/create-suborg.ts
 npx tsx examples/ethereum-ethers.ts
 npx tsx examples/ethereum-viem.ts
 npx tsx examples/solana-signing.ts
@@ -227,6 +229,10 @@ turnkey-agent-skills/
 │   │   │   ├── SKILL.md                  # Create wallets, derive addresses
 │   │   │   ├── references/
 │   │   │   └── evals/
+│   │   ├── turnkey-suborg-management/
+│   │   │   ├── SKILL.md                  # Create sub-orgs with root users + wallet
+│   │   │   ├── references/
+│   │   │   └── evals/
 │   │   └── turnkey-transaction-signing/
 │   │       ├── SKILL.md                  # Stamping overview + chain routing
 │   │       ├── references/
@@ -255,6 +261,7 @@ turnkey-agent-skills/
 │           └── references/
 ├── examples/
 │   ├── wallet-management.ts
+│   ├── create-suborg.ts
 │   ├── ethereum-ethers.ts
 │   ├── ethereum-viem.ts
 │   ├── solana-signing.ts

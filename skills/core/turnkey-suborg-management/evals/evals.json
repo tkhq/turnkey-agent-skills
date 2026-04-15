@@ -1,0 +1,76 @@
+{
+  "skill_name": "turnkey-suborg-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a Turnkey sub-organization under my parent org. It should have one root user (with the parent's API key attached) and a default Ethereum wallet. Use env vars TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, and TURNKEY_ORGANIZATION_ID.",
+      "expected_output": "Working TypeScript code that initializes a @turnkey/sdk-server client and calls createSubOrganization with subOrganizationName, a single rootUser containing the parent's API key, rootQuorumThreshold of 1, and a wallet with one ADDRESS_FORMAT_ETHEREUM account at m/44'/60'/0'/0/0. Logs the returned subOrganizationId.",
+      "files": [
+        "skills/core/turnkey-suborg-management/references/sdk-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_API_PRIVATE_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "calls", "value": "createSubOrganization" },
+        { "type": "contains", "value": "subOrganizationName" },
+        { "type": "contains", "value": "rootQuorumThreshold" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "contains", "value": "API_KEY_CURVE_P256" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Provision a Turnkey sub-org with a multi-chain wallet — I need addresses for Ethereum, Solana, and Bitcoin testnet SegWit. Single root user is fine.",
+      "expected_output": "Code that calls createSubOrganization with one root user and a wallet whose accounts include ADDRESS_FORMAT_ETHEREUM, ADDRESS_FORMAT_SOLANA, ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH, and ADDRESS_FORMAT_COMPRESSED (the compressed pubkey companion required for Bitcoin signing). Should use @turnkey/sdk-server.",
+      "files": [
+        "skills/core/turnkey-suborg-management/references/sdk-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "calls", "value": "createSubOrganization" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_COMPRESSED" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a Turnkey sub-organization but I really don't want to add @turnkey/sdk-server as a dependency — my deployment is bundle-size constrained. Just sign and post the activity directly using node:crypto. Use the parent's P-256 API key from env vars.",
+      "expected_output": "Code that uses node:crypto (createECDH, createPrivateKey, createSign) to build a P-256 stamp, then POSTs to /public/v1/submit/create_sub_organization with the X-Stamp header. Body is type ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V7. Does NOT import @turnkey/sdk-server.",
+      "files": [
+        "skills/core/turnkey-suborg-management/references/raw-stamping-examples.md"
+      ],
+      "assertions": [
+        { "type": "not_contains", "value": "@turnkey/sdk-server" },
+        { "type": "imports", "value": "node:crypto" },
+        { "type": "env_var", "value": "TURNKEY_API_PUBLIC_KEY" },
+        { "type": "env_var", "value": "TURNKEY_API_PRIVATE_KEY" },
+        { "type": "env_var", "value": "TURNKEY_ORGANIZATION_ID" },
+        { "type": "contains", "value": "ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V7" },
+        { "type": "contains", "value": "X-Stamp" },
+        { "type": "contains", "value": "/public/v1/submit/create_sub_organization" },
+        { "type": "compiles" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I need to create a sub-org for a 3-person team. Each member has their own P-256 API key. Set up 2-of-3 root quorum so any two of them can approve sub-org root activities. Include a default Ethereum wallet.",
+      "expected_output": "Code that creates a sub-org with three root users (each with their own API key), rootQuorumThreshold set to 2, and a wallet with an ADDRESS_FORMAT_ETHEREUM account.",
+      "files": [
+        "skills/core/turnkey-suborg-management/references/sdk-examples.md"
+      ],
+      "assertions": [
+        { "type": "imports", "value": "@turnkey/sdk-server" },
+        { "type": "calls", "value": "createSubOrganization" },
+        { "type": "contains", "value": "rootQuorumThreshold: 2" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "compiles" }
+      ]
+    }
+  ]
+}

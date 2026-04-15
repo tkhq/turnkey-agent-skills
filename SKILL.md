@@ -24,6 +24,7 @@ Skills for AI agents that need to manage wallets and sign transactions using [Tu
 | Skill | Path | Use when… |
 |-------|------|-----------|
 | Wallet Management | `skills/core/turnkey-wallet-management/SKILL.md` | creating a wallet, deriving addresses, or retrieving an existing wallet |
+| Sub-Organization Management | `skills/core/turnkey-suborg-management/SKILL.md` | provisioning a new sub-org for an end-user, tenant, or isolated workspace |
 | Transaction Signing | `skills/core/turnkey-transaction-signing/SKILL.md` | signing on unsupported chains, signing raw payloads, or understanding how Turnkey stamping works |
 
 ### Signing

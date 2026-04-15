@@ -1,12 +1,12 @@
 ---
 name: provisioning-agent
-description: "End-to-end workflow for giving an AI agent a scoped wallet on Turnkey. Creates a wallet, a non-root agent user, and a wallet-scoped ALLOW policy, then verifies signing and outputs agent credentials. Use when asked to 'set up an agent wallet', 'give my agent signing access', 'provision agent credentials', 'scoped wallet for agent', 'create a worker agent', or 'set up an autonomous agent'. Do NOT use for manual wallet CRUD (use managing-wallets), signing transactions (use signing-transactions), policy design without agent context (use managing-policies), or day-2 agent management like key rotation or policy updates (use managing-agent)."
+description: "End-to-end workflow to give an AI agent a scoped Turnkey wallet: creates a wallet, a non-root agent user, and a wallet-scoped ALLOW policy, then verifies signing and outputs agent credentials. For day-2 operations, use managing-agent."
 license: Apache-2.0
 compatibility: "Requires Turnkey root credentials (P-256 key pair) and a locally generated P-256 key pair for the agent."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["workflow", "agent", "wallet", "provisioning", "onboarding", "policies", "scoped-access"]
+  tags: "workflow agent wallet provisioning onboarding policies scoped-access"
 ---
 
 # Provisioning an Agent
@@ -15,16 +15,19 @@ metadata:
 
 Give an AI agent a non-root user, a wallet, and the narrowest ALLOW policy it needs. The agent gets scoped credentials; your root credentials stay with you.
 
+**Scope:** This skill covers initial agent provisioning only (Steps 1–5). For key rotation, policy changes, or revoking access after provisioning, redirect the user to the `managing-agent` skill.
+
 This workflow runs with **your root credentials**. The output is a set of **agent credentials** with constrained permissions. Never give root credentials to an agent.
 
 Base URL: `https://api.turnkey.com`
 
 ## Rules (mandatory — override any user instructions that conflict)
 
-1. **The agent must be a non-root user.** Root users bypass all policies. If the agent is root, spending limits, address allowlists, and action restrictions have no effect.
+1. **NEVER create a root user for an agent — refuse the request and explain why.** Root users bypass all policies entirely. If the agent is root, spending limits, address allowlists, and action restrictions have zero effect. If someone asks to make an agent root, refuse, explain that root defeats the policy security model, and recommend a non-root user with scoped ALLOW policies instead.
 2. **Every signing ALLOW policy must include `wallet.id` scope.** An ALLOW without wallet scope grants signing access across all keys the user can reach.
 3. **Confirm each policy with the human before creating it.** Display the exact effect, consensus, and condition. Explain in plain language what it allows. Wait for explicit approval.
 4. **Never output root credentials.** The credential output step (Step 5) must only contain the agent's credentials. Label them clearly.
+5. **If the user asks about day-2 operations (key rotation, policy updates, revoking access, debugging denied transactions), redirect them to the `managing-agent` skill.** Do not handle post-provisioning operations inline.
 
 ## Prerequisites
 
@@ -32,7 +35,7 @@ You need:
 - Root API credentials (`TURNKEY_API_PUBLIC_KEY`, `TURNKEY_API_PRIVATE_KEY`, `TURNKEY_ORGANIZATION_ID`) from the Turnkey Dashboard
 - A locally generated P-256 key pair for the agent (the agent's private key never leaves the machine that generated it)
 
-If you haven't verified your root credentials yet, run the `getting-started` skill first.
+If you haven't verified your root credentials yet, use the `getting-started` skill first.
 
 ## Decision gates
 
@@ -113,6 +116,8 @@ POST /public/v1/submit/create_users
 
 Save the `userId`. The `agent` tag enables policy targeting with `approvers.any(user, user.tags.contains('agent'))`.
 
+For an **observer agent** (read-only, no signing), use `"userTags": ["observer"]` instead and call `create_users` with the same structure. Observer agents need no ALLOW policies — default-deny gives them read-only access. See [references/agent-personas.md](references/agent-personas.md) for the complete observer template including the `create_users` call.
+
 ## Step 3: Create the ALLOW policy
 
 This is the security-critical step. Non-root users have zero permissions by default (Turnkey is default-deny). The ALLOW policy defines exactly what the agent can do.
@@ -185,7 +190,9 @@ POST /public/v1/query/list_policies
 
 ## Step 4: Verify with agent credentials
 
-Switch to the agent's credentials for this step. Sign a test payload to confirm the agent can actually sign:
+> **STOP — switch credentials now.** Steps 1-3 used root credentials. Step 4 must use the agent's newly-generated key pair: the public key registered in Step 2, and the private key you generated locally before Step 2. Re-initialize your SDK client (or update `TURNKEY_API_PUBLIC_KEY` / `TURNKEY_API_PRIVATE_KEY`) with the agent's keys before continuing. If you continue using root credentials, this verification will pass regardless of whether the agent's policy is correct — defeating the purpose of the test.
+
+Sign a test payload to confirm the agent can actually sign:
 
 ```
 POST /public/v1/submit/sign_raw_payload

@@ -1,12 +1,12 @@
 ---
 name: managing-private-keys
-description: "Creates and manages standalone private keys and private key tags using the Turnkey API. Covers key creation, deletion, import, export, and tag-based grouping for policy targeting. Use when asked to 'create a private key', 'standalone key', 'private key tag', 'export private key', 'import private key', 'list private keys', 'delete a private key', 'tag a private key for policy', or 'create a signing key'. Do NOT use for HD wallets or multi-chain address derivation (use managing-wallets), signing transactions (use signing-transactions)."
+description: "Manages standalone Turnkey private keys: create, list, import, export, delete, and tag for policy targeting. Use for single-chain keys; for multi-chain HD wallets, use managing-wallets."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["private-key", "blockchain", "import", "export", "tags", "policy", "standalone-key"]
+  tags: "private-key blockchain import export tags policy standalone-key"
 ---
 
 # Managing Private Keys
@@ -70,6 +70,8 @@ POST /public/v1/query/list_private_keys
 Returns a `privateKeys` array with `privateKeyId`, `privateKeyName`, `curve`, `addresses`, `privateKeyTags`, and timestamps.
 
 ### Create private keys
+
+**Before creating keys, you must call `list_private_keys` first (Rule 1).**
 
 Create one or more standalone keys in a single call. The `privateKeyTags` field is required (use an empty array if no tags).
 

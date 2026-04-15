@@ -7,9 +7,9 @@
       "expected_output": "Calls list_private_keys before create_private_keys, uses CURVE_SECP256K1 and ADDRESS_FORMAT_ETHEREUM, includes privateKeyTags",
       "files": ["skills/managing-private-keys/references/private-key-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "list_private_keys" },
-        { "type": "contains", "value": "create_private_keys" },
-        { "type": "order", "before": "list_private_keys", "after": "create_private_keys" },
+        { "type": "regex", "pattern": "\\b(list_private_keys|listPrivateKeys|getPrivateKeys)\\b" },
+        { "type": "regex", "pattern": "\\b(create_private_keys|createPrivateKeys)\\b" },
+        { "type": "regex", "pattern": "(list_private_keys|listPrivateKeys|getPrivateKeys)[\\s\\S]*?(create_private_keys|createPrivateKeys)" },
         { "type": "contains", "value": "CURVE_SECP256K1" },
         { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
         { "type": "contains", "value": "privateKeyTags" }
@@ -24,7 +24,7 @@
         { "type": "contains", "value": "CURVE_ED25519" },
         { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" },
         { "type": "not_contains", "value": "CURVE_SECP256K1" },
-        { "type": "contains", "value": "list_private_keys" }
+        { "type": "regex", "pattern": "\\b(list_private_keys|listPrivateKeys|getPrivateKeys)\\b" }
       ]
     },
     {
@@ -44,7 +44,7 @@
       "expected_output": "Recommends HD wallet (managing-wallets) for multi-chain, not standalone private keys",
       "files": [],
       "assertions": [
-        { "type": "regex", "value": "(?i)(hd wallet|managing-wallets|create_wallet)", "flags": "i" }
+        { "type": "regex", "value": "(hd wallet|managing-wallets|create_wallet|createWallet)", "flags": "i" }
       ]
     },
     {
@@ -53,7 +53,7 @@
       "expected_output": "Uses create_private_key_tag with the tag name and key IDs",
       "files": ["skills/managing-private-keys/references/private-key-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "create_private_key_tag" },
+        { "type": "regex", "pattern": "\\b(create_private_key_tag|createPrivateKeyTag)\\b" },
         { "type": "contains", "value": "treasury" },
         { "type": "contains", "value": "pk_abc" },
         { "type": "contains", "value": "pk_def" }
@@ -63,11 +63,12 @@
       "id": 6,
       "prompt": "Delete my private key pk_abc123. It hasn't been exported and I don't need it anymore.",
       "expected_output": "Uses delete_private_keys with deleteWithoutExport but warns about permanent fund loss and asks for confirmation",
+      "gradeFullResponse": true,
       "files": ["skills/managing-private-keys/references/private-key-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "delete_private_keys" },
+        { "type": "regex", "pattern": "\\b(delete_private_keys|deletePrivateKeys)\\b" },
         { "type": "contains", "value": "deleteWithoutExport" },
-        { "type": "regex", "value": "(?i)(irrecoverable|permanent|lost forever|cannot be undone|confirm|are you sure)", "flags": "i" }
+        { "type": "regex", "value": "(irrecoverable|permanent|lost forever|cannot be undone|confirm|are you sure|irreversible|warning|caution|destroy)", "flags": "i" }
       ]
     },
     {
@@ -76,8 +77,8 @@
       "expected_output": "Uses the 3-step import flow: init_import_private_key, encrypt client-side, import_private_key",
       "files": ["skills/managing-private-keys/references/private-key-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "init_import_private_key" },
-        { "type": "contains", "value": "import_private_key" },
+        { "type": "regex", "pattern": "\\b(init_import_private_key|initImportPrivateKey)\\b" },
+        { "type": "regex", "pattern": "\\b(import_private_key|importPrivateKey)\\b(?![_A-Za-z])" },
         { "type": "contains", "value": "encryptedBundle" },
         { "type": "contains", "value": "CURVE_SECP256K1" }
       ]

@@ -1,12 +1,12 @@
 ---
 name: managing-wallets
-description: "Creates and manages Turnkey HD wallets and derives blockchain addresses. Supports Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, and Sei. Use when asked to 'create a wallet', 'list wallets', 'get my ETH address', 'derive a Solana address', 'add a chain to my wallet', 'export wallet mnemonic', 'import a wallet', 'list wallet accounts', 'delete a wallet', or any time a signing address is needed before transacting. Do NOT use for standalone private keys (use managing-private-keys), signing (use signing-transactions), or balance queries (use checking-balances)."
+description: "Manages Turnkey HD wallets across 13+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei): create wallets, derive addresses, add chains, import/export. For standalone single-chain keys, use managing-private-keys."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["wallet", "blockchain", "address-derivation", "hd-wallet", "ethereum", "solana", "bitcoin", "multi-chain"]
+  tags: "wallet blockchain address-derivation hd-wallet ethereum solana bitcoin multi-chain"
 ---
 
 # Managing Wallets
@@ -267,10 +267,10 @@ For complete request/response examples for all operations, see [references/walle
 ## Troubleshooting
 
 **`ACTIVITY_STATUS_FAILED`**
-Wallet creation failed server-side. Check the Turnkey console for details.
+Wallet creation failed server-side. Call `get_activity` with the `activityId` to retrieve the error message.
 
 **`ACTIVITY_STATUS_REJECTED`**
-A policy denied the operation. Review policies in the Turnkey console.
+A policy denied the operation. Call `get_policy_evaluations` with the `activityId` to see which policy matched and why. See the `managing-policies` skill for policy debugging.
 
 **`ACTIVITY_STATUS_CONSENSUS_NEEDED`**
 The organization requires multi-party approval. Log the `activityId` and prompt a human approver.

@@ -43,6 +43,7 @@ const CONTENT_SECTION_PATTERNS = [
   // Policy/signing patterns
   "## How policies work",
   "## Choosing an approach",
+  "## Turnkey-managed",
   // Primitives with descriptive sections
   "## Activity lifecycle",
   "## When to use",
@@ -226,11 +227,11 @@ describe("SKILL.md (root package manifest)", () => {
       expect(typeof rootParsed.data.metadata.version).toBe("string");
     });
 
-    it("has metadata.tags field (array)", () => {
+    it("has metadata.tags field (non-empty string)", () => {
       expect(rootParsed.data).toHaveProperty("metadata");
       expect(rootParsed.data.metadata).toHaveProperty("tags");
-      expect(Array.isArray(rootParsed.data.metadata.tags)).toBe(true);
-      expect((rootParsed.data.metadata.tags as unknown[]).length).toBeGreaterThan(0);
+      expect(typeof rootParsed.data.metadata.tags).toBe("string");
+      expect((rootParsed.data.metadata.tags as string).trim().length).toBeGreaterThan(0);
     });
   });
 
@@ -289,7 +290,7 @@ const ASSERTION_FIELDS: Record<string, string[]> = {
   contains: ["value"],
   not_contains: ["value"],
   order: ["before", "after"],
-  regex: ["value"],
+  regex: [],  // requires "value" or "pattern" — validated below
   compiles: [],
 };
 
@@ -353,6 +354,13 @@ for (const evalsPath of evalsFiles) {
                 expect(
                   assertion[field] !== undefined && assertion[field] !== null,
                   `Assertion type "${assertion.type}" requires field "${field}"`,
+                ).toBe(true);
+              }
+              // regex assertions require either "value" or "pattern"
+              if (assertion.type === "regex") {
+                expect(
+                  assertion.value !== undefined || assertion.pattern !== undefined,
+                  `Assertion type "regex" requires either "value" or "pattern"`,
                 ).toBe(true);
               }
             });

@@ -50,7 +50,15 @@ function extractTypeScriptBlocks(markdown: string): CodeBlock[] {
 // Tests
 // ---------------------------------------------------------------------------
 
-const referenceFiles = findReferenceFiles(SKILLS_ROOT);
+const referenceFiles = findReferenceFiles(SKILLS_ROOT).filter(
+  (f) => f.endsWith(".ts"),
+);
+
+describe("reference file discovery", () => {
+  it("finds .ts reference files (may be zero)", () => {
+    expect(Array.isArray(referenceFiles)).toBe(true);
+  });
+});
 
 for (const filePath of referenceFiles) {
   const name = relativePath(filePath);

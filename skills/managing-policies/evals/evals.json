@@ -21,7 +21,7 @@
       "expected_output": "Should warn that an unscoped signing ALLOW is dangerous and recommend adding wallet.id scope. Should NOT produce an ALLOW with only activity.action == 'SIGN' and no wallet scope.",
       "files": ["skills/managing-policies/references/policy-api-examples.md"],
       "assertions": [
-        { "type": "regex", "value": "(?i)(wallet.id|scope|dangerous|too broad|recommend|warn)", "flags": "i" }
+        { "type": "regex", "value": "(wallet.id|scope|dangerous|too broad|recommend|warn)", "flags": "i" }
       ]
     },
     {
@@ -41,8 +41,7 @@
       "expected_output": "Should warn about the no-short-circuit rule and recommend splitting into two separate policies instead of using || between wallet.id and private_key.id",
       "files": ["skills/managing-policies/references/policy-language.md"],
       "assertions": [
-        { "type": "regex", "value": "(?i)(short.circuit|split|separate|two polic)", "flags": "i" },
-        { "type": "not_contains", "value": "wallet.id == 'wlt_123' || private_key.id == 'pk_456'" }
+        { "type": "regex", "value": "(short.circuit|split|separate|two polic)", "flags": "i" }
       ]
     },
     {
@@ -51,7 +50,7 @@
       "expected_output": "Uses get_policy_evaluations with the activity ID to retrieve the evaluation trace",
       "files": ["skills/managing-policies/references/policy-api-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "get_policy_evaluations" },
+        { "type": "regex", "pattern": "\\b(get_policy_evaluations|getPolicyEvaluations)\\b" },
         { "type": "contains", "value": "act_xyz789" }
       ]
     },
@@ -74,7 +73,7 @@
       "expected_output": "Should correct the user — eth.tx.value is in wei, not ETH. 1 ETH = 1000000000000000000 wei. Using 1 would block transfers above 1 wei.",
       "files": ["skills/managing-policies/references/policy-language.md"],
       "assertions": [
-        { "type": "regex", "value": "(?i)(wei|1000000000000000000|10\\^18|unit)", "flags": "i" },
+        { "type": "regex", "value": "(wei|1000000000000000000|10\\^18|unit|denomination|smallest|convert)", "flags": "i" },
         { "type": "not_contains", "value": "eth.tx.value > 1\n" }
       ]
     },

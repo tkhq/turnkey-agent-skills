@@ -1,12 +1,12 @@
 ---
 name: managing-policies
-description: "Creates and manages Turnkey policies for access control and transaction governance. Policies use effect (ALLOW/DENY), consensus, and condition fields to control what users and agents can do. Use when asked to 'create a policy', 'set up an allowlist', 'set spending limits', 'restrict signing', 'manage policies', 'upload a smart contract ABI', 'debug a denied transaction', 'set up multi-sig approval', or 'check policy evaluations'. Do NOT use for wallet operations (use managing-wallets), signing (use signing-transactions), or user management (use managing-users)."
+description: "Manages Turnkey policies for access control and transaction governance: ALLOW/DENY policies, consensus expressions, allowlists, spending limits, multi-sig approval, smart contract ABIs, and policy evaluation debugging."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["policy", "access-control", "governance", "security", "allowlist", "deny", "consensus", "smart-contract"]
+  tags: "policy access-control governance security allowlist deny consensus smart-contract"
 ---
 
 # Managing Policies
@@ -23,6 +23,16 @@ Policies control access to real wallets holding real funds. A misconfigured poli
 2. **Every ALLOW policy for signing MUST include `wallet.id` or `private_key.id` scope.** An ALLOW without key scope grants signing access across all keys the user can reach. This is almost never intended.
 3. **Explain consequences, not just syntax.** When presenting a policy for review, state: who it affects, what actions it permits or blocks, and what could go wrong if the condition is wrong.
 4. **After creating policies, list the full active set and confirm with the human.** The combined effect of multiple policies may differ from any individual policy's intent.
+
+## Prerequisites
+
+Requires API credentials. Use the `getting-started` skill if you still need to verify credentials.
+
+```env
+TURNKEY_API_PUBLIC_KEY=    # Turnkey API key — public component (hex)
+TURNKEY_API_PRIVATE_KEY=   # Turnkey API key — private component (P-256 hex)
+TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
+```
 
 ## How policies work
 
@@ -70,153 +80,9 @@ condition: "wallet.id == 'wlt_123' || private_key.id == 'pk_456'"
 
 **Fix:** Split into two separate policies — one for wallet signing, one for private key signing.
 
-## Good ALLOW policy templates
+## Policy templates and anti-patterns
 
-These templates are starting points. Always scope to the specific user/wallet and tighten further based on the use case.
-
-### Agent can sign with a specific wallet
-
-```json
-{
-  "policyName": "agent-sign-with-wallet",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'"
-}
-```
-
-This is the minimum viable ALLOW for an agent. It scopes to signing only, with one specific wallet.
-
-### Agent can sign EVM transactions to approved addresses only
-
-```json
-{
-  "policyName": "agent-eth-allowlist",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to in ['<ADDR_1>', '<ADDR_2>', '<ADDR_3>']"
-}
-```
-
-### Spending cap (use as a DENY guardrail)
-
-```json
-{
-  "policyName": "deny-large-eth-transfers",
-  "effect": "EFFECT_DENY",
-  "condition": "eth.tx.value > 100000000000000000"
-}
-```
-
-This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless of who submits it. No `consensus` means it applies to all users. DENY overrides any ALLOW.
-
-### Restrict to specific contract function (requires ABI upload)
-
-```json
-{
-  "policyName": "agent-usdc-transfer-only",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.id == '<AGENT_USER_ID>')",
-  "condition": "eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
-}
-```
-
-`eth.tx.function_name` only works after uploading the contract's ABI. See Smart Contract Interfaces below.
-
-### Multi-sig approval (require 2 of N)
-
-```json
-{
-  "policyName": "require-two-traders",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('trader')).count() >= 2",
-  "condition": "activity.action == 'SIGN'"
-}
-```
-
-### Solana: restrict to a specific program
-
-```json
-{
-  "policyName": "agent-solana-system-program-only",
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
-}
-```
-
-### Block admin operations for an agent
-
-```json
-{
-  "policyName": "agent-deny-admin",
-  "effect": "EFFECT_DENY",
-  "condition": "activity.resource in ['USER', 'POLICY', 'ORGANIZATION']"
-}
-```
-
-No `consensus` — applies universally. Prevents any user from creating users, modifying policies, or changing org settings. Root users bypass this.
-
-## Anti-patterns (DO NOT use these)
-
-### Unscoped signing ALLOW
-
-```json
-{
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN'"
-}
-```
-
-**Why it's bad:** No wallet scope. The agent can sign with ANY wallet or key in the organization. Always include `wallet.id == '<ID>'` or `private_key.id == '<ID>'`.
-
-### ALLOW-all with no conditions
-
-```json
-{
-  "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.id == '<USER_ID>')"
-}
-```
-
-**Why it's bad:** No condition means this user can do anything — create users, modify policies, delete wallets. Only use this for admin users who genuinely need full access.
-
-### Mixed context in one condition
-
-```json
-{
-  "condition": "wallet.id == 'wlt_123' || private_key.id == 'pk_456'"
-}
-```
-
-**Why it's bad:** The policy engine doesn't short-circuit. One side will always error depending on whether the signing target is a wallet or private key. Split into separate policies.
-
-### DENY-all with no admin escape
-
-```json
-{
-  "effect": "EFFECT_DENY",
-  "condition": "true"
-}
-```
-
-**Why it's bad:** Blocks all non-root users from all actions. The only way to remove this policy is via root quorum. If root access is unavailable, the organization is permanently locked.
-
-### Wrong units for spending caps
-
-```json
-{
-  "condition": "eth.tx.value > 1"
-}
-```
-
-**Why it's bad:** `eth.tx.value` is in wei. This blocks transfers above 1 wei (essentially all transfers). Use `1000000000000000000` for 1 ETH, `100000000000000000` for 0.1 ETH, etc.
-
-**Unit reference:**
-- ETH: `eth.tx.value` in wei (1 ETH = 10^18 wei)
-- SOL: `solana.tx.transfers[].amount` in lamports (1 SOL = 10^9 lamports)
-- BTC: `bitcoin.tx.outputs[].value` in satoshis (1 BTC = 10^8 satoshis)
+For ready-to-use ALLOW templates (wallet-scoped signing, address allowlists, spending caps, ABI-restricted contract calls, multi-sig, Solana program restrictions, admin blocks) and anti-patterns to avoid (unscoped ALLOWs, mixed wallet/private_key contexts, DENY-all lockouts, wrong unit math), see [references/policy-templates.md](references/policy-templates.md).
 
 ## Instructions
 

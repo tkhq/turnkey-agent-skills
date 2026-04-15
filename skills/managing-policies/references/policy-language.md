@@ -1,5 +1,18 @@
 # Policy Language Reference
 
+## Example expressions
+
+```
+# Consensus: any approver with a specific tag
+approvers.any(user, user.tags.contains('finance-approver'))
+
+# Condition: allow signing only from a specific wallet, ETH value under 1 ETH
+activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value < 1000000000000000000
+
+# Condition: deny all policy mutations
+activity.resource == 'POLICY'
+```
+
 ## Grammar
 
 | Operation | Operators | Example | Types |

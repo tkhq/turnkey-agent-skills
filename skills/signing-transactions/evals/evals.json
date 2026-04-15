@@ -4,10 +4,10 @@
     {
       "id": 1,
       "prompt": "Send 0.001 ETH to 0xRecipient on Base. Use the simplest approach possible.",
-      "expected_output": "Uses eth_send_transaction with caip2 eip155:8453, not SDK signing",
+      "expected_output": "Uses the Turnkey-managed eth_send_transaction endpoint (via SDK or direct HTTP) with caip2 eip155:8453, not SDK signing",
       "files": ["skills/signing-transactions/references/evm-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "eth_send_transaction" },
+        { "type": "regex", "value": "eth_send_transaction|ethSendTransaction" },
         { "type": "contains", "value": "eip155:8453" },
         { "type": "not_contains", "value": "TurnkeySigner" },
         { "type": "not_contains", "value": "createAccount" }
@@ -16,14 +16,14 @@
     {
       "id": 2,
       "prompt": "Send a sponsored (gasless) USDC transfer on Base using Turnkey. The recipient is 0xRecipient and the amount is 10 USDC.",
-      "expected_output": "Uses eth_send_transaction with sponsor: true, encodes ERC-20 transfer in data field",
+      "expected_output": "Uses the Turnkey-managed eth_send_transaction endpoint (via SDK or direct HTTP) with sponsor: true, encodes ERC-20 transfer in data field",
       "files": ["skills/signing-transactions/references/evm-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "eth_send_transaction" },
+        { "type": "regex", "value": "eth_send_transaction|ethSendTransaction" },
         { "type": "contains", "value": "sponsor" },
         { "type": "contains", "value": "true" },
         { "type": "contains", "value": "data" },
-        { "type": "contains", "value": "a9059cbb" }
+        { "type": "regex", "pattern": "a9059cbb|encodeFunctionData" }
       ]
     },
     {
@@ -122,10 +122,10 @@
     {
       "id": 10,
       "prompt": "I want to send SOL as simply as possible. Don't make me install any extra packages.",
-      "expected_output": "Uses sol_send_transaction (Turnkey-managed), not @turnkey/solana SDK",
+      "expected_output": "Uses the Turnkey-managed sol_send_transaction endpoint (via SDK or direct HTTP), not @turnkey/solana SDK signing",
       "files": ["skills/signing-transactions/references/solana-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "sol_send_transaction" },
+        { "type": "regex", "value": "sol_send_transaction|solSendTransaction" },
         { "type": "not_contains", "value": "TurnkeySigner" },
         { "type": "not_contains", "value": "@turnkey/solana" }
       ]

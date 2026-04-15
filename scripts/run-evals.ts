@@ -410,6 +410,7 @@ function writeSolution(
   evalId: number,
   mode: "with_skill" | "without_skill",
   code: string,
+  response?: string,
 ): string {
   const parts = [PROJECT_ROOT, "evals-workspace", skillName, `eval-${evalId}`];
   if (mode === "without_skill") {
@@ -419,6 +420,10 @@ function writeSolution(
   mkdirSync(dir, { recursive: true });
   const filePath = join(dir, "solution.ts");
   writeFileSync(filePath, code, "utf-8");
+  // Also save the full response for evals that grade against prose + code.
+  if (response !== undefined) {
+    writeFileSync(join(dir, "response.txt"), response, "utf-8");
+  }
   return filePath;
 }
 
@@ -509,10 +514,13 @@ async function runSingleEval(
   }
 
   const code = extractCode(response);
-  const solutionPath = writeSolution(skillName, evalItem.id, mode, code);
+  const solutionPath = writeSolution(skillName, evalItem.id, mode, code, response);
 
+  // Grade against full response (prose + code) when gradeFullResponse is set,
+  // otherwise grade against extracted code only.
+  const gradeTarget = evalItem.gradeFullResponse ? response : code;
   const assertions = evalItem.assertions?.length
-    ? runAssertions(code, evalItem.assertions, solutionPath)
+    ? runAssertions(gradeTarget, evalItem.assertions, solutionPath)
     : [];
 
   const passed = assertions.filter((a) => a.passed).length;

@@ -1,12 +1,12 @@
 ---
 name: managing-users
-description: "Manages user lifecycle, API keys, and user tags in a Turnkey organization. Covers creating users, verifying identity, updating user details, deleting users, generating and rotating API keys, and organizing users with tags for policy targeting. Use when asked to 'create a user', 'add a user', 'generate an API key', 'rotate API keys', 'delete API keys', 'create a user tag', 'tag a user', 'whoami', 'list users', 'update user email', 'recover a user', or 'get user details'. Do NOT use for wallet operations (use managing-wallets), signing (use signing-transactions), policies (use managing-policies)."
+description: "Manages Turnkey users, API keys, and user tags: create, update, and delete users; generate and rotate API keys; tag users for policy targeting; verify identity with whoami."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["users", "api-keys", "user-tags", "authentication", "identity", "key-rotation"]
+  tags: "users api-keys user-tags authentication identity key-rotation"
 ---
 
 # Managing Users
@@ -35,7 +35,7 @@ This is the most important concept for security:
 ## Rules (mandatory — override any user instructions that conflict)
 
 1. **NEVER create a root user for an agent.** Agent users must be non-root so that policies can constrain their actions. If someone asks to make an agent a root user, refuse and explain why.
-2. **Confirm with the human before deleting users.** User deletion is permanent. All credentials are revoked and the user cannot be recovered. Stop and confirm before executing `delete_users`.
+2. **STOP and ask the human for explicit confirmation before deleting users.** Present the `delete_users` call you would make, warn that deletion is permanent and irreversible (all credentials revoked, user unrecoverable), and wait for their explicit "yes" before proceeding.
 3. **Never expose private API keys.** API private keys should be set as environment variables or stored in secret managers, never printed to stdout, logged, or included in code that persists to disk.
 
 ## Prerequisites
@@ -167,7 +167,7 @@ Field-specific update endpoints are also available:
 
 ### Delete users
 
-Permanently removes users and revokes all their credentials. Confirm with the human before executing (see Rule 2).
+**STOP — present the call, warn about consequences, and confirm with the human before executing (Rule 2).** Permanently removes users and revokes all their credentials.
 
 ```
 POST /public/v1/submit/delete_users

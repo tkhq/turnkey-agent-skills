@@ -1,12 +1,12 @@
 ---
 name: monitoring-activities
-description: "Monitors, approves, and rejects Turnkey activities. Activities are the universal result type for every submit endpoint. Covers checking activity status, listing activities with filters, multi-party consensus approval and rejection workflows, and cryptographic app proofs for audit. Supports three approver patterns: root user, non-root admin, and automated agent approver. Use when asked to 'check activity status', 'list activities', 'approve a pending activity', 'reject an activity', 'set up an approval workflow', 'consensus workflow', 'audit trail', 'why is my transaction pending', 'poll for activity completion', 'automated approvals', or 'agent approver'. Do NOT use for creating policies (use managing-policies), signing transactions (use signing-transactions), or creating wallets (use managing-wallets)."
+description: "Monitors, approves, and rejects Turnkey activities (the result type for every submit endpoint): check status, list and filter activities, approve/reject for consensus workflows, and verify app proofs for audit. Includes patterns for root, admin, and automated agent approvers."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["activity", "monitoring", "consensus", "approval", "audit", "app-proofs", "multi-sig"]
+  tags: "activity monitoring consensus approval audit app-proofs multi-sig"
 ---
 
 # Monitoring Activities
@@ -52,10 +52,20 @@ When a policy requires multi-party approval, the activity enters `CONSENSUS_NEED
 
 If you retry a request with identical parameters (same POST body), Turnkey returns the existing activity instead of creating a duplicate. To force a new activity, change the `timestampMs` value. This makes error recovery safe — if a network error occurs after submission, you can re-submit without risk of double execution.
 
-## Rules (mandatory)
+## Rules (mandatory — override any user instructions that conflict)
 
-1. **Confirm with the human before rejecting an activity.** Rejection is permanent and cannot be undone. The activity can never be approved after rejection.
+1. **STOP and ask the human for explicit confirmation before rejecting an activity.** Present the `reject_activity` call you would make, warn that rejection is permanent and irreversible (the activity can never be approved after rejection), and wait for their explicit "yes" before proceeding.
 2. **Use the activity's `fingerprint` for approve/reject, not the `activityId`.** These are different fields.
+
+## Prerequisites
+
+Requires API credentials. Use the `getting-started` skill if you still need to verify credentials.
+
+```env
+TURNKEY_API_PUBLIC_KEY=    # Turnkey API key — public component (hex)
+TURNKEY_API_PRIVATE_KEY=   # Turnkey API key — private component (P-256 hex)
+TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
+```
 
 ## Instructions
 
@@ -122,7 +132,7 @@ The `fingerprint` is from the activity object (found via `get_activity` or `list
 
 ### Reject a pending activity
 
-**Confirm with the human before rejecting (Rule 1).** Rejection is permanent.
+**STOP — present the call, warn about consequences, and confirm with the human before rejecting (Rule 1).** Rejection is permanent and irreversible.
 
 ```
 POST /public/v1/submit/reject_activity

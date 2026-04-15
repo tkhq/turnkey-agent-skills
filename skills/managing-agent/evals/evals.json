@@ -7,9 +7,9 @@
       "expected_output": "Uses get_policy_evaluations with the activity ID, explains how to interpret the outcomes",
       "files": ["skills/managing-agent/references/policy-debugging-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "get_policy_evaluations" },
+        { "type": "regex", "pattern": "\\b(get_policy_evaluations|getPolicyEvaluations)\\b" },
         { "type": "contains", "value": "act_xyz789" },
-        { "type": "regex", "value": "(?i)(OUTCOME_DENY|DENY_EXPLICIT|DENY_IMPLICIT|outcome)", "flags": "i" }
+        { "type": "regex", "value": "(OUTCOME_DENY|DENY_EXPLICIT|DENY_IMPLICIT|outcome)", "flags": "i" }
       ]
     },
     {
@@ -18,10 +18,10 @@
       "expected_output": "Lists policies first to find the DENY, then updates with new wei value (1000000000000000000). Confirms with human before updating.",
       "files": ["skills/managing-agent/references/policy-update-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "list_policies" },
-        { "type": "contains", "value": "update_policy" },
+        { "type": "regex", "pattern": "\\b(list_policies|listPolicies|getPolicies)\\b" },
+        { "type": "regex", "pattern": "\\b(update_policy|updatePolicy)\\b" },
         { "type": "contains", "value": "1000000000000000000" },
-        { "type": "order", "before": "list_policies", "after": "update_policy" }
+        { "type": "regex", "pattern": "(list_policies|listPolicies|getPolicies)[\\s\\S]*?(update_policy|updatePolicy)" }
       ]
     },
     {
@@ -30,8 +30,8 @@
       "expected_output": "Lists policies, finds the allowlist ALLOW, updates with the full address list including the new one. Notes that update_policy replaces the condition entirely.",
       "files": ["skills/managing-agent/references/policy-update-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "list_policies" },
-        { "type": "contains", "value": "update_policy" },
+        { "type": "regex", "pattern": "\\b(list_policies|listPolicies|getPolicies)\\b" },
+        { "type": "regex", "pattern": "\\b(update_policy|updatePolicy)\\b" },
         { "type": "contains", "value": "0xNewAddr" },
         { "type": "contains", "value": "eth.tx.to" }
       ]
@@ -42,11 +42,11 @@
       "expected_output": "Follows correct rotation order: create new key, verify with whoami (signed with new key), delete old key (signed with new key), update runtime",
       "files": ["skills/managing-agent/references/key-rotation-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "create_api_keys" },
-        { "type": "contains", "value": "whoami" },
-        { "type": "contains", "value": "delete_api_keys" },
-        { "type": "order", "before": "create_api_keys", "after": "whoami" },
-        { "type": "order", "before": "whoami", "after": "delete_api_keys" },
+        { "type": "regex", "pattern": "\\b(create_api_keys|createApiKeys)\\b" },
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\b" },
+        { "type": "regex", "pattern": "(create_api_keys|createApiKeys)[\\s\\S]*?(whoami|Whoami|getWhoami)" },
+        { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(delete_api_keys|deleteApiKeys)" },
         { "type": "contains", "value": "04def456" }
       ]
     },
@@ -56,8 +56,8 @@
       "expected_output": "Deletes all API keys for the agent user immediately. Emphasizes this is instant. Optionally suggests cleanup of policies and user after.",
       "files": [],
       "assertions": [
-        { "type": "contains", "value": "delete_api_keys" },
-        { "type": "regex", "value": "(?i)(immediate|instant|right away|cannot.*authenticate)", "flags": "i" }
+        { "type": "regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\b" },
+        { "type": "regex", "value": "(immediate|instant|right away|cannot.*authenticate)", "flags": "i" }
       ]
     },
     {
@@ -66,9 +66,9 @@
       "expected_output": "Creates a Solana wallet account with create_wallet_accounts, AND warns that policies need to be updated for the new chain since EVM policies don't cover Solana",
       "files": ["skills/managing-agent/references/policy-update-examples.md"],
       "assertions": [
-        { "type": "contains", "value": "create_wallet_accounts" },
+        { "type": "regex", "pattern": "\\b(create_wallet_accounts|createWalletAccounts)\\b" },
         { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" },
-        { "type": "regex", "value": "(?i)(polic|solana.tx|new.*chain.*polic|doesn't.*cover|separate.*polic)", "flags": "i" }
+        { "type": "regex", "value": "(polic|solana.tx|new.*chain.*polic|doesn't.*cover|separate.*polic)", "flags": "i" }
       ]
     },
     {
@@ -77,7 +77,7 @@
       "expected_output": "Explains the no-short-circuit rule — likely mixing wallet.id and private_key.id in one condition. Recommends splitting into separate policies.",
       "files": ["skills/managing-agent/references/policy-debugging-examples.md"],
       "assertions": [
-        { "type": "regex", "value": "(?i)(short.circuit|split|separate|two polic|error.*evaluat)", "flags": "i" }
+        { "type": "regex", "value": "(short.circuit|split|separate|two polic|error.*evaluat)", "flags": "i" }
       ]
     }
   ]

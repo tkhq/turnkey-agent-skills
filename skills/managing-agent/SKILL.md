@@ -1,12 +1,12 @@
 ---
 name: managing-agent
-description: "Day-2 operations for a provisioned Turnkey agent. Independent recipes for debugging denied transactions, changing spending limits or allowed addresses, rotating agent API keys, revoking agent access, and adding new chains. Use when asked to 'debug a denied transaction', 'why was my agent blocked', 'change agent spending limit', 'update agent allowlist', 'add an address to my agent policy', 'rotate agent key', 'revoke agent access', 'disable my agent', 'add a chain to my agent wallet', or 'update agent permissions'. Do NOT use for initial agent setup (use provisioning-agent), general policy design (use managing-policies), or general wallet management (use managing-wallets)."
+description: "Day-2 operations for a provisioned Turnkey agent: debug denied transactions, update policies (spending limits, allowlists), rotate API keys, revoke access, and add chains. Requires root credentials. For initial agent setup, use provisioning-agent."
 license: Apache-2.0
 compatibility: "Requires Turnkey root credentials (P-256 key pair). All recipes run with root/admin access."
 metadata:
   version: "1.0.0"
   author: turnkey
-  tags: ["workflow", "agent", "management", "key-rotation", "revocation", "debugging", "policy-update"]
+  tags: "workflow agent management key-rotation revocation debugging policy-update"
 ---
 
 # Managing an Agent
@@ -21,6 +21,18 @@ Base URL: `https://api.turnkey.com`
 
 1. **Human confirmation before any policy change.** Display the updated policy and explain what changes. Wait for explicit approval.
 2. **When revoking access, delete keys first.** Key deletion is instant. Policy and user cleanup can happen after.
+
+## Prerequisites
+
+Requires **root** API credentials. All recipes run with root/admin access, not agent credentials.
+
+```env
+TURNKEY_API_PUBLIC_KEY=    # Root API key — public component (hex)
+TURNKEY_API_PRIVATE_KEY=   # Root API key — private component (P-256 hex)
+TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
+```
+
+Use the `getting-started` skill if you still need to verify credentials.
 
 ---
 

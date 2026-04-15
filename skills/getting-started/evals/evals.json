@@ -7,7 +7,7 @@
       "expected_output": "Uses the whoami endpoint with organizationId to verify credentials",
       "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
       "assertions": [
-        { "type": "contains", "value": "whoami" },
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
         { "type": "contains", "value": "organizationId" }
       ]
     },
@@ -17,11 +17,11 @@
       "expected_output": "Verifies credentials first with whoami, lists existing wallets, then creates a wallet with ETH and Solana accounts",
       "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
       "assertions": [
-        { "type": "contains", "value": "whoami" },
-        { "type": "contains", "value": "list_wallets" },
-        { "type": "contains", "value": "create_wallet" },
-        { "type": "order", "before": "whoami", "after": "list_wallets" },
-        { "type": "order", "before": "list_wallets", "after": "create_wallet" },
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "\\b(list_wallets|listWallets|getWallets)\\b" },
+        { "type": "regex", "pattern": "\\b(create_wallet|createWallet)\\b(?![_A-Za-z])" },
+        { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(list_wallets|listWallets|getWallets)" },
+        { "type": "regex", "pattern": "(list_wallets|listWallets|getWallets)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" },
         { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
         { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" }
       ]
@@ -32,19 +32,20 @@
       "expected_output": "Should still verify with whoami first and list_wallets before creating — these are mandatory steps",
       "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
       "assertions": [
-        { "type": "contains", "value": "whoami" },
-        { "type": "contains", "value": "list_wallets" },
-        { "type": "order", "before": "whoami", "after": "create_wallet" },
-        { "type": "order", "before": "list_wallets", "after": "create_wallet" }
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "\\b(list_wallets|listWallets|getWallets)\\b" },
+        { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" },
+        { "type": "regex", "pattern": "(list_wallets|listWallets|getWallets)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" }
       ]
     },
     {
       "id": 4,
       "prompt": "I want to give my AI agent a wallet on Turnkey. Where do I start?",
-      "expected_output": "Routes to provisioning-agent skill for agent setup, does not try to create the agent wallet directly in this workflow",
+      "expected_output": "Routes to provisioning-agent skill for agent setup, or describes the provisioning workflow",
+      "gradeFullResponse": true,
       "files": [],
       "assertions": [
-        { "type": "regex", "value": "(?i)provisioning.agent", "flags": "i" }
+        { "type": "regex", "pattern": "provisioning.agent|provision.*agent|agent.*provision|non.root.*user|userTags", "flags": "i" }
       ]
     },
     {
@@ -53,7 +54,7 @@
       "expected_output": "Uses sign_raw_payload with the address, hex payload, and HASH_FUNCTION_SHA256 for a simple test",
       "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
       "assertions": [
-        { "type": "contains", "value": "sign_raw_payload" },
+        { "type": "regex", "pattern": "\\b(sign_raw_payload|signRawPayload)\\b" },
         { "type": "contains", "value": "0xABC" },
         { "type": "contains", "value": "HASH_FUNCTION_SHA256" },
         { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" }

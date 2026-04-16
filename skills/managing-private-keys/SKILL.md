@@ -106,13 +106,19 @@ You can specify multiple `addressFormats` per key to get addresses in multiple f
 | Aptos | CURVE_ED25519 | ADDRESS_FORMAT_APTOS |
 | Sui | CURVE_ED25519 | ADDRESS_FORMAT_SUI |
 | Tron | CURVE_SECP256K1 | ADDRESS_FORMAT_TRON |
-| TON | CURVE_ED25519 | ADDRESS_FORMAT_TON_V4R2 |
+| TON (v4r2) | CURVE_ED25519 | ADDRESS_FORMAT_TON_V4R2 |
+| TON (v5r1) | CURVE_ED25519 | ADDRESS_FORMAT_TON_V5R1 |
 | XRP | CURVE_SECP256K1 | ADDRESS_FORMAT_XRP |
 | Stellar (XLM) | CURVE_ED25519 | ADDRESS_FORMAT_XLM |
 | Dogecoin | CURVE_SECP256K1 | ADDRESS_FORMAT_DOGE_MAINNET |
 | Sei | CURVE_ED25519 | ADDRESS_FORMAT_SEI |
+| Spark | CURVE_SECP256K1 | ADDRESS_FORMAT_SPARK_MAINNET |
 
-For testnet Bitcoin: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR`.
+For TON, v5r1 is the recommended wallet contract. Use `ADDRESS_FORMAT_TON_V3R2` for legacy wallets.
+
+For testnet Bitcoin: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR`. For testnet Dogecoin: `ADDRESS_FORMAT_DOGE_TESTNET`.
+
+Additional Bitcoin address formats are supported: `ADDRESS_FORMAT_BITCOIN_MAINNET_P2PKH` (legacy), `ADDRESS_FORMAT_BITCOIN_MAINNET_P2SH` (script hash), `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WSH` (witness script hash). SegWit (P2WPKH) and Taproot (P2TR) are recommended for new keys.
 
 ### Get a single private key
 

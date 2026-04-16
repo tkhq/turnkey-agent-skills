@@ -1,6 +1,6 @@
 ---
 name: managing-wallets
-description: "Manages Turnkey HD wallets across 13+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei): create wallets, derive addresses, add chains, import/export. For standalone single-chain keys, use managing-private-keys."
+description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, Spark): create wallets, derive addresses, add chains, import/export. For standalone single-chain keys, use managing-private-keys."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
@@ -128,15 +128,23 @@ The result contains `walletId` and an `addresses` array ordered to match the `ac
 | Aptos | CURVE_ED25519 | m/44'/637'/0'/0'/0 | ADDRESS_FORMAT_APTOS |
 | Sui | CURVE_ED25519 | m/44'/784'/0'/0/0 | ADDRESS_FORMAT_SUI |
 | Tron | CURVE_SECP256K1 | m/44'/195'/0'/0/0 | ADDRESS_FORMAT_TRON |
-| TON | CURVE_ED25519 | m/44'/607'/0'/0/0 | ADDRESS_FORMAT_TON_V4R2 |
+| TON (v4r2) | CURVE_ED25519 | m/44'/607'/0'/0/0 | ADDRESS_FORMAT_TON_V4R2 |
+| TON (v5r1) | CURVE_ED25519 | m/44'/607'/0'/0/0 | ADDRESS_FORMAT_TON_V5R1 |
 | XRP | CURVE_SECP256K1 | m/44'/144'/0'/0/0 | ADDRESS_FORMAT_XRP |
 | Stellar (XLM) | CURVE_ED25519 | m/44'/148'/0'/0'/0 | ADDRESS_FORMAT_XLM |
 | Dogecoin | CURVE_SECP256K1 | m/44'/3'/0'/0/0 | ADDRESS_FORMAT_DOGE_MAINNET |
 | Sei | CURVE_ED25519 | m/44'/118'/0'/0/0 | ADDRESS_FORMAT_SEI |
+| Spark | CURVE_SECP256K1 | m/8797555'/0'/0' | ADDRESS_FORMAT_SPARK_MAINNET |
 
-For testnet Bitcoin: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` (path `m/84'/1'/1'/0/0`) or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR` (path `m/86'/1'/1'/0/0`).
+For TON, v5r1 is the recommended wallet contract (gasless support, up to 255 messages per request). Use v4r2 for compatibility with older TON tooling, and `ADDRESS_FORMAT_TON_V3R2` for legacy wallets.
 
-One EVM account covers all EVM-compatible chains (Ethereum, Base, Polygon, Arbitrum, Optimism). Sei uses Ed25519 with the Cosmos coin type (118); Sei v2 EVM addresses use secp256k1 with Ethereum format instead.
+For testnet Bitcoin: `ADDRESS_FORMAT_BITCOIN_TESTNET_P2WPKH` (path `m/84'/1'/1'/0/0`) or `ADDRESS_FORMAT_BITCOIN_TESTNET_P2TR` (path `m/86'/1'/1'/0/0`). For testnet Dogecoin: `ADDRESS_FORMAT_DOGE_TESTNET`. Bitcoin Signet and Regtest address formats are also available.
+
+Additional Bitcoin address formats are supported for legacy and multi-sig use cases: `ADDRESS_FORMAT_BITCOIN_MAINNET_P2PKH` (legacy), `ADDRESS_FORMAT_BITCOIN_MAINNET_P2SH` (script hash), and `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WSH` (witness script hash for multi-sig). SegWit (P2WPKH) and Taproot (P2TR) are recommended for new wallets.
+
+Spark uses raw payload signing only (`sign_raw_payload` with plain BIP-340 Schnorr) — it does not support `sign_transaction`. For Spark regtest: `ADDRESS_FORMAT_SPARK_REGTEST`.
+
+One EVM account covers all EVM-compatible chains (Ethereum, Base, Polygon, Arbitrum, Optimism, Flare, and others). Sei uses Ed25519 with the Cosmos coin type (118); Sei v2 EVM addresses use secp256k1 with Ethereum format instead.
 
 ### Bitcoin requires two accounts at the same path
 

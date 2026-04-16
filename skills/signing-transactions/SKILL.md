@@ -99,6 +99,8 @@ POST /public/v1/submit/eth_send_transaction
 | Base Sepolia | `eip155:84532` |
 | Polygon | `eip155:137` |
 | Polygon Amoy | `eip155:80002` |
+| Arbitrum | `eip155:42161` |
+| Arbitrum Sepolia | `eip155:421614` |
 
 For additional EVM chains and gas station nonce usage, see [references/evm-examples.md](references/evm-examples.md).
 
@@ -140,6 +142,8 @@ When `sponsor: true`, Turnkey handles the fee payer and provides a recent blockh
 | Solana Mainnet | `solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp` |
 | Solana Devnet | `solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG` |
 | Solana Testnet | `solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY` |
+
+These are the exact enum values accepted by the API. They use the Solana genesis hash as the chain reference. Turnkey's SDK tutorials may show short aliases like `solana:mainnet` — the SDK translates these internally, but for HTTP API calls use the genesis-hash values above.
 
 For SDK signing, batch transactions, message signing, and versioned transactions, see [references/solana-examples.md](references/solana-examples.md).
 

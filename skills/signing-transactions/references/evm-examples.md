@@ -128,6 +128,8 @@ Add `"gasStationNonce": true` to get the Turnkey gas station nonce (for sponsore
 | Base Sepolia | `eip155:84532` |
 | Polygon | `eip155:137` |
 | Polygon Amoy | `eip155:80002` |
+| Arbitrum | `eip155:42161` |
+| Arbitrum Sepolia | `eip155:421614` |
 
 ---
 

@@ -65,7 +65,7 @@ DENY always overrides ALLOW. A single DENY policy beats any number of ALLOWs.
 ### Implicit permissions (no policy needed)
 
 - All users can read data in their own organization
-- All users can change their own credentials
+- All users can change their own credentials, **unless** a policy explicitly allows or denies credential actions — once any policy covers credentials, the implicit permission no longer applies
 - Users named in a consensus expression can approve that activity
 
 ### The no-short-circuit rule

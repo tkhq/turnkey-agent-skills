@@ -112,7 +112,7 @@ POST /public/v1/submit/create_wallet
 }
 ```
 
-`mnemonicLength` is optional (defaults to 12). Valid values: 12 (128-bit) or 24 (256-bit).
+`mnemonicLength` is optional (defaults to 12). Valid values: 12, 15, 18, 21, or 24.
 
 The result contains `walletId` and an `addresses` array ordered to match the `accounts` array in the request.
 

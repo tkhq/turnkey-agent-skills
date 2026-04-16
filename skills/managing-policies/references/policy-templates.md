@@ -75,6 +75,32 @@ This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless o
 }
 ```
 
+### Tron: allow TRX transfers under a cap
+
+```json
+{
+  "policyName": "agent-tron-transfer-cap",
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tron.tx.contract[0].type == 'TransferContract' && tron.tx.contract[0].amount < 10000000"
+}
+```
+
+Amount is in SUN (1 TRX = 1,000,000 SUN). This cap is 10 TRX.
+
+### Tempo: restrict calls to an approved contract
+
+```json
+{
+  "policyName": "agent-tempo-approved-contract",
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
+}
+```
+
+Uses `all` to ensure every call in a batched Tempo transaction targets the approved address.
+
 ### Block admin operations for an agent
 
 ```json
@@ -147,3 +173,4 @@ No `consensus` — applies universally. Prevents any user from creating users, m
 - ETH: `eth.tx.value` in wei (1 ETH = 10^18 wei)
 - SOL: `solana.tx.transfers[].amount` in lamports (1 SOL = 10^9 lamports)
 - BTC: `bitcoin.tx.outputs[].value` in satoshis (1 BTC = 10^8 satoshis)
+- TRX: `tron.tx.contract[0].amount` in SUN (1 TRX = 10^6 SUN)

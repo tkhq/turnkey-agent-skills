@@ -243,11 +243,11 @@ For Bitcoin, remember the dual-account requirement (compressed key + address at 
 
 ### Update policies for the new chain
 
-Adding a chain account does NOT automatically grant the agent permission to sign on it. If the agent's ALLOW policy only references `eth.tx.*` conditions, it won't cover Solana transactions.
+Adding a chain account does NOT automatically grant the agent permission to sign on it. If the agent's ALLOW policy only references `eth.tx.*` conditions, it won't cover Solana, Tron, Tempo, or Bitcoin transactions.
 
 You may need to:
-1. **Create a new ALLOW policy** for the new chain (e.g., with `solana.tx.*` conditions)
-2. **Create chain-specific DENY guardrails** (e.g., Solana transfer cap, program restrictions)
+1. **Create a new ALLOW policy** for the new chain (e.g., `solana.tx.*` for Solana, `tron.tx.*` for Tron, `tempo.tx.*` for Tempo, `bitcoin.tx.*` for Bitcoin)
+2. **Create chain-specific DENY guardrails** (e.g., Solana transfer cap, Tron amount cap in SUN, program restrictions)
 3. **Verify** the agent can sign on the new chain with a test payload
 
 Confirm all policy changes with the human before creating them.
@@ -266,7 +266,7 @@ List all policies to check for conflicting DENY policies that override the updat
 Verify all keys were deleted, not just one. Use `get_api_keys` to confirm zero keys remain for the user. If using sessions, those may need to expire separately.
 
 **New chain added but agent can't sign on it**
-Policies are chain-specific. An ALLOW with `eth.tx.to in [...]` doesn't cover Solana. Create a separate policy with `solana.tx.*` conditions.
+Policies are chain-specific. An ALLOW with `eth.tx.to in [...]` doesn't cover Solana, Tron, Tempo, or Bitcoin. Create a separate policy with the appropriate namespace (`solana.tx.*`, `tron.tx.*`, `tempo.tx.*`, `bitcoin.tx.*`).
 
 ## Related Skills
 

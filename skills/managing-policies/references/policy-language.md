@@ -83,6 +83,7 @@ Available in the `condition` field:
 | `solana.tx` | SolanaTransaction |
 | `tron.tx` | TronTransaction |
 | `bitcoin.tx` | BitcoinTransaction |
+| `tempo.tx` | TempoTransaction |
 | `wallet` | Wallet |
 | `wallets` | list\<Wallet> |
 | `private_key` | PrivateKey |
@@ -211,12 +212,41 @@ Unresolved lookups appear as the literal string `ADDRESS_TABLE_LOOKUP` in addres
 
 | Field | Available for |
 |-------|---------------|
-| `type` | All (`TransferContract`, `TriggerSmartContract`) |
+| `type` | All (`TransferContract`, `TriggerSmartContract`, `DelegateResourceContract`, `UnDelegateResourceContract`, `FreezeBalanceV2Contract`, `UnfreezeBalanceV2Contract`, `AccountPermissionUpdateContract`) |
 | `owner_address` | All |
 | `to_address` | TransferContract |
-| `amount` | TransferContract (in **sun**, 1 TRX = 10^6) |
+| `amount` | TransferContract (in **SUN**, 1 TRX = 10^6) |
 | `contract_address` | TriggerSmartContract |
-| `data` | TriggerSmartContract |
+| `data` | TriggerSmartContract (function selector + encoded args) |
+| `call_value` | TriggerSmartContract (TRX passed to contract) |
+| `resource` | DelegateResourceContract, UnDelegateResourceContract, FreezeBalanceV2Contract, UnfreezeBalanceV2Contract (`"ENERGY"` or `"BANDWIDTH"`) |
+| `balance` | DelegateResourceContract, UnDelegateResourceContract (in SUN) |
+| `receiver_address` | DelegateResourceContract, UnDelegateResourceContract |
+
+## Tempo transaction (tempo.tx)
+
+| Field | Type |
+|-------|------|
+| `chain_id` | int |
+| `from` | string |
+| `nonce` | int |
+| `gas_limit` | int |
+| `max_fee_per_gas` | int |
+| `max_priority_fee_per_gas` | int |
+| `fee_token` | string (token address used to pay fees) |
+| `valid_before` | int (upper validity timestamp, 0 if unset) |
+| `valid_after` | int (lower validity timestamp, 0 if unset) |
+| `calls` | list\<TempoCall> |
+
+### TempoCall
+
+| Field | Type |
+|-------|------|
+| `to` | string (destination address) |
+| `input` | string (hex calldata, supports slicing e.g. `input[34..74]`) |
+| `function_signature` | string (4-byte selector, e.g. `0xa9059cbb`) |
+
+Tempo does not support ABI/IDL uploads. Use calldata slicing on `input` to inspect encoded arguments.
 
 ## Common activity types
 

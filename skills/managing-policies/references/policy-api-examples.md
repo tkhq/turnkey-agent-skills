@@ -285,6 +285,84 @@ Sepolia chain ID = `11155111`. Base = `8453`. Mainnet = `1`.
 
 Include the change address in the allowlist or the transaction will be denied.
 
+## Tron policy patterns
+
+### Allow TRX transfers only
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tron.tx.contract[0].type == 'TransferContract'"
+}
+```
+
+### TRX transfer cap
+
+```json
+{
+  "effect": "EFFECT_DENY",
+  "condition": "tron.tx.contract[0].amount > 10000000"
+}
+```
+
+10,000,000 SUN = 10 TRX.
+
+### Allow TRC-20 calls to a specific contract
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tron.tx.contract[0].contract_address == '<TRC20_CONTRACT>' && tron.tx.contract[0].data[0..8] == 'a9059cbb'"
+}
+```
+
+`a9059cbb` is the ERC-20/TRC-20 `transfer(address,uint256)` function selector.
+
+## Tempo policy patterns
+
+### Allow Tempo transactions for a specific wallet
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "activity.action == 'SIGN' && activity.params.type == 'TRANSACTION_TYPE_TEMPO' && wallet.id == '<WALLET_ID>'"
+}
+```
+
+### Restrict all calls to an approved contract
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
+}
+```
+
+### Deny high gas limit
+
+```json
+{
+  "effect": "EFFECT_DENY",
+  "condition": "tempo.tx.gas_limit > 100000"
+}
+```
+
+### Restrict ERC-20 transfer recipient via calldata slicing
+
+Tempo does not support ABI uploads. Inspect encoded arguments by slicing `input`. The recipient address in a `transfer(address,uint256)` call starts at position 34 (after the 4-byte selector + 12 bytes of left-padding):
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "tempo.tx.calls[0].to == '<TOKEN_CONTRACT>' && tempo.tx.calls[0].input[34..74] == '<RECIPIENT_NO_0x>'"
+}
+```
+
 ## Smart contract interface management
 
 ### Upload an ABI

@@ -211,7 +211,23 @@ POST /public/v1/submit/create_smart_contract_interface
 }
 ```
 
-After uploading, you can use `eth.tx.function_name`, `eth.tx.function_signature`, and `eth.tx.contract_call_args` in policy conditions.
+After uploading, you can use `eth.tx.function_name`, `eth.tx.function_signature`, and `eth.tx.contract_call_args` in policy conditions. For Solana programs, upload an IDL instead of an ABI using `"type": "SMART_CONTRACT_INTERFACE_TYPE_SOLANA"`.
+
+## Chain-specific policy namespaces
+
+The policy engine parses signed transactions and exposes chain-specific fields:
+
+| Namespace | Chain | Key fields |
+|-----------|-------|------------|
+| `eth.tx` | Ethereum/EVM | `to`, `value` (wei), `data`, `function_name`, `chain_id` |
+| `solana.tx` | Solana | `transfers`, `spl_transfers`, `program_keys`, `instructions` |
+| `bitcoin.tx` | Bitcoin | `inputs`, `outputs`, `fee` (satoshis) |
+| `tron.tx` | Tron | `contract[0].type`, `contract[0].amount` (SUN), `contract[0].to_address`, `contract[0].contract_address` |
+| `tempo.tx` | Tempo | `calls`, `chain_id`, `fee_token`, `from`; each call has `to`, `input`, `function_signature` |
+
+Tron transactions contain a `contract` array (currently always one element). Reference fields as `tron.tx.contract[0].field`. Supported contract types: `TransferContract`, `TriggerSmartContract`, `DelegateResourceContract`, `UnDelegateResourceContract`, `FreezeBalanceV2Contract`, `UnfreezeBalanceV2Contract`, `AccountPermissionUpdateContract`.
+
+Tempo transactions support batched calls. Use `tempo.tx.calls` with list operations (`all`, `any`, `count`) to govern individual calls. Tempo does not support ABI uploads — use calldata slicing on `tempo.tx.calls[i].input` to inspect encoded arguments.
 
 For the complete policy language reference (all keywords, types, struct fields, chain-specific data), see [references/policy-language.md](references/policy-language.md).
 
@@ -226,7 +242,7 @@ The no-short-circuit rule means conditions that mix wallet and private_key conte
 The contract's ABI hasn't been uploaded. Use `create_smart_contract_interface` first.
 
 **Spending cap doesn't work**
-Check units. `eth.tx.value` is in wei. 1 ETH = `1000000000000000000`. A cap of `100` blocks transfers above 100 wei, not 100 ETH.
+Check units. `eth.tx.value` is in wei (1 ETH = `1000000000000000000`). `tron.tx.contract[0].amount` is in SUN (1 TRX = `1000000`). `solana.tx.transfers[].amount` is in lamports (1 SOL = `1000000000`). `bitcoin.tx.outputs[].value` is in satoshis (1 BTC = `100000000`). A cap of `100` blocks transfers above 100 of the smallest unit, not 100 of the token.
 
 **Agent denied unexpectedly**
 Use `get_policy_evaluations` to see which policy matched. Common causes: a DENY policy's condition is broader than intended, or the ALLOW policy's consensus doesn't match the agent's user ID or tag.

@@ -119,7 +119,7 @@ Some activity types expose additional fields via `activity.params`:
 | activity.type | Param | Description |
 |---------------|-------|-------------|
 | `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | `hash_function` | e.g., `HASH_FUNCTION_NO_OP`, `HASH_FUNCTION_SHA256`, `HASH_FUNCTION_KECCAK256` |
-| `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | `encoding` | e.g., `PAYLOAD_ENCODING_HEXADECIMAL`, `PAYLOAD_ENCODING_EIP712` |
+| `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | `encoding` | `PAYLOAD_ENCODING_HEXADECIMAL`, `PAYLOAD_ENCODING_TEXT_UTF8`, `PAYLOAD_ENCODING_EIP712`, `PAYLOAD_ENCODING_EIP7702_AUTHORIZATION` |
 | `ACTIVITY_TYPE_SIGN_TRANSACTION_V2` | `type` | `TRANSACTION_TYPE_ETHEREUM`, `TRANSACTION_TYPE_SOLANA`, `TRANSACTION_TYPE_BITCOIN`, `TRANSACTION_TYPE_TRON`, `TRANSACTION_TYPE_TEMPO` |
 
 ## Wallet, PrivateKey, WalletAccount structs
@@ -177,6 +177,18 @@ Some activity types expose additional fields via `activity.params`:
 | `message` | map\<string, Value> |
 
 All hex strings in EIP-712 must be lowercase.
+
+## EIP-7702 authorization (eth.eip_7702_authorization)
+
+Available when `activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'` and `encoding == 'PAYLOAD_ENCODING_EIP7702_AUTHORIZATION'`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address` | string | The delegation contract address |
+| `chain_id` | number | The EVM chain ID |
+| `nonce` | number | The nonce of the authority (EOA) |
+
+EIP-7702 lets an EOA delegate to a smart contract without migrating funds. The authorization is signed via `sign_raw_payload` and included in a Type 4 EVM transaction's authorization list.
 
 ## Solana transaction (solana.tx)
 

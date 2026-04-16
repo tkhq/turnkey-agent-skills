@@ -218,6 +218,17 @@ Sepolia chain ID = `11155111`. Base = `8453`. Mainnet = `1`.
 }
 ```
 
+### EIP-7702 authorization restriction
+
+```json
+{
+  "effect": "EFFECT_ALLOW",
+  "condition": "eth.eip_7702_authorization.address == '<DELEGATION_CONTRACT>' && eth.eip_7702_authorization.chain_id == 1 && activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'"
+}
+```
+
+Restricts EIP-7702 delegation to a specific contract on a specific chain. Without a policy like this, an agent could delegate the EOA to any contract.
+
 ## Solana policy patterns
 
 ### Restrict to System Program

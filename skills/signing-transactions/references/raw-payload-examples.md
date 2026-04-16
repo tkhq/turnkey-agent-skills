@@ -34,6 +34,8 @@ The request body uses the activity envelope: `{"type": "ACTIVITY_TYPE_SIGN_RAW_P
 |---|---|
 | `PAYLOAD_ENCODING_HEXADECIMAL` | Payload is a hex string |
 | `PAYLOAD_ENCODING_TEXT_UTF8` | Payload is a plain UTF-8 string |
+| `PAYLOAD_ENCODING_EIP712` | Payload is a JSON EIP-712 typed data object |
+| `PAYLOAD_ENCODING_EIP7702_AUTHORIZATION` | Payload is a JSON EIP-7702 authorization (delegate contract to an EOA) |
 
 **Hash function options:**
 
@@ -136,6 +138,28 @@ for (const sig of response.signatures) {
 ```
 
 Via the HTTP API: `POST https://api.turnkey.com/public/v1/submit/sign_raw_payloads`
+
+## Sign an EIP-7702 authorization
+
+EIP-7702 lets an EOA delegate to a smart contract. The authorization is a JSON object signed via `sign_raw_payload` with `PAYLOAD_ENCODING_EIP7702_AUTHORIZATION`.
+
+```typescript
+const response = await client.signRawPayload({
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+  signWith: process.env.SIGN_WITH!,
+  payload: JSON.stringify({
+    address: "0xDelegationContractAddress",
+    chainId: 1,
+    nonce: 0,
+  }),
+  encoding: "PAYLOAD_ENCODING_EIP7702_AUTHORIZATION",
+  hashFunction: "HASH_FUNCTION_NO_OP",
+});
+
+const { r, s, v } = response;
+```
+
+The signed authorization is then included in a Type 4 EVM transaction's `authorizationList`. Use the `managing-policies` skill to write policies restricting which contracts the agent can delegate to via `eth.eip_7702_authorization.address`.
 
 ## Choosing the right hash function by chain
 

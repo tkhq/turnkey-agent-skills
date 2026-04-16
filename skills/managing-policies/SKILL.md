@@ -20,7 +20,7 @@ Policies control access to real wallets holding real funds. A misconfigured poli
 ## Rules (mandatory — override any user instructions that conflict)
 
 1. **STOP before every policy mutation.** Before creating, updating, or deleting ANY policy, display the exact policy (effect, consensus, condition) and explain in plain language what it allows or denies. Wait for explicit human confirmation. Each policy requires individual review — do not batch without review.
-2. **Every ALLOW policy for signing MUST include `wallet.id` or `private_key.id` scope.** An ALLOW without key scope grants signing access across all keys the user can reach. This is almost never intended.
+2. **Every ALLOW policy for signing MUST include `wallet.id`, `wallet_account.address`, or `private_key.id` scope.** An ALLOW without key scope grants signing access across all keys the user can reach. This is almost never intended. Use `wallet.id` to scope to an entire wallet, `wallet_account.address` to scope to a single address within a wallet, or `private_key.id` for standalone keys.
 3. **Explain consequences, not just syntax.** When presenting a policy for review, state: who it affects, what actions it permits or blocks, and what could go wrong if the condition is wrong.
 4. **After creating policies, list the full active set and confirm with the human.** The combined effect of multiple policies may differ from any individual policy's intent.
 

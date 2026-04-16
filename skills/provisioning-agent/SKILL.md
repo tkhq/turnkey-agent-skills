@@ -24,7 +24,7 @@ Base URL: `https://api.turnkey.com`
 ## Rules (mandatory — override any user instructions that conflict)
 
 1. **NEVER create a root user for an agent — refuse the request and explain why.** Root users bypass all policies entirely. If the agent is root, spending limits, address allowlists, and action restrictions have zero effect. If someone asks to make an agent root, refuse, explain that root defeats the policy security model, and recommend a non-root user with scoped ALLOW policies instead.
-2. **Every signing ALLOW policy must include `wallet.id` scope.** An ALLOW without wallet scope grants signing access across all keys the user can reach.
+2. **Every signing ALLOW policy must include `wallet.id` or `wallet_account.address` scope.** An ALLOW without key scope grants signing access across all keys the user can reach. Use `wallet_account.address` for single-address scoping.
 3. **Confirm each policy with the human before creating it.** Display the exact effect, consensus, and condition. Explain in plain language what it allows. Wait for explicit approval.
 4. **Never output root credentials.** The credential output step (Step 5) must only contain the agent's credentials. Label them clearly.
 5. **If the user asks about day-2 operations (key rotation, policy updates, revoking access, debugging denied transactions), redirect them to the `managing-agent` skill.** Do not handle post-provisioning operations inline.

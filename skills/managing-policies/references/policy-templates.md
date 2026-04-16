@@ -17,6 +17,19 @@ Starting points for common policy patterns, plus mistakes to avoid. Always scope
 
 This is the minimum viable ALLOW for an agent. It scopes to signing only, with one specific wallet.
 
+### Agent can sign with a specific wallet account address
+
+```json
+{
+  "policyName": "agent-sign-with-address",
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "activity.action == 'SIGN' && wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>'"
+}
+```
+
+More granular than `wallet.id` — restricts signing to a single address within a wallet. Useful when a wallet has accounts on multiple chains and the agent should only sign on one.
+
 ### Agent can sign EVM transactions to approved addresses only
 
 ```json

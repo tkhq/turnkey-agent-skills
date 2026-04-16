@@ -64,7 +64,7 @@ POST /public/v1/query/whoami
 }
 ```
 
-Returns `userId`, `username`, and `organizationId`.
+Returns `organizationId`, `organizationName`, `userId`, and `username`.
 
 ### List users
 

@@ -43,7 +43,7 @@ POST /public/v1/query/whoami
 }
 ```
 
-**Success:** Returns `userId`, `username`, and `organizationName`.
+**Success:** Returns `organizationId`, `organizationName`, `userId`, and `username`.
 
 **Failure:** Check that:
 - `TURNKEY_API_PUBLIC_KEY` matches the key registered in the Turnkey Dashboard

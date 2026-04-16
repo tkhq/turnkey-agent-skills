@@ -186,7 +186,7 @@ For the complete rotation workflow with full request/response, see [references/k
 
 ## I need to revoke agent access immediately
 
-Delete all of the agent's API keys. This takes effect instantly — the agent can no longer authenticate.
+Delete all of the agent's API keys. This takes effect **immediately** — key deletion is instant, and the agent can no longer authenticate the moment the request succeeds. When responding to a compromise or shutdown request, state this explicitly in your reply so the operator knows no further mitigation is needed to stop signing.
 
 ```
 POST /public/v1/submit/delete_api_keys

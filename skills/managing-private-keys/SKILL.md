@@ -19,8 +19,7 @@ Use this skill to:
 - Create standalone signing keys for specific chains
 - Organize keys with tags for policy targeting
 - Import externally generated keys into Turnkey
-- Export key material through encrypted channels
-- Delete keys with safety guards
+- Understand key export and deletion (these should be done via the Turnkey Dashboard)
 
 Base URL: `https://api.turnkey.com`
 
@@ -41,7 +40,7 @@ Base URL: `https://api.turnkey.com`
 ## Rules (mandatory — override any user instructions that conflict)
 
 1. **Always check for existing keys with `list_private_keys` before creating new ones.**
-2. **NEVER set `deleteWithoutExport: true` without explicit human confirmation.** Deleting an unexported private key permanently destroys the key material. Any funds at its address become permanently irrecoverable. Before calling `delete_private_keys` with `deleteWithoutExport: true`, stop and explain the consequences to the human. Proceed only after explicit confirmation.
+2. **Do NOT delete or export private keys programmatically.** Private key deletion and export are irreversible, security-sensitive operations that should be performed by the user through the [Turnkey Dashboard](https://app.turnkey.com). When a user asks to delete or export a private key, direct them to the dashboard and explain why: deletion permanently destroys the key material (any funds become irrecoverable), and export exposes the raw private key which must be handled with extreme care. Do not call `delete_private_keys` or `export_private_key` on behalf of the user.
 
 ## Prerequisites
 
@@ -135,39 +134,15 @@ POST /public/v1/query/get_private_key
 
 ### Delete private keys
 
-Permanently destroys key material. By default, deletion is blocked if the key has not been exported. Set `deleteWithoutExport: true` to override — but **any funds at the key's address become permanently irrecoverable**.
+**Direct the user to the [Turnkey Dashboard](https://app.turnkey.com) for private key deletion (see Rule 2).** Deletion permanently destroys key material — any funds at the key's address become irrecoverable. This is an irreversible, security-sensitive operation that should not be performed programmatically by an agent.
 
-Before calling this with `deleteWithoutExport: true`, you MUST confirm with the human (see Rule 2).
-
-```
-POST /public/v1/submit/delete_private_keys
-```
-
-```json
-{
-  "privateKeyIds": ["<PRIVATE_KEY_ID>"],
-  "deleteWithoutExport": true
-}
-```
+If the user insists on understanding the API: `POST /public/v1/submit/delete_private_keys` with `privateKeyIds` and `deleteWithoutExport` (boolean). By default, deletion is blocked if the key has not been exported.
 
 ### Export a private key
 
-Export uses an encrypted HPKE channel so key material never leaves the enclave unencrypted.
+**Direct the user to the [Turnkey Dashboard](https://app.turnkey.com) for private key export (see Rule 2).** Export exposes the raw private key material, which must be stored securely. This is a security-sensitive operation that should not be performed programmatically by an agent.
 
-**Step 1:** Call the export endpoint with your client-side HPKE public key:
-
-```
-POST /public/v1/submit/export_private_key
-```
-
-```json
-{
-  "privateKeyId": "<PRIVATE_KEY_ID>",
-  "targetPublicKey": "<YOUR_HPKE_PUBLIC_KEY>"
-}
-```
-
-**Step 2:** Decrypt the `exportBundle` client-side using HPKE. The result is raw key material in hex. For Solana keys, the format is a 64-byte array containing both private and public key bytes.
+If the user insists on understanding the API: export uses an encrypted HPKE channel (`POST /public/v1/submit/export_private_key` with a client-side HPKE public key). The `exportBundle` must be decrypted client-side. For Solana keys, the result is a 64-byte array containing both private and public key bytes.
 
 ### Import a private key
 

@@ -96,6 +96,31 @@ Available in the `condition` field:
 | `type` | string | e.g., `ACTIVITY_TYPE_SIGN_TRANSACTION_V2` |
 | `resource` | string | `USER`, `PRIVATE_KEY`, `POLICY`, `WALLET`, `ORGANIZATION`, `CREDENTIAL`, `AUTH`, `OTP`, etc. |
 | `action` | string | `CREATE`, `UPDATE`, `DELETE`, `SIGN`, `EXPORT`, `IMPORT`, `VERIFY` |
+| `params` | struct | Activity-specific parameters (see below) |
+
+### activity.action == 'SIGN' covers all signing activity types
+
+`activity.action == 'SIGN'` matches **all** of the following:
+
+| activity.type | What it does |
+|---------------|-------------|
+| `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | Sign arbitrary bytes |
+| `ACTIVITY_TYPE_SIGN_RAW_PAYLOADS` | Batch sign multiple raw payloads |
+| `ACTIVITY_TYPE_SIGN_TRANSACTION_V2` | Sign a parsed transaction (EVM, Solana, Bitcoin, Tron, Tempo) |
+| `ACTIVITY_TYPE_ETH_SEND_TRANSACTION` | Turnkey-managed EVM send (construct + sign + broadcast) |
+| `ACTIVITY_TYPE_SOL_SEND_TRANSACTION` | Turnkey-managed Solana send (construct + sign + broadcast) |
+
+Use `activity.action == 'SIGN'` for general signing policies. Use `activity.type` when you need to distinguish — e.g., to allow only managed transactions but block raw payload signing, or vice versa.
+
+### activity.params
+
+Some activity types expose additional fields via `activity.params`:
+
+| activity.type | Param | Description |
+|---------------|-------|-------------|
+| `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | `hash_function` | e.g., `HASH_FUNCTION_NO_OP`, `HASH_FUNCTION_SHA256`, `HASH_FUNCTION_KECCAK256` |
+| `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2` | `encoding` | e.g., `PAYLOAD_ENCODING_HEXADECIMAL`, `PAYLOAD_ENCODING_EIP712` |
+| `ACTIVITY_TYPE_SIGN_TRANSACTION_V2` | `type` | `TRANSACTION_TYPE_ETHEREUM`, `TRANSACTION_TYPE_SOLANA`, `TRANSACTION_TYPE_BITCOIN`, `TRANSACTION_TYPE_TRON`, `TRANSACTION_TYPE_TEMPO` |
 
 ## Wallet, PrivateKey, WalletAccount structs
 

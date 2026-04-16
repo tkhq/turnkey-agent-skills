@@ -126,6 +126,31 @@ Uses `all` to ensure every call in a batched Tempo transaction targets the appro
 
 No `consensus` — applies universally. Prevents any user from creating users, modifying policies, or changing org settings. Root users bypass this.
 
+### Allow only managed EVM transactions (block raw signing)
+
+```json
+{
+  "policyName": "agent-managed-eth-only",
+  "effect": "EFFECT_ALLOW",
+  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "condition": "activity.type == 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION' && wallet.id == '<WALLET_ID>'"
+}
+```
+
+Unlike `activity.action == 'SIGN'`, this only allows Turnkey-managed EVM sends. Raw payload signing and `SIGN_TRANSACTION_V2` are not covered, so the agent cannot sign arbitrary bytes.
+
+### Deny raw payload signing (allow everything else)
+
+```json
+{
+  "policyName": "deny-raw-signing",
+  "effect": "EFFECT_DENY",
+  "condition": "activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'"
+}
+```
+
+Blocks raw payload signing while still permitting `SIGN_TRANSACTION_V2`, `ETH_SEND_TRANSACTION`, and `SOL_SEND_TRANSACTION`. Useful when you want parsed-transaction policies to govern signing but don't want agents signing arbitrary bytes.
+
 ## Anti-patterns (DO NOT use these)
 
 ### Unscoped signing ALLOW

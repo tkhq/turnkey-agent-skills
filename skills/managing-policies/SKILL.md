@@ -53,6 +53,17 @@ TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
 - **condition**: When it applies — expression over activity metadata, transaction fields, wallet/key info
 - Both are optional, but at least one should be provided
 
+### activity.action vs activity.type
+
+`activity.action == 'SIGN'` is a broad matcher that covers **all** signing activity types: `SIGN_RAW_PAYLOAD_V2`, `SIGN_RAW_PAYLOADS`, `SIGN_TRANSACTION_V2`, `ETH_SEND_TRANSACTION`, and `SOL_SEND_TRANSACTION`. This is the recommended approach for general signing policies.
+
+When you need finer control, use `activity.type` to target a specific activity:
+- **Allow only managed transactions**: `activity.type == 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION'` (blocks raw signing)
+- **Block raw payload signing**: `activity.type != 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'` combined with `activity.action == 'SIGN'`
+- **Target EIP-712 specifically**: `activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2' && activity.params.encoding == 'PAYLOAD_ENCODING_EIP712'`
+
+See [references/policy-language.md](references/policy-language.md) for the full action → type mapping table.
+
 ### Evaluation order
 
 1. **Root quorum bypass**: Root users are always allowed, regardless of policies

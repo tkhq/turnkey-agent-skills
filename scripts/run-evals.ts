@@ -12,7 +12,7 @@
  *   --provider custom     Use a custom command (requires --command)
  *
  * Options:
- *   --skill <name>       Run only evals for this skill (e.g., turnkey-ethereum-evm)
+ *   --skill <name>       Run only evals for this skill (e.g., signing-transactions)
  *   --eval <id>          Run only this eval ID (requires --skill)
  *   --without-skill      Also run a baseline without skill context
  *   --model <model>      Model name (provider-specific, e.g. gpt-4o, claude-sonnet-4-20250514)

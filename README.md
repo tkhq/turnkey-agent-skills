@@ -52,7 +52,7 @@ Install as a plugin so all skills are automatically discovered:
 Or reference skills directly in your prompt:
 ```
 Please read SKILL.md and help me sign an Ethereum transaction.
-Please read skills/core/turnkey-wallet-management/SKILL.md and create a wallet for me.
+Please read skills/managing-wallets/SKILL.md and create a wallet for me.
 ```
 
 Point your agent at the root `SKILL.md` when you're not sure which skill you need — it will route to the right one.
@@ -66,8 +66,8 @@ npx add-skill turnkey/turnkey-agent-skills
 
 Then invoke skills by name:
 ```
-$turnkey-wallet-management
-$turnkey-ethereum-evm
+$managing-wallets
+$signing-transactions
 ```
 
 ### OpenClaw
@@ -107,40 +107,36 @@ Please read SKILL.md in this repo and help me sign an Ethereum transaction.
 
 For multi-step tasks, skills should be loaded in a specific order. The root [`SKILL.md`](SKILL.md) documents this in detail, but the summary is:
 
-- **Signing** — wallet management → transaction signing → chain-specific skill (e.g. `turnkey-ethereum-evm`)
-- **Wallet only** — just `turnkey-wallet-management`
-- **Authentication** — just `turnkey-otp-auth` (it depends on wallet management internally)
+- **First-time setup** — `getting-started` (verifies credentials, creates your first wallet)
+- **Signing a transaction** — `managing-wallets` → `signing-transactions` (one skill covers EVM, Solana, Bitcoin, and 10+ other chains)
+- **Provisioning an agent** — `provisioning-agent` (pulls in `managing-wallets`, `managing-users`, and `managing-policies` as needed)
 
 Agents that load the root `SKILL.md` first will follow this order automatically.
 
 ## Skills
 
-### Core
+### Workflows
+
+Guided multi-step procedures — start here for onboarding or agent setup.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| Wallet Management | `skills/core/turnkey-wallet-management/` | Create wallets, derive addresses, manage accounts |
-| Transaction Signing | `skills/core/turnkey-transaction-signing/` | Stamping overview; directs to chain-specific skills |
+| Getting Started | `skills/getting-started/` | Day-0 onboarding: verify credentials, create your first wallet |
+| Provisioning Agent | `skills/provisioning-agent/` | Create a scoped agent with constrained credentials and policies |
+| Managing Agent | `skills/managing-agent/` | Debug denied transactions, rotate keys, update agent policies |
 
-### Signing
+### Primitives
 
-| Skill | Path | Description |
-|-------|------|-------------|
-| Ethereum / EVM | `skills/signing/turnkey-ethereum-evm/` | EVM signing with ethers.js or viem — pick based on your stack |
-| Solana | `skills/signing/turnkey-solana-signing/` | Solana signing with `@turnkey/solana` |
-| Bitcoin | `skills/signing/turnkey-bitcoin-signing/` | Bitcoin signing with bitcoinjs-lib (P2WPKH + P2TR) |
-
-### Auth
+Individual operations — use for ongoing work and one-off tasks.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| OTP Authentication | `skills/auth/turnkey-otp-auth/` | Email OTP login with sub-organization management |
-
-### Meta
-
-| Skill | Path | Description |
-|-------|------|-------------|
-| Skill Making | `skills/meta/turnkey-skill-making/` | Guide for creating new skills — conventions, validation, evals |
+| Managing Wallets | `skills/managing-wallets/` | Create wallets, derive addresses, add chains, import/export |
+| Managing Private Keys | `skills/managing-private-keys/` | Standalone keys, key tags for policy targeting, import/export |
+| Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
+| Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
+| Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
+| Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
 ## Running Examples
 

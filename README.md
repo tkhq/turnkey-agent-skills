@@ -8,6 +8,14 @@ These skills enable AI agents to autonomously create wallets, derive addresses, 
 
 Turnkey stores private keys in secure enclaves (AWS Nitro, etc.) — keys are **never exposed** to application code. Every API request is cryptographically "stamped" (signed with your API key pair) before being sent, ensuring only authorized callers can trigger operations on your keys.
 
+## Why Use These Skills?
+
+These skills let you operate Turnkey through conversation instead of code. Point your AI agent at the skills and describe what you need — it handles the API calls, parameter formatting, and chain-specific details.
+
+- **Explore and test** — create wallets, sign transactions, and set policies without writing integration code. See [`managing-wallets`](skills/managing-wallets/SKILL.md) and [`signing-transactions`](skills/signing-transactions/SKILL.md).
+- **Administer your organization** — manage users, rotate API keys, and monitor activities conversationally. See [`managing-users`](skills/managing-users/SKILL.md), [`managing-policies`](skills/managing-policies/SKILL.md), and [`monitoring-activities`](skills/monitoring-activities/SKILL.md).
+- **Provision autonomous agents** — set up a scoped wallet with constrained credentials and governance policies so an agent can transact on-chain without human review. See [`provisioning-agent`](skills/provisioning-agent/SKILL.md).
+
 ## Environment Variables
 
 All skills require these three variables:

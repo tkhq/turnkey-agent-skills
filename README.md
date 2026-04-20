@@ -80,6 +80,21 @@ Each `SKILL.md` is automatically indexed by the OpenClaw gateway.
 
 Paste the contents of a `SKILL.md` into your assistant's system prompt, or upload it as a knowledge file in the Assistants API. For multi-skill tasks, include the root `SKILL.md` as context so the assistant knows the full skill set.
 
+### Any AI assistant (local clone)
+
+If none of the above fit your setup — or you just want to try things quickly — clone the repo and point your assistant at the folder. This works with any AI assistant that can read files (Cursor, Cline, Windsurf, Aider, ChatGPT with file upload, etc.):
+
+```bash
+git clone https://github.com/turnkey/turnkey-agent-skills.git
+cd turnkey-agent-skills
+```
+
+Then reference the root `SKILL.md` (or a specific skill) in your prompt:
+
+```
+Please read SKILL.md in this repo and help me sign an Ethereum transaction.
+```
+
 ### Skill load order
 
 For multi-step tasks, skills should be loaded in a specific order. The root [`SKILL.md`](SKILL.md) documents this in detail, but the summary is:

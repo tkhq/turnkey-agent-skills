@@ -18,6 +18,15 @@ TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
 
+> **⚠️ Security warning — these are root credentials**
+>
+> A root API key has full access to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It bypasses all policies. Before giving these credentials to an AI agent, consider your use case:
+>
+> - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
+> - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
+>
+> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded.
+
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
 
 ## Loading Skills

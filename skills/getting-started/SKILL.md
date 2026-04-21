@@ -29,6 +29,38 @@ These are your **root credentials**. They have full access to the organization a
 
 Base URL: `https://api.turnkey.com`
 
+## Calling the API
+
+Turnkey does **not** accept bearer tokens. Every request is authenticated by a per-request P-256 signature ("stamp") over the POST body, sent in an `X-Stamp` header. Plain `curl` against these endpoints will return `401 Unauthorized` unless you implement the stamping protocol yourself.
+
+The recommended path is `@turnkey/sdk-server`, which stamps every request automatically:
+
+```bash
+npm install @turnkey/sdk-server
+```
+
+```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+```
+
+Each `POST /public/v1/...` endpoint shown below maps to a `camelCase` SDK method. Query endpoints rename `list_` to `get`:
+
+- `POST /public/v1/query/whoami` → `client.getWhoami()`
+- `POST /public/v1/query/list_wallets` → `client.getWallets()`
+- `POST /public/v1/query/list_wallet_accounts` → `client.getWalletAccounts({...})`
+- `POST /public/v1/submit/create_wallet` → `client.createWallet({...})`
+- `POST /public/v1/submit/sign_raw_payload` → `client.signRawPayload({...})`
+
+For the direct-HTTP fallback and the full endpoint-to-method convention, see the root [`SKILL.md`](../../SKILL.md) "Calling the API" section and the [Turnkey stamps documentation](https://docs.turnkey.com/developer-reference/api-overview/stamps).
+
 ## Phase 1: Verify credentials
 
 Confirm your API key works before creating any resources. If this step fails, fix credentials before moving on.
@@ -150,7 +182,7 @@ For the complete walkthrough with full request/response JSON, see [references/fi
 ## Troubleshooting
 
 **`401 Unauthorized` on `whoami`**
-The API key pair is invalid or doesn't match the organization. Regenerate credentials in the Turnkey console under **Settings → API Keys**.
+If you're using `@turnkey/sdk-server`, the API key pair is invalid or doesn't match the organization — regenerate credentials in the Turnkey console under **Settings → API Keys**. If you're making raw HTTP calls, a 401 usually means the `X-Stamp` header is missing, malformed, or doesn't match the exact POST body bytes that were stamped. Prefer the SDK unless you're deliberately implementing the stamping protocol.
 
 **`403 Forbidden` on `create_wallet`**
 The API key doesn't have permission to create wallets. Verify it's a root API key by checking `whoami` — root users have `"userType": "root"`. If using a scoped key, the key needs an ALLOW policy for wallet creation.

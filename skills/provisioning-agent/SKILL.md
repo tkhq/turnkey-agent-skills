@@ -37,6 +37,26 @@ You need:
 
 If you haven't verified your root credentials yet, use the `getting-started` skill first.
 
+### Calling the API
+
+Every `POST /public/v1/...` call below must be cryptographically stamped — Turnkey does not accept bearer tokens. Use `@turnkey/sdk-server` with your root credentials to stamp automatically:
+
+```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+```
+
+Endpoints map to `camelCase` SDK methods (e.g., `create_wallet` → `client.createWallet({...})`, `list_policies` → `client.getPolicies()`). For the full mapping convention and direct-HTTP fallback, see the root [`SKILL.md`](../../SKILL.md) and the `getting-started` skill.
+
+**Step 4 requires a second client** initialized with the **agent's** newly-generated key pair — see the callout in Step 4 before verifying.
+
 ## Decision gates
 
 Before making API calls, lock these decisions with the human:

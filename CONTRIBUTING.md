@@ -88,7 +88,6 @@ turnkey-agent-skills/
 │   ├── provisioning-agent/               # Create a scoped agent
 │   ├── managing-agent/                   # Debug / rotate / revoke an agent
 │   ├── managing-wallets/                 # HD wallets, addresses, chains
-│   ├── managing-private-keys/            # Standalone keys, key tags
 │   ├── signing-transactions/             # Sign & broadcast on any chain
 │   ├── managing-users/                   # Users, API keys, user tags
 │   ├── managing-policies/                # Access control, spending limits

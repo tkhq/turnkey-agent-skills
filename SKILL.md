@@ -23,7 +23,6 @@ Wallet infrastructure skills for [Turnkey](https://turnkey.com). Private keys li
 |-------|------|-----------|
 | Signing Transactions | `skills/signing-transactions/SKILL.md` | signing, broadcasting, gasless/sponsored transactions on any chain |
 | Managing Wallets | `skills/managing-wallets/SKILL.md` | creating wallets, deriving addresses, adding chains, import/export |
-| Managing Private Keys | `skills/managing-private-keys/SKILL.md` | standalone keys, key tags for policy targeting, import/export |
 | Managing Users | `skills/managing-users/SKILL.md` | creating users, API key rotation, user tags |
 | Managing Policies | `skills/managing-policies/SKILL.md` | access control, spending limits, allowlists, multi-sig, policy debugging |
 | Monitoring Activities | `skills/monitoring-activities/SKILL.md` | activity status, consensus approvals, automated agent approver, audit |

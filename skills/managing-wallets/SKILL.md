@@ -1,6 +1,6 @@
 ---
 name: managing-wallets
-description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, Spark): create wallets, derive addresses, add chains, import/export. For standalone single-chain keys, use managing-private-keys."
+description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, Spark): create wallets, derive addresses, add chains, import/export."
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
@@ -284,5 +284,4 @@ This is expected — `get_wallet` returns wallet metadata only. Use `list_wallet
 ## Related Skills
 
 - `signing-transactions` — sign and broadcast transactions
-- `managing-private-keys` — standalone private keys (one key, one address)
 - `managing-policies` — policies that affect wallet operations

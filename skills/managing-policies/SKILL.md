@@ -268,6 +268,5 @@ Unresolved address table lookups appear as this literal string. Guard against it
 
 - `managing-users` — create users and tags referenced in policy consensus expressions
 - `managing-wallets` — wallet IDs referenced in policy conditions
-- `managing-private-keys` — private key IDs and tags referenced in policy conditions
 - `signing-transactions` — signing operations governed by policies
 - `provisioning-agent` — end-to-end workflow that creates agent policies

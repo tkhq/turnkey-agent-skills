@@ -18,7 +18,6 @@ const PLUGIN_DIR = resolve(process.cwd());
 const SKILL_NAMES = [
   "signing-transactions",
   "managing-wallets",
-  "managing-private-keys",
   "managing-users",
   "managing-policies",
   "monitoring-activities",

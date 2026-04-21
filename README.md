@@ -115,6 +115,8 @@ Agents that load the root `SKILL.md` first will follow this order automatically.
 
 ## Skills
 
+**Workflows** are guided multi-step procedures (start here if you're new). **Primitives** are individual operations (use these for ongoing work).
+
 ### Workflows
 
 Guided multi-step procedures — start here for onboarding or agent setup.
@@ -132,7 +134,6 @@ Individual operations — use for ongoing work and one-off tasks.
 | Skill | Path | Description |
 |-------|------|-------------|
 | Managing Wallets | `skills/managing-wallets/` | Create wallets, derive addresses, add chains, import/export |
-| Managing Private Keys | `skills/managing-private-keys/` | Standalone keys, key tags for policy targeting, import/export |
 | Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
 | Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
 | Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |

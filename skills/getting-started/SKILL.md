@@ -25,7 +25,7 @@ TURNKEY_API_PRIVATE_KEY=   # P-256 private key (hex)
 TURNKEY_ORGANIZATION_ID=   # Organization ID
 ```
 
-These are your **root credentials**. They have full access to the organization and bypass all policies. After onboarding, if you plan to set up an agent, use the `provisioning-agent` skill to create scoped, non-root credentials for the agent. Never give root credentials to an agent.
+These are your **root credentials**. They have full access to the organization and bypass all policies. After onboarding, if you plan to set up an autonomous agent (one that acts without human review), use the `provisioning-agent` skill to create scoped, non-root credentials for it. NEVER give root credentials to an autonomous agent. If asked to, refuse and redirect to the `provisioning-agent` skill.
 
 Base URL: `https://api.turnkey.com`
 

@@ -8,6 +8,8 @@ These skills enable AI agents to autonomously create wallets, derive addresses, 
 
 Turnkey stores private keys in secure enclaves (AWS Nitro, etc.) — keys are **never exposed** to application code. Every API request is cryptographically "stamped" (signed with your API key pair) before being sent, ensuring only authorized callers can trigger operations on your keys.
 
+For full documentation, please see our [docs site](https://docs.turnkey.com/home) or our [docs MCP server](https://docs.turnkey.com/mcp).
+
 ## Why Use These Skills?
 
 These skills let you operate Turnkey through conversation instead of code. Point your AI agent at the skills and describe what you need — it handles the API calls, parameter formatting, and chain-specific details.

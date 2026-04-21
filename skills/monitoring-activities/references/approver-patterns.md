@@ -39,7 +39,7 @@ An admin user reviews and approves using their own non-root credentials.
 
 ### Setup
 
-**Step 1:** Create the admin user with a tag:
+**Step 1:** Create the admin user with a tag. `userTags` takes tag **IDs**, not names — create the `admin` tag first with `create_user_tag` (or look it up with `list_user_tags`) to get its `userTagId`, e.g. `tag_admin123`:
 
 ```
 POST /public/v1/submit/create_users
@@ -55,7 +55,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["admin"]
+    "userTags": ["tag_admin123"]
   }]
 }
 ```
@@ -87,7 +87,7 @@ A dedicated agent that programmatically approves or rejects other agents' activi
 
 ### Setup
 
-**Step 1:** Create the approver user:
+**Step 1:** Create the approver user. `userTags` takes tag **IDs** — create the `approver` tag first with `create_user_tag` (or look it up with `list_user_tags`) to get its `userTagId`, e.g. `tag_approver456`:
 
 ```json
 {
@@ -99,7 +99,7 @@ A dedicated agent that programmatically approves or rejects other agents' activi
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["approver"]
+    "userTags": ["tag_approver456"]
   }]
 }
 ```

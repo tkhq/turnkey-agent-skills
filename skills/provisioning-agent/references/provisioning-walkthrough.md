@@ -69,7 +69,37 @@ Save: `walletId` = `wlt-agent-9012`, address = `0x1234abcd5678ef901234abcd5678ef
 
 ## Step 3: Create the agent user (non-root)
 
-Generate the agent's P-256 key pair locally first. Register only the public key.
+First create the `agent` tag so you have a `userTagId` to assign. (`create_users.userTags` takes tag IDs, not names.)
+
+```
+POST /public/v1/submit/create_user_tag
+```
+
+```json
+{
+  "userTagName": "agent",
+  "userIds": []
+}
+```
+
+**Response:**
+
+```json
+{
+  "activity": {
+    "id": "act-create-tag-001",
+    "status": "ACTIVITY_STATUS_COMPLETED",
+    "type": "ACTIVITY_TYPE_CREATE_USER_TAG",
+    "result": {
+      "createUserTagResult": {
+        "userTagId": "tag-agent-001"
+      }
+    }
+  }
+}
+```
+
+Then generate the agent's P-256 key pair locally, register only the public key, and pass the tag ID:
 
 ```
 POST /public/v1/submit/create_users
@@ -88,7 +118,7 @@ POST /public/v1/submit/create_users
         }
       ],
       "authenticators": [],
-      "userTags": ["agent"]
+      "userTags": ["tag-agent-001"]
     }
   ]
 }

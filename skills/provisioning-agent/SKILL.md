@@ -17,7 +17,7 @@ Give an AI agent a non-root user, a wallet, and the narrowest ALLOW policy it ne
 
 **Scope:** This skill covers initial agent provisioning only (Steps 1–5). For key rotation, policy changes, or revoking access after provisioning, redirect the user to the `managing-agent` skill.
 
-This workflow runs with **your root credentials**. The output is a set of **agent credentials** with constrained permissions. Never give root credentials to an autonomous agent.
+This workflow runs with **your root credentials**. The output is a set of **agent credentials** with constrained permissions. NEVER give root credentials to an autonomous agent.
 
 Base URL: `https://api.turnkey.com`
 
@@ -93,7 +93,40 @@ Save `walletId` and the derived address. For multi-chain or Bitcoin wallets, see
 
 ## Step 2: Create the agent user (non-root)
 
-The agent must not be a root user. Generate the agent's P-256 key pair locally, then register the public key:
+The agent must not be a root user. This step has two parts: first create the `agent` tag (if it doesn't already exist) so you have a tag ID to pass into `create_users`, then create the user itself.
+
+### Step 2a: Create the `agent` tag
+
+`create_users.userTags` takes tag **IDs**, not names. Create the tag first (skip this if `list_user_tags` shows `agent` already exists — in that case, grab its `userTagId`):
+
+```
+POST /public/v1/submit/create_user_tag
+```
+
+```json
+{
+  "userTagName": "agent",
+  "userIds": []
+}
+```
+
+**Response** — save `userTagId`:
+
+```json
+{
+  "activity": {
+    "result": {
+      "createUserTagResult": {
+        "userTagId": "tag_agent123"
+      }
+    }
+  }
+}
+```
+
+### Step 2b: Create the user
+
+Generate the agent's P-256 key pair locally, then register the public key and assign the tag by ID:
 
 ```
 POST /public/v1/submit/create_users
@@ -109,14 +142,14 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["agent"]
+    "userTags": ["<AGENT_TAG_ID>"]
   }]
 }
 ```
 
-Save the `userId`. The `agent` tag enables policy targeting with `approvers.any(user, user.tags.contains('agent'))`.
+Save the `userId`. The tag is referenced by its **ID** here; policy conditions in Step 3 target it by its **name** (`approvers.any(user, user.tags.contains('agent'))`). Both surfaces address the same tag object — see the "Tag IDs vs. tag names" callout in the `managing-users` skill.
 
-For an **observer agent** (read-only, no signing), use `"userTags": ["observer"]` instead and call `create_users` with the same structure. Observer agents need no ALLOW policies — default-deny gives them read-only access. See [references/agent-personas.md](references/agent-personas.md) for the complete observer template including the `create_users` call.
+For an **observer agent** (read-only, no signing), create an `observer` tag the same way in Step 2a, then pass its ID as `"userTags": ["<OBSERVER_TAG_ID>"]` here. Observer agents need no ALLOW policies — default-deny gives them read-only access. See [references/agent-personas.md](references/agent-personas.md) for the complete observer template.
 
 ## Step 3: Create the ALLOW policy
 

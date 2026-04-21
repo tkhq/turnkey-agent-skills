@@ -84,6 +84,8 @@ Ask the human to confirm each:
 
 ### Worker user creation
 
+`userTags` takes tag **IDs**. Create the `agent` tag via `create_user_tag` first (or look it up with `list_user_tags`) to get its `userTagId`:
+
 ```json
 {
   "users": [{
@@ -94,10 +96,12 @@ Ask the human to confirm each:
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["agent"]
+    "userTags": ["<AGENT_TAG_ID>"]
   }]
 }
 ```
+
+The tag's **name** (`'agent'`) is what the policy DSL matches — `user.tags.contains('agent')` in the consensus expressions above.
 
 ## Observer Agent
 
@@ -126,6 +130,8 @@ If the organization has broad shared ALLOW policies that would unintentionally g
 
 ### Observer user creation
 
+`userTags` takes tag **IDs**. Create the `observer` tag via `create_user_tag` first (or look it up with `list_user_tags`) to get its `userTagId`:
+
 ```json
 {
   "users": [{
@@ -136,7 +142,7 @@ If the organization has broad shared ALLOW policies that would unintentionally g
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["observer"]
+    "userTags": ["<OBSERVER_TAG_ID>"]
   }]
 }
 ```

@@ -97,6 +97,8 @@ POST /public/v1/query/get_user
 
 Create one or more users in a single call. Each user can have API keys, authenticators, and tags assigned at creation time.
 
+> **`userTags` takes tag IDs, not tag names.** If the tag doesn't exist yet, create it first with `create_user_tag` (see [User tags](#user-tags) below) and pass the returned `userTagId`. If it already exists, get its ID from `list_user_tags`. The policy DSL is the one surface that matches tags by *name* — wire-level APIs always use IDs. Pass `[]` if the user has no tags.
+
 ```
 POST /public/v1/submit/create_users
 ```
@@ -112,7 +114,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["engineering"]
+    "userTags": ["<ENGINEERING_TAG_ID>"]
   }]
 }
 ```
@@ -121,7 +123,7 @@ Generate the P-256 key pair locally, then register the public key here. The priv
 
 #### Creating an agent user
 
-Agent users should be non-root with a descriptive tag for policy targeting:
+Agent users should be non-root with a descriptive tag for policy targeting. Create the tag first if it doesn't exist, then pass its ID:
 
 ```json
 {
@@ -133,12 +135,12 @@ Agent users should be non-root with a descriptive tag for policy targeting:
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["agent"]
+    "userTags": ["<AGENT_TAG_ID>"]
   }]
 }
 ```
 
-The `agent` tag lets you write policies like `approvers.any(user, user.tags.contains('agent'))` to scope permissions to this user.
+With the tag assigned, you can target this user in policies by the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. The `userTags` field above uses the tag's **ID**; the policy DSL uses the tag's **name**. They address the same tag object via different fields — see [User tags](#user-tags).
 
 ### Update user
 
@@ -251,6 +253,13 @@ See [references/api-key-examples.md](references/api-key-examples.md) for the com
 ## User tags
 
 Tags group users for policy targeting. Write policies like `approvers.filter(user, user.tags.contains('trader')).count() >= 2` to require two traders to approve an action.
+
+> **Tag IDs vs. tag names — important.** A tag has two addressable surfaces on the same object:
+>
+> - **Wire-level APIs reference tags by ID.** `create_users.userTags`, `list_users` responses (`userTags`), and `update_user.userTagIds` all contain tag IDs (e.g. `tag_abc123`), not names.
+> - **The policy DSL matches tags by name.** Expressions like `user.tags.contains('trader')` compare against the human-readable `tagName`.
+>
+> Typical flow: call `create_user_tag` with a `userTagName`, capture the returned `userTagId`, pass that ID into `create_users` / `update_user`, and write policy conditions against the original name.
 
 ### List user tags
 

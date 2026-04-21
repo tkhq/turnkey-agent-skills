@@ -48,7 +48,7 @@ POST /public/v1/query/list_users
       "userId": "usr_...",
       "userName": "alice",
       "userEmail": "alice@example.com",
-      "userTags": ["engineering"],
+      "userTags": ["tag_engineering123"],
       "apiKeys": [
         {
           "apiKeyId": "key_...",
@@ -80,6 +80,35 @@ POST /public/v1/query/get_user
 
 ## Create a human user with email
 
+`userTags` takes tag **IDs**, not names. If the `engineering` tag doesn't exist yet, create it first:
+
+```
+POST /public/v1/submit/create_user_tag
+```
+
+```json
+{
+  "userTagName": "engineering",
+  "userIds": []
+}
+```
+
+**Response** (capture `userTagId`):
+
+```json
+{
+  "activity": {
+    "result": {
+      "createUserTagResult": {
+        "userTagId": "tag_engineering123"
+      }
+    }
+  }
+}
+```
+
+Then create the user, passing the tag's ID:
+
 ```
 POST /public/v1/submit/create_users
 ```
@@ -95,7 +124,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["engineering"]
+    "userTags": ["tag_engineering123"]
   }]
 }
 ```
@@ -119,7 +148,7 @@ POST /public/v1/submit/create_users
 
 ## Create a non-root agent user
 
-Agent users should be non-root with a tag for policy targeting. Do not include `userEmail` — agents don't need email:
+Agent users should be non-root with a tag for policy targeting. Do not include `userEmail` — agents don't need email. Create the `agent` tag first (via `create_user_tag` — shown above) to get its `userTagId`, then:
 
 ```json
 {
@@ -131,14 +160,16 @@ Agent users should be non-root with a tag for policy targeting. Do not include `
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
-    "userTags": ["agent"]
+    "userTags": ["tag_agent456"]
   }]
 }
 ```
 
-The `agent` tag enables policy expressions like `approvers.any(user, user.tags.contains('agent'))`.
+`userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. Same tag object, different addressable fields — see the "Tag IDs vs. tag names" callout in `SKILL.md`.
 
 ## Create multiple users in one call
+
+Each user's `userTags` contains tag **IDs**. The `trading` and `monitoring` tags must already exist (or be created via `create_user_tag`) to get their IDs:
 
 ```json
 {
@@ -147,13 +178,13 @@ The `agent` tag enables policy expressions like `approvers.any(user, user.tags.c
       "userName": "agent-1",
       "apiKeys": [{ "apiKeyName": "agent-1-key", "publicKey": "04aaa...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
-      "userTags": ["agent", "trading"]
+      "userTags": ["tag_agent456", "tag_trading789"]
     },
     {
       "userName": "agent-2",
       "apiKeys": [{ "apiKeyName": "agent-2-key", "publicKey": "04bbb...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
-      "userTags": ["agent", "monitoring"]
+      "userTags": ["tag_agent456", "tag_monitoring012"]
     }
   ]
 }

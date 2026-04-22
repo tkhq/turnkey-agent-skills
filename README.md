@@ -141,6 +141,8 @@ Individual operations — use for ongoing work and one-off tasks.
 | Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
 | Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
+**Note**: You don't need to run `npm install` in this repo to use the skills — your AI assistant reads the `SKILL.md` files directly as prompts. The skills will, however, tell you to install `@turnkey/sdk-server` (and a chain-specific package if you're signing transactions) in your own project, since Turnkey's API requires a cryptographic stamp on every request that the SDK handles for you. The Running Examples section below is only for developers who want to run this repo's examples/ demos end-to-end.
+
 ## Running Examples
 
 ```bash

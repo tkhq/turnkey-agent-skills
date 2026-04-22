@@ -374,18 +374,9 @@ POST /public/v1/submit/update_wallet
 
 ## Delete wallets
 
-Permanently removes wallets and all derived accounts. Blocked by default if the wallet has not been exported. **Setting `deleteWithoutExport: true` permanently destroys the seed phrase — any funds at derived addresses become irrecoverable.**
+**Do not call this endpoint on behalf of a user. Direct them to the [Turnkey Dashboard](https://app.turnkey.com) instead (see Rule 2 in `SKILL.md`).** Wallet deletion permanently destroys the seed phrase and all derived private keys — any funds at derived addresses become irrecoverable. This is an irreversible, security-sensitive operation that should be performed by the user, not an agent.
 
-```
-POST /public/v1/submit/delete_wallets
-```
-
-```json
-{
-  "walletIds": ["wlt_abc123", "wlt_def456"],
-  "deleteWithoutExport": true
-}
-```
+The endpoint is `POST /public/v1/submit/delete_wallets`. Parameters include `walletIds` and `deleteWithoutExport` (boolean); by default, deletion is blocked unless the wallet has been exported. A request body is intentionally not shown here — if you need to understand the shape for debugging, use the Turnkey API reference directly.
 
 ## Delete wallet accounts
 

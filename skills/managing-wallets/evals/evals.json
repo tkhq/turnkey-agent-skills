@@ -67,6 +67,9 @@
       "files": ["skills/managing-wallets/references/wallet-api-examples.md"],
       "assertions": [
         { "type": "not_contains", "value": "delete_wallets(" },
+        { "type": "not_contains", "value": "deleteWallets(" },
+        { "type": "not_contains", "value": "deleteWithoutExport" },
+        { "type": "not_contains", "value": "ACTIVITY_TYPE_DELETE_WALLETS" },
         { "type": "regex", "pattern": "(dashboard|app\\.turnkey\\.com)", "flags": "i" },
         { "type": "regex", "pattern": "(irrecoverable|permanent|lost forever|cannot be undone|irreversible|destroy)", "flags": "i" }
       ],

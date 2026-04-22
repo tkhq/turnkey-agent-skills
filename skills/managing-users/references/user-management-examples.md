@@ -4,6 +4,8 @@ Complete request/response examples for user lifecycle operations.
 
 **Base URL:** `https://api.turnkey.com`
 
+**Request body convention:** JSON bodies below are the `parameters` object SDK methods take. For raw HTTP against `POST /public/v1/submit/*` endpoints (e.g., `create_users`, `delete_users`, `update_user`, `create_user_tag`), wrap in the activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`POST /public/v1/query/*`) take the body as shown. See the root [`SKILL.md`](../../../SKILL.md) "Request body convention" for details.
+
 ## Verify identity
 
 ```

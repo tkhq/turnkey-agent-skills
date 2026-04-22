@@ -4,6 +4,28 @@ Complete request/response JSON for every step of the getting-started workflow.
 
 **Base URL:** `https://api.turnkey.com`
 
+## Request body convention
+
+The JSON bodies below are the `parameters` object — the exact shape SDK methods accept (e.g., `client.createWallet({walletName, accounts, mnemonicLength})`). For raw HTTP calls, wrapping depends on the endpoint prefix:
+
+- `POST /public/v1/query/*` (`whoami`, `list_wallets`, `list_wallet_accounts`) — body as shown, no envelope.
+- `POST /public/v1/submit/*` (`create_wallet`, `sign_raw_payload`) — wrap in the activity envelope:
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET",
+  "timestampMs": "1700000000000",
+  "organizationId": "org-12345678-abcd-1234-abcd-1234567890ab",
+  "parameters": {
+    "walletName": "my-first-wallet",
+    "accounts": [ /* ... */ ],
+    "mnemonicLength": 12
+  }
+}
+```
+
+Activity types follow the endpoint path: `create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`. `timestampMs` is a stringified ms Unix timestamp and must change between retries. See the root [`SKILL.md`](../../../SKILL.md) for the full convention — or just use the SDK and skip the envelope.
+
 ## Step 1: Verify credentials
 
 ```

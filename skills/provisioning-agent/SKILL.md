@@ -55,6 +55,8 @@ const client = turnkey.apiClient();
 
 Endpoints map to `camelCase` SDK methods (e.g., `create_wallet` → `client.createWallet({...})`, `list_policies` → `client.getPolicies()`). For the full mapping convention and direct-HTTP fallback, see the root [`SKILL.md`](../../SKILL.md) and the `getting-started` skill.
 
+**Raw HTTP note:** the JSON bodies shown in each step below are the `parameters` object the SDK takes. For raw HTTP against `submit` endpoints (`create_wallet`, `create_user_tag`, `create_users`, `create_policy`, `sign_raw_payload`), wrap in an activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`list_wallets`, `list_user_tags`, `list_policies`, `get_policy_evaluations`) do not need the envelope. See the root [`SKILL.md`](../../SKILL.md) "Request body convention" for details.
+
 **Step 4 requires a second client** initialized with the **agent's** newly-generated key pair — see the callout in Step 4 before verifying.
 
 ## Decision gates

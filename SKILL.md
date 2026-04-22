@@ -97,6 +97,26 @@ const wallets = await client.getWallets();
 
 If you cannot use the SDK, every request must include an `X-Stamp` header containing a base64url-encoded signature over the POST body. See [Turnkey docs on stamps](https://docs.turnkey.com/developer-reference/api-overview/stamps) for the stamping protocol.
 
+### Request body convention
+
+JSON bodies shown in skills and reference files are the **`parameters` object** — the exact shape SDK methods accept (e.g., `client.createWallet({walletName, accounts, mnemonicLength})`). When making raw HTTP calls, the wrapping differs by endpoint prefix:
+
+- **`POST /public/v1/query/*`** (read-only, e.g. `whoami`, `list_wallets`): send the body as shown. No envelope.
+- **`POST /public/v1/submit/*`** (mutations, e.g. `create_wallet`, `sign_raw_payload`): wrap in the activity envelope:
+
+```json
+{
+  "type": "ACTIVITY_TYPE_CREATE_WALLET",
+  "timestampMs": "1700000000000",
+  "organizationId": "<ORG_ID>",
+  "parameters": { /* body shown in the skill goes here */ }
+}
+```
+
+The activity `type` follows the endpoint path: `create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V2`, etc. Canonical list in the [Turnkey API reference](https://docs.turnkey.com/api-reference/activities/create-wallet). `timestampMs` must be a stringified millisecond Unix timestamp and must change between otherwise-identical retries (Turnkey uses the body hash as an idempotency fingerprint).
+
+The SDK constructs this envelope for you — this is why `client.createWallet({...})` takes only the `parameters` fields.
+
 ## Generating API key pairs
 
 Agent provisioning and key rotation require generating a P-256 key pair locally. The private key never leaves the machine — only the public key is registered with Turnkey.

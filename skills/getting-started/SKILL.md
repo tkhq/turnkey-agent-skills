@@ -59,7 +59,7 @@ Each `POST /public/v1/...` endpoint shown below maps to a `camelCase` SDK method
 - `POST /public/v1/submit/create_wallet` → `client.createWallet({...})`
 - `POST /public/v1/submit/sign_raw_payload` → `client.signRawPayload({...})`
 
-For the direct-HTTP fallback and the full endpoint-to-method convention, see the root [`SKILL.md`](../../SKILL.md) "Calling the API" section and the [Turnkey stamps documentation](https://docs.turnkey.com/developer-reference/api-overview/stamps).
+**Raw HTTP note:** the JSON bodies shown below are the `parameters` object the SDK takes. For raw HTTP against `submit` endpoints (`create_wallet`, `sign_raw_payload`), wrap in an activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`whoami`, `list_wallets`, `list_wallet_accounts`) do not need the envelope. See the root [`SKILL.md`](../../SKILL.md) "Request body convention" for details and the activity-type naming rule.
 
 ## Phase 1: Verify credentials
 

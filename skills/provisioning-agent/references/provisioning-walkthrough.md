@@ -103,7 +103,7 @@ POST /public/v1/submit/create_user_tag
 }
 ```
 
-Then generate the agent's P-256 key pair locally, register only the public key, and pass the tag ID:
+Then obtain the agent's P-256 public key (either by running the Step 2b generation script from `provisioning-agent/SKILL.md`, which writes the private key to a destination you chose, or by supplying a pre-generated public key), register only the public key, and pass the tag ID:
 
 ```
 POST /public/v1/submit/create_users

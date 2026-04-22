@@ -2,7 +2,7 @@
 name: provisioning-agent
 description: "End-to-end workflow to give an AI agent a scoped Turnkey wallet: creates a wallet, a non-root agent user, and a wallet-scoped ALLOW policy, then verifies signing and outputs agent credentials. For day-2 operations, use managing-agent."
 license: Apache-2.0
-compatibility: "Requires Turnkey root credentials (P-256 key pair) and a locally generated P-256 key pair for the agent."
+compatibility: "Requires Turnkey root credentials (P-256 key pair). The agent's P-256 key pair is either generated inline in Step 2b or supplied by you."
 metadata:
   version: "1.0.0"
   author: turnkey
@@ -28,12 +28,17 @@ Base URL: `https://api.turnkey.com`
 3. **Confirm each policy with the human before creating it.** Display the exact effect, consensus, and condition. Explain in plain language what it allows. Wait for explicit approval.
 4. **Never output root credentials.** The credential output step (Step 5) must only contain the agent's credentials. Label them clearly.
 5. **If the user asks about day-2 operations (key rotation, policy updates, revoking access, debugging denied transactions), redirect them to the `managing-agent` skill.** Do not handle post-provisioning operations inline.
+6. **The agent's private key must be captured and persisted at generation time, with an explicit destination chosen by the human.** Never generate a key pair without asking where the private half should go (secrets manager, `.env` with `chmod 600`, or — only as a last resort for one-shot manual flows — the terminal). Never write the private key to a path inside a git-tracked directory. Never store it alongside your root credentials. If the human is bringing their own key pair, confirm they already have the private key stored safely before you register the public key.
 
 ## Prerequisites
 
 You need:
 - Root API credentials (`TURNKEY_API_PUBLIC_KEY`, `TURNKEY_API_PRIVATE_KEY`, `TURNKEY_ORGANIZATION_ID`) from the Turnkey Dashboard
-- A locally generated P-256 key pair for the agent (the agent's private key never leaves the machine that generated it)
+- A P-256 key pair for the agent. You have two options, picked in Step 2b:
+  - **(a) Generate inline** — Step 2b runs a local script that creates the key pair and writes the private half to the destination you choose.
+  - **(b) Bring your own** — you generate the key pair beforehand (e.g., via your HSM, secrets manager, or the `generateApiKeyPair` helper in the root [`SKILL.md`](../../SKILL.md) "Generating API key pairs" section) and paste the public key into Step 2b.
+
+  Either way, the private key is never sent to Turnkey and must never be stored alongside your root credentials.
 
 If you haven't verified your root credentials yet, use the `getting-started` skill first.
 
@@ -146,9 +151,68 @@ POST /public/v1/submit/create_user_tag
 }
 ```
 
-### Step 2b: Create the user
+### Step 2b: Generate (or supply) the agent's key pair, then create the user
 
-Generate the agent's P-256 key pair locally, then register the public key and assign the tag by ID:
+**Before calling `create_users`, you need the agent's P-256 public key. Pick one path and confirm the private-key destination with the human (Rule 6).**
+
+#### Option A — Generate inline (recommended for new agents)
+
+Run this script on the machine that will **not** host your root credentials. It generates the key pair, prints the public key for the `create_users` call below, and writes the private key to the destination you choose. Default destination is a local `.env` file with `chmod 600`; swap the `fs.writeFileSync` block for a secrets-manager call (e.g., `aws secretsmanager put-secret-value`, `vault kv put`, `op item create`) for production hand-offs — see the root [`SKILL.md`](../../SKILL.md) "Destination for the private key" section for the full list.
+
+The derivation itself (lines that produce `publicKeyHex` / `privateKeyHex`) is the same as the root [`SKILL.md`](../../SKILL.md) `generateApiKeyPair` helper; the script below adds the file-write wrapper and a git-tracking guard on top.
+
+```typescript
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
+
+const keyPair = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
+const pubJwk = keyPair.publicKey.export({ format: "jwk" }) as { x: string; y: string };
+const privJwk = keyPair.privateKey.export({ format: "jwk" }) as { d: string };
+
+const publicKeyHex =
+  "04" +
+  Buffer.from(pubJwk.x, "base64url").toString("hex") +
+  Buffer.from(pubJwk.y, "base64url").toString("hex");
+const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex");
+
+const envPath = path.resolve(process.env.AGENT_ENV_PATH ?? "./agent.env");
+
+try {
+  const gitRoot = execSync("git rev-parse --show-toplevel", { stdio: ["ignore", "pipe", "ignore"] })
+    .toString()
+    .trim();
+  if (envPath.startsWith(gitRoot + path.sep)) {
+    throw new Error(
+      `Refusing to write private key inside a git-tracked directory: ${envPath}. ` +
+        `Set AGENT_ENV_PATH to a path outside ${gitRoot}.`,
+    );
+  }
+} catch (e) {
+  if ((e as Error).message.startsWith("Refusing")) throw e;
+}
+
+fs.writeFileSync(
+  envPath,
+  `TURNKEY_API_PUBLIC_KEY=${publicKeyHex}\nTURNKEY_API_PRIVATE_KEY=${privateKeyHex}\n`,
+  { mode: 0o600 },
+);
+fs.chmodSync(envPath, 0o600);
+
+console.log("AGENT_PUBLIC_KEY (paste into create_users below):", publicKeyHex);
+console.log(`Private key written to ${envPath} (chmod 600). Do not commit this file.`);
+```
+
+Use the printed `AGENT_PUBLIC_KEY` as `<AGENT_PUBLIC_KEY>` in the request below. The private half stays on disk at `envPath` and becomes the agent's `TURNKEY_API_PRIVATE_KEY` in Step 5.
+
+**Last-resort manual flow only:** if you cannot write to a file (e.g., ephemeral shell, no disk), replace the `fs.writeFileSync` block with `console.log("TURNKEY_API_PRIVATE_KEY=", privateKeyHex)` — then warn the human that the private key will land in shell history, scrollback, and any active screen share, and copy it into a secrets manager before closing the terminal.
+
+#### Option B — Bring your own public key
+
+If the human has already generated the key pair (e.g., in an HSM or existing secrets manager), skip the script above and confirm with them that the private key is already persisted in its final destination. Paste their public key (uncompressed hex, `04` + X + Y) as `<AGENT_PUBLIC_KEY>` below.
+
+#### Register the public key and assign the tag
 
 ```
 POST /public/v1/submit/create_users
@@ -245,7 +309,7 @@ POST /public/v1/query/list_policies
 
 ## Step 4: Verify with agent credentials
 
-> **STOP — switch credentials now.** Steps 1-3 used root credentials. Step 4 must use the agent's newly-generated key pair: the public key registered in Step 2, and the private key you generated locally before Step 2. Re-initialize your SDK client (or update `TURNKEY_API_PUBLIC_KEY` / `TURNKEY_API_PRIVATE_KEY`) with the agent's keys before continuing. If you continue using root credentials, this verification will pass regardless of whether the agent's policy is correct — defeating the purpose of the test.
+> **STOP — switch credentials now.** Steps 1-3 used root credentials. Step 4 must use the agent's key pair: the public key registered in Step 2b, and the matching private key from whichever destination you chose in Step 2b (the generated `agent.env` file, your secrets manager, or the key pair you brought in yourself). Re-initialize your SDK client (or point `TURNKEY_API_PUBLIC_KEY` / `TURNKEY_API_PRIVATE_KEY` at that destination) before continuing. If you continue using root credentials, this verification will pass regardless of whether the agent's policy is correct — defeating the purpose of the test.
 
 Sign a test payload to confirm the agent can actually sign:
 
@@ -281,17 +345,23 @@ Fix the policy — don't broaden it without revisiting the decision gates with t
 
 ## Step 5: Output agent credentials
 
-After successful verification, output these values for the agent's runtime environment:
+After successful verification, assemble the agent's runtime environment. The public/private key pair already exists in the destination you chose in Step 2b — you are **not** generating or handling new key material here, only adding the org ID and wallet address alongside it.
+
+- **Option A → file destination (default):** `agent.env` already contains `TURNKEY_API_PUBLIC_KEY` and `TURNKEY_API_PRIVATE_KEY` (written by the Step 2b script, `chmod 600`). Append the two lines below to that file.
+- **Option A → secrets manager destination:** the key pair is already stored. Expose it to the agent runtime the way that secrets manager expects, and set `TURNKEY_ORGANIZATION_ID` + `SIGN_WITH` alongside it.
+- **Option B (BYO):** the human already has the private key stored. Hand them the two additional values below.
+
+The final environment the agent reads looks like:
 
 ```env
 # AGENT CREDENTIALS (not root — these have constrained permissions)
-TURNKEY_API_PUBLIC_KEY=<agent public key from Step 2>
-TURNKEY_API_PRIVATE_KEY=<agent private key, generated locally>
+TURNKEY_API_PUBLIC_KEY=<agent public key from Step 2b>
+TURNKEY_API_PRIVATE_KEY=<agent private key from Step 2b — already persisted, do NOT re-print>
 TURNKEY_ORGANIZATION_ID=<org ID>
 SIGN_WITH=<wallet address from Step 1>
 ```
 
-**These are the agent's credentials, not yours.** Your root credentials stay with you and should never be placed in the agent's environment.
+**These are the agent's credentials, not yours.** Your root credentials stay with you and must never be placed in the agent's environment. Do not re-print the private key in this step — it was already captured in Step 2b and should only be read from its persisted destination.
 
 The agent is now operational with scoped permissions.
 

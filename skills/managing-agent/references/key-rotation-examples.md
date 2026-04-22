@@ -11,7 +11,7 @@ Complete request/response for the 4-step API key rotation workflow.
 You need:
 - The agent's `userId` (from `list_users` or saved during provisioning)
 - The old API key ID (from `get_api_keys`)
-- A newly generated P-256 key pair (local)
+- A newly generated P-256 key pair (local) — use the `generateApiKeyPair` helper from the root [`SKILL.md`](../../../SKILL.md) "Generating API key pairs" section, and pick a destination for the new private key before running it (see that section's "Destination for the private key" subsection). The new private key will replace the old value in the agent's runtime environment in Step 5.
 
 ## Step 1: List current API keys
 

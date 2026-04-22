@@ -121,25 +121,39 @@ The SDK constructs this envelope for you — this is why `client.createWallet({.
 
 Agent provisioning and key rotation require generating a P-256 key pair locally. The private key never leaves the machine — only the public key is registered with Turnkey.
 
+The helper below is the **derivation step only**: it returns the key pair as hex strings. The caller decides where the private half goes — persisting it is a separate, deliberate step (see "Destination for the private key" below). Do not paste the raw snippet into an ad-hoc console and walk away; that is how private keys end up in shell history.
+
 ```typescript
 import crypto from "crypto";
 
-const keyPair = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
+export function generateApiKeyPair(): { publicKeyHex: string; privateKeyHex: string } {
+  const keyPair = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
+  const pubJwk = keyPair.publicKey.export({ format: "jwk" }) as { x: string; y: string };
+  const privJwk = keyPair.privateKey.export({ format: "jwk" }) as { d: string };
 
-// Export as hex for Turnkey
-const pubJwk = keyPair.publicKey.export({ format: "jwk" });
-const privJwk = keyPair.privateKey.export({ format: "jwk" });
+  const publicKeyHex =
+    "04" +
+    Buffer.from(pubJwk.x, "base64url").toString("hex") +
+    Buffer.from(pubJwk.y, "base64url").toString("hex");
+  const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex");
 
-// Uncompressed public key: 04 || x || y
-const x = Buffer.from(pubJwk.x!, "base64url");
-const y = Buffer.from(pubJwk.y!, "base64url");
-const publicKeyHex = "04" + x.toString("hex") + y.toString("hex");
-
-// Private key scalar
-const privateKeyHex = Buffer.from(privJwk.d!, "base64url").toString("hex");
-
-console.log("Public key (register with Turnkey):", publicKeyHex);
-console.log("Private key (store securely):", privateKeyHex);
+  return { publicKeyHex, privateKeyHex };
+}
 ```
 
-Use `publicKeyHex` as the `publicKey` field when calling `create_api_keys` or `create_users`. Store `privateKeyHex` as the agent's `TURNKEY_API_PRIVATE_KEY` — never log it or commit it to source control.
+Use `publicKeyHex` as the `publicKey` field when calling `create_api_keys` or `create_users`. `privateKeyHex` becomes the agent's `TURNKEY_API_PRIVATE_KEY`.
+
+### Destination for the private key
+
+Pick exactly one, in this order of preference:
+
+1. **Secrets manager (recommended for production).** Pipe `privateKeyHex` straight into AWS Secrets Manager, HashiCorp Vault, 1Password, etc. Example: `aws secretsmanager put-secret-value --secret-id agent/turnkey --secret-string "$privateKeyHex"`. The agent runtime reads it from there; it never touches disk in cleartext.
+2. **`.env` file with `chmod 600`.** Acceptable for local development and hand-off to a single machine. Write to a path **outside any git-tracked directory**. The end-to-end pattern — including the git-root guard, `chmod 600`, and wire-up to the `create_users` call — is documented in `provisioning-agent` Step 2b, Option A. Reuse that script rather than reinventing it.
+3. **Terminal print (last resort, manual flows only).** Only when you cannot write to disk or a secrets manager (e.g., ephemeral shell). Treat the terminal session as compromised afterward: private key will be in shell history, scrollback, and any active screen share. Copy into a secrets manager and close the terminal.
+
+Whichever destination you pick: never log `privateKeyHex` to application logs, never commit it, never store it alongside your root credentials, and never transmit it to Turnkey.
+
+### Where this helper is used
+
+- **Agent provisioning** (`provisioning-agent` Step 2b, Option A): wraps this helper with a file-write + git-tracking guard. Use that wrapper directly.
+- **Key rotation** (`managing-agent` → `references/key-rotation-examples.md` Step 1): generate a new pair, register the public key while the old key is still active, verify with the new key, then delete the old one. The new `privateKeyHex` replaces the old value in whichever destination the agent's runtime reads from.

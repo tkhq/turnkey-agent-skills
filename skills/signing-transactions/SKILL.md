@@ -31,6 +31,8 @@ For SDK signing, Bitcoin, or raw payload signing, you **must** read the linked r
 
 Turnkey handles transaction construction, signing, broadcasting, and monitoring. Set `sponsor: true` for gasless transactions where Turnkey pays the fees.
 
+Turnkey handles gas fees on your behalf (billed to the organization monthly). **Note**: this functionality is not available at all tiers, the human user must reach out to Turnkey support for enablement. Advise them to do so if relevant.
+
 ### Send a sponsored (gasless) EVM transaction
 
 ```

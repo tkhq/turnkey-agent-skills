@@ -76,6 +76,8 @@ const feeRate = fees.halfHourFee; // sat/vB
 
 ## Send BTC with P2WPKH (SegWit)
 
+<!-- compile-skip: the Build PSBT block depends on variables from "Fetch UTXOs" and the Sign-and-broadcast block depends on `psbt` from Build PSBT; reference-compiles.test.ts can't reconstruct this chain without per-section-wide scope, which would break other sections. Syntax is still checked. -->
+
 ### Build the PSBT
 
 ```typescript
@@ -152,6 +154,8 @@ console.log("Broadcast txid:", txid);
 
 ## Send BTC with P2TR (Taproot)
 
+<!-- compile-skip: written as a delta on top of "Send BTC with P2WPKH" — it reuses `confirmedUtxos` and `network` from earlier continuation sections. Syntax is still checked. -->
+
 Taproot uses the x-only public key (32 bytes, without the prefix byte) as the `tapInternalKey`.
 
 ### Build the PSBT
@@ -186,6 +190,8 @@ for (const utxo of confirmedUtxos) {
 The signing, finalization, and broadcast steps are identical to P2WPKH.
 
 ## Advanced: Per-input signing with signRawPayload
+
+<!-- compile-skip: the class-definition block and the usage block share state within the section, which our per-block scope isolation breaks. Syntax is still checked. -->
 
 Use this approach when you need per-input signing control or custom sighash types. You define a custom signer class that calls `signRawPayload` for each PSBT input.
 

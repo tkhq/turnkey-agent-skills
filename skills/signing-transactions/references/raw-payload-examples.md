@@ -132,7 +132,8 @@ const response = await client.signRawPayloads({
 });
 
 // response.signatures is an array of {r, s, v} objects, one per payload in order
-for (const sig of response.signatures) {
+const signatures = response.signatures ?? [];
+for (const sig of signatures) {
   console.log("r:", sig.r, "s:", sig.s, "v:", sig.v);
 }
 ```

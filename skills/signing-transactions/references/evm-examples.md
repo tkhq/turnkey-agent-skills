@@ -369,6 +369,8 @@ Both work with the same Turnkey wallet account and the same environment variable
 
 ## Troubleshooting
 
+<!-- compile-skip: mixes ethers and viem snippets (distinct setups) and references `provider`, `address`, etc. that aren't bound in scope. Syntax is still checked. -->
+
 **Insufficient ETH for value + gas**
 Fund the address (`SIGN_WITH`). For Sepolia: faucets.chain.link/sepolia.
 

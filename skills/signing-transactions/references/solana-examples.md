@@ -232,6 +232,8 @@ await connection.confirmTransaction(
 
 ## Troubleshooting
 
+<!-- compile-skip: the log-inspection snippet references `signedTx` from an earlier continuation section that our compile harness doesn't chain. Syntax is still checked. -->
+
 **`Blockhash not found` / blockhash expiry**
 Solana blockhashes expire after ~150 slots (~60 seconds). Always fetch a fresh blockhash immediately before signing. Do not reuse blockhashes across retries.
 

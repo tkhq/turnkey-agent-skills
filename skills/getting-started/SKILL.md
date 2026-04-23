@@ -11,6 +11,8 @@ metadata:
 
 # Getting Started
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `whoami` → `client.getWhoami()`, `create_wallet` → `client.createWallet(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Quick Start
 
 Go from "I have API keys" to "I have a wallet and my credentials work" in two required steps. An optional third step lets you try signing.

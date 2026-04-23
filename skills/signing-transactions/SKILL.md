@@ -11,6 +11,8 @@ metadata:
 
 # Signing Transactions
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_wallets` → `client.getWallets(...)`, `sign_raw_payload` → `client.signRawPayload(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Overview
 
 Turnkey provides three approaches to signing, from simplest to most control.
@@ -126,6 +128,8 @@ POST /public/v1/submit/sol_send_transaction
 ```
 
 When `sponsor: true`, Turnkey handles the fee payer and provides a recent blockhash if you omit one.
+
+**SDK equivalent:** `client.solSendTransaction({...})` from `@turnkey/sdk-server` / `@turnkey/http` / `@turnkey/core` — same request shape. Poll with `client.getSendTransactionStatus({...})`. Prefer this path over `@turnkey/solana` when the user wants the simplest setup or asks to avoid extra packages.
 
 ### Solana request parameters
 

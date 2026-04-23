@@ -11,6 +11,8 @@ metadata:
 
 # Managing Users
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_users` → `client.getUsers(...)`, `create_users` → `client.createUsers(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Overview
 
 Turnkey users are resources within organizations that can submit activities via a valid credential (API key or passkey). Each user belongs to exactly one organization. Organizations can contain up to 100 users.

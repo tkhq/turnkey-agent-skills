@@ -11,6 +11,8 @@ metadata:
 
 # Managing Policies
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_policies` → `client.getPolicies(...)`, `create_policy` → `client.createPolicy(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## CRITICAL: Human Review Required
 
 Policies control access to real wallets holding real funds. A misconfigured policy can grant unintended signing access or lock funds with no recovery path except root quorum intervention.

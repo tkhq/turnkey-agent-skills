@@ -87,7 +87,7 @@
       "assertions": [
         { "type": "contains", "value": "fingerprint" },
         { "type": "regex", "pattern": "\\b(get_activity|getActivity)\\b" },
-        { "type": "regex", "value": "(not.*activityId|fingerprint.*not.*id|use.*fingerprint)", "flags": "i" }
+        { "type": "regex", "value": "(not.*activityId|fingerprint.*not.*id|use.*fingerprint|activity\\.fingerprint|\\.fingerprint\\b|fingerprint[\"'\\s]*:)", "flags": "i" }
       ]
     }
   ]

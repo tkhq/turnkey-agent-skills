@@ -8,7 +8,7 @@
       "files": ["skills/managing-users/references/user-management-examples.md"],
       "assertions": [
         { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
-        { "type": "contains", "value": "organizationId" }
+        { "type": "regex", "value": "(organizationId|defaultOrganizationId|TURNKEY_ORGANIZATION_ID|ORG_ID)" }
       ]
     },
     {

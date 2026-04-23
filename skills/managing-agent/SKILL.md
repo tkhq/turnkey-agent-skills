@@ -11,6 +11,8 @@ metadata:
 
 # Managing an Agent
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `create_api_keys` → `client.createApiKeys(...)`, `update_policy` → `client.updatePolicy(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 Independent recipes for day-2 agent operations. Each section is self-contained — find the one that matches your situation.
 
 All recipes run with **root credentials** (or credentials with sufficient policy permissions). These are admin operations, not actions the agent performs on itself.

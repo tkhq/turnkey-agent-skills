@@ -19,6 +19,36 @@ Use `sol_send_transaction` when you want Turnkey to handle the fee payer, signin
 
 When `sponsor: true`, Turnkey handles the fee payer and provides a recent blockhash if you omit one.
 
+### SDK equivalent
+
+Every Turnkey SDK client exposes this endpoint as `solSendTransaction` (same request shape as the HTTP body above):
+
+```typescript
+import { Turnkey } from "@turnkey/sdk-server";
+
+const turnkey = new Turnkey({
+  apiBaseUrl: "https://api.turnkey.com",
+  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
+  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
+});
+const client = turnkey.apiClient();
+
+const { activity } = await client.solSendTransaction({
+  unsignedTransaction: "<BASE64_ENCODED_SERIALIZED_TX>",
+  signWith: "<SOLANA_ADDRESS>",
+  caip2: "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+  sponsor: true,
+});
+
+// Poll until terminal
+const status = await client.getSendTransactionStatus({
+  sendTransactionStatusId: activity.result.solSendTransactionResult!.sendTransactionStatusId,
+});
+```
+
+Use this path (no `@turnkey/solana`, no `TurnkeySigner`) when the user wants the simplest setup or asks to avoid extra packages.
+
 ### Solana request parameters
 
 | Field | Required | Description |

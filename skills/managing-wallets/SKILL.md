@@ -11,6 +11,8 @@ metadata:
 
 # Managing Wallets
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_wallets` → `client.getWallets(...)`, `create_wallet` → `client.createWallet(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Overview
 
 Turnkey wallets are HD (hierarchical deterministic) wallets. A single seed phrase derives unlimited chain-specific addresses. Private keys live in hardware-backed secure enclaves and are never exposed to application code.

@@ -11,6 +11,8 @@ metadata:
 
 # Provisioning an Agent
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `create_wallet` → `client.createWallet(...)`, `create_users` → `client.createUsers(...)`, `create_policy` → `client.createPolicy(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Overview
 
 Give an AI agent a non-root user, a wallet, and the narrowest ALLOW policy it needs. The agent gets scoped credentials; your root credentials stay with you.
@@ -83,7 +85,7 @@ See [references/agent-personas.md](references/agent-personas.md) for Worker and 
 
 ## Step 1: Create the wallet
 
-Check for existing wallets first (mandatory rule from `managing-wallets`):
+Always start by listing existing wallets — do not skip this call even when the user asks for a "fresh" agent. Reusing a suitable wallet avoids orphan keys and surfaces name collisions before `create_wallet` fails (mandatory rule from `managing-wallets`):
 
 ```
 POST /public/v1/query/list_wallets

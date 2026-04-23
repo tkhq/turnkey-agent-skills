@@ -11,6 +11,8 @@ metadata:
 
 # Monitoring Activities
 
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `get_activity` → `client.getActivity(...)`, `approve_activity` → `client.approveActivity(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+
 ## Overview
 
 Every action submitted to Turnkey — creating a wallet, signing a transaction, updating a policy — returns an **activity**. Activities track the lifecycle of that request from submission to completion.
@@ -66,7 +68,7 @@ TURNKEY_API_PUBLIC_KEY=    # Turnkey API key — public component (hex)
 TURNKEY_API_PRIVATE_KEY=   # Turnkey API key — private component (P-256 hex)
 TURNKEY_ORGANIZATION_ID=   # Turnkey organization UUID
 ```
-
+ 
 ## Instructions
 
 ### Get activity details

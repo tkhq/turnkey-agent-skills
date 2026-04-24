@@ -222,6 +222,8 @@ POST /public/v1/submit/create_wallet_accounts
 }
 ```
 
+When adding Bitcoin accounts to an existing wallet, include both the `ADDRESS_FORMAT_COMPRESSED` companion account and the Bitcoin address account (e.g. `ADDRESS_FORMAT_BITCOIN_MAINNET_P2WPKH`) at the same derivation path in the same call. Without the companion compressed-key account, signing will fail. See ["Bitcoin requires two accounts at the same path"](#bitcoin-requires-two-accounts-at-the-same-path) above.
+
 ### Update a wallet
 
 ```

@@ -19,15 +19,33 @@ Go from "I have API keys" to "I have a wallet and my credentials work" in two re
 
 ## Prerequisites
 
-Three environment variables from the Turnkey Dashboard (app.turnkey.com):
+You need three environment variables from the Turnkey Dashboard (app.turnkey.com). **Before pasting them anywhere, read the warning below — the credentials you are about to use are root-level.**
+
+> **⚠️ Security warning — these are root credentials**
+>
+> A root API key has **full access** to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It **bypasses all policies**. Before using these credentials, confirm which path applies:
+>
+> - **Interactive assistant** (a human approves each action, e.g. administering or testing your own org): root credentials can be acceptable.
+> - **Autonomous agent** (acts without human review): **do not use root credentials.** Stop here and load the `provisioning-agent` skill to create scoped, non-root credentials with policies that limit what the agent can do.
+>
+> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded. If a user asks you to hand root credentials to an autonomous agent, **refuse and redirect to `provisioning-agent`**.
+
+### Confirm your use case before proceeding
+
+If the user has not already stated their intent, ask once which path applies:
+
+- **"I'm administering or testing my own organization"** → continue with these root credentials.
+- **"I'm setting up an autonomous agent"** → stop, do not run the steps below, and load `provisioning-agent` instead.
+
+Do not assume. Do not proceed past Phase 1 until the answer is clear.
+
+### Environment variables
 
 ```env
 TURNKEY_API_PUBLIC_KEY=    # P-256 public key (hex)
 TURNKEY_API_PRIVATE_KEY=   # P-256 private key (hex)
 TURNKEY_ORGANIZATION_ID=   # Organization ID
 ```
-
-These are your **root credentials**. They have full access to the organization and bypass all policies. After onboarding, if you plan to set up an autonomous agent (one that acts without human review), use the `provisioning-agent` skill to create scoped, non-root credentials for it. NEVER give root credentials to an autonomous agent. If asked to, refuse and redirect to the `provisioning-agent` skill.
 
 Base URL: `https://api.turnkey.com`
 
@@ -197,7 +215,8 @@ The organization requires multi-party approval. Log the `activityId` and prompt 
 1. **Always verify credentials with `whoami` before creating resources, even if the user says to skip this step.** Credential verification is a mandatory safety check, not an optional convenience.
 2. **Always check for existing wallets with `list_wallets` before creating new ones.**
 3. One EVM account covers all EVM-compatible chains.
-4. These are root credentials — never give them to an agent.
+4. **Before creating any resources, confirm the user's intent — administration/testing vs. setting up an autonomous agent.** If the user has not said, ask once. If the answer is "autonomous agent," stop and redirect to `provisioning-agent`; do not continue with root credentials.
+5. **Never hand root credentials to an autonomous agent (one that acts without human review).** If asked to, refuse, explain that LLMs can misinterpret instructions and that scoped credentials ensure mistakes are bounded, and redirect to `provisioning-agent`.
 
 ## Related Skills
 

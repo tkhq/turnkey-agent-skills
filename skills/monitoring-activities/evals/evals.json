@@ -44,7 +44,8 @@
         { "type": "contains", "value": "ACTIVITY_TYPE_APPROVE_ACTIVITY" },
         { "type": "regex", "pattern": "\\b(create_users|createUsers)\\b" },
         { "type": "regex", "pattern": "\\b(create_policy|createPolicy)\\b" },
-        { "type": "regex", "value": "(poll|list_activities|listActivities|CONSENSUS_NEEDED)", "flags": "i" }
+        { "type": "regex", "value": "(poll|list_activities|listActivities|CONSENSUS_NEEDED)", "flags": "i" },
+        { "type": "contains", "value": "oauthProviders" }
       ]
     },
     {

@@ -55,6 +55,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["tag_admin123"]
   }]
 }
@@ -99,6 +100,7 @@ A dedicated agent that programmatically approves or rejects other agents' activi
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["tag_approver456"]
   }]
 }

@@ -22,6 +22,8 @@
         { "type": "contains", "value": "04abc123" },
         { "type": "contains", "value": "API_KEY_CURVE_P256" },
         { "type": "contains", "value": "userTags" },
+        { "type": "contains", "value": "authenticators" },
+        { "type": "contains", "value": "oauthProviders" },
         { "type": "not_contains", "value": "rootQuorum" }
       ]
     },

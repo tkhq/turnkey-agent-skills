@@ -6,7 +6,7 @@ Complete request/response JSON for provisioning an Ethereum agent in the parent 
 
 ## Request body convention
 
-The JSON bodies below are the `parameters` object — the shape SDK methods accept. For raw HTTP against `POST /public/v1/submit/*` endpoints, wrap in the activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`POST /public/v1/query/*`) take the body as shown. Activity types follow the endpoint path (`create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V2`, `create_policy` → `ACTIVITY_TYPE_CREATE_POLICY_V3`, `create_user_tag` → `ACTIVITY_TYPE_CREATE_USER_TAG`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`). See the root [`SKILL.md`](../../../SKILL.md) for the full convention.
+The JSON bodies below are the `parameters` object — the shape SDK methods accept. For raw HTTP against `POST /public/v1/submit/*` endpoints, wrap in the activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`POST /public/v1/query/*`) take the body as shown. Activity types follow the endpoint path (`create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V3`, `create_policy` → `ACTIVITY_TYPE_CREATE_POLICY_V3`, `create_user_tag` → `ACTIVITY_TYPE_CREATE_USER_TAG`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`). See the root [`SKILL.md`](../../../SKILL.md) for the full convention.
 
 ## Step 1: Check for existing wallets
 
@@ -122,6 +122,7 @@ POST /public/v1/submit/create_users
         }
       ],
       "authenticators": [],
+      "oauthProviders": [],
       "userTags": ["tag-agent-001"]
     }
   ]
@@ -135,9 +136,9 @@ POST /public/v1/submit/create_users
   "activity": {
     "id": "act-create-users-002",
     "status": "ACTIVITY_STATUS_COMPLETED",
-    "type": "ACTIVITY_TYPE_CREATE_USERS_V2",
+    "type": "ACTIVITY_TYPE_CREATE_USERS_V3",
     "result": {
-      "createUsersResultV2": {
+      "createUsersResult": {
         "userIds": ["usr-agent-003"]
       }
     }

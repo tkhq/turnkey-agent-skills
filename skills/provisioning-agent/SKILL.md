@@ -230,6 +230,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["<AGENT_TAG_ID>"]
   }]
 }

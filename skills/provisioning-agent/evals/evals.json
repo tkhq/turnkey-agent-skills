@@ -14,7 +14,8 @@
         { "type": "regex", "pattern": "(list_wallets|listWallets|getWallets)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" },
         { "type": "regex", "pattern": "(create_wallet|createWallet)(?![_A-Za-z])[\\s\\S]*?(create_users|createUsers)" },
         { "type": "regex", "pattern": "(create_users|createUsers)[\\s\\S]*?(create_policy|createPolicy)" },
-        { "type": "contains", "value": "userTags" }
+        { "type": "contains", "value": "userTags" },
+        { "type": "contains", "value": "oauthProviders" }
       ]
     },
     {

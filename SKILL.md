@@ -113,7 +113,7 @@ JSON bodies shown in skills and reference files are the **`parameters` object** 
 }
 ```
 
-The activity `type` follows the endpoint path: `create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V2`, etc. Canonical list in the [Turnkey API reference](https://docs.turnkey.com/api-reference/activities/create-wallet). `timestampMs` must be a stringified millisecond Unix timestamp and must change between otherwise-identical retries (Turnkey uses the body hash as an idempotency fingerprint).
+The activity `type` follows the endpoint path: `create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V3`, etc. Canonical list in the [Turnkey API reference](https://docs.turnkey.com/api-reference/activities/create-wallet). `timestampMs` must be a stringified millisecond Unix timestamp and must change between otherwise-identical retries (Turnkey uses the body hash as an idempotency fingerprint).
 
 The SDK constructs this envelope for you — this is why `client.createWallet({...})` takes only the `parameters` fields.
 

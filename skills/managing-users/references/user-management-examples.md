@@ -126,6 +126,7 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["tag_engineering123"]
   }]
 }
@@ -138,9 +139,9 @@ POST /public/v1/submit/create_users
   "activity": {
     "id": "act_...",
     "status": "ACTIVITY_STATUS_COMPLETED",
-    "type": "ACTIVITY_TYPE_CREATE_USERS_V2",
+    "type": "ACTIVITY_TYPE_CREATE_USERS_V3",
     "result": {
-      "createUsersResultV2": {
+      "createUsersResult": {
         "userIds": ["usr_..."]
       }
     }
@@ -162,12 +163,15 @@ Agent users should be non-root with a tag for policy targeting. Do not include `
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["tag_agent456"]
   }]
 }
 ```
 
 `userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. Same tag object, different addressable fields — see the "Tag IDs vs. tag names" callout in `SKILL.md`.
+
+`userName` is the only required string field on a user. `userEmail` and `userPhoneNumber` (E.164 format, e.g. `+13214567890`) are both optional — pass them for human users if you want OTP recovery flows to work, omit them for agents that should never receive out-of-band contact. The four array fields (`apiKeys`, `authenticators`, `oauthProviders`, `userTags`) are required but can be empty.
 
 ## Create multiple users in one call
 
@@ -180,12 +184,14 @@ Each user's `userTags` contains tag **IDs**. The `trading` and `monitoring` tags
       "userName": "agent-1",
       "apiKeys": [{ "apiKeyName": "agent-1-key", "publicKey": "04aaa...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
+      "oauthProviders": [],
       "userTags": ["tag_agent456", "tag_trading789"]
     },
     {
       "userName": "agent-2",
       "apiKeys": [{ "apiKeyName": "agent-2-key", "publicKey": "04bbb...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
+      "oauthProviders": [],
       "userTags": ["tag_agent456", "tag_monitoring012"]
     }
   ]

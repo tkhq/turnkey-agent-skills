@@ -116,12 +116,15 @@ POST /public/v1/submit/create_users
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["<ENGINEERING_TAG_ID>"]
   }]
 }
 ```
 
 Generate the P-256 key pair locally, then register the public key here. The private key stays on the user's machine — it is never sent to Turnkey.
+
+> **All four array fields must be present.** `apiKeys`, `authenticators`, `oauthProviders`, and `userTags` are required in the request body — pass `[]` for any you don't need. Omitting any of them causes the API to reject the call.
 
 #### Creating an agent user
 
@@ -137,6 +140,7 @@ Agent users should be non-root with a descriptive tag for policy targeting. Crea
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
+    "oauthProviders": [],
     "userTags": ["<AGENT_TAG_ID>"]
   }]
 }

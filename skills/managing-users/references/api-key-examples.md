@@ -68,6 +68,8 @@ POST /public/v1/submit/create_api_keys
 }
 ```
 
+Optionally pass `"expirationSeconds": "<SECONDS>"` on an API key to have it auto-expire. This is a useful defense-in-depth for agent keys — expired keys cannot sign, even if leaked. Example: `"expirationSeconds": "2592000"` for a 30-day key. `expirationSeconds` is also accepted when creating the user with `create_users` (inside `apiKeys[]`), so you can bake expiration into provisioning instead of patching afterwards.
+
 **Response:**
 
 ```json

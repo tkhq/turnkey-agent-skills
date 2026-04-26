@@ -51,6 +51,8 @@ Available in the `consensus` field:
 | `approvers` | list\<User> | Users that have approved the activity |
 | `credentials` | list\<Credential> | Credentials used to approve the activity |
 
+> **Submitter-in-consensus rule:** The submitter's auto-vote only counts toward clauses their user ID or tags satisfy. If every clause in `consensus` references tags/IDs the submitter doesn't have, the ALLOW doesn't fire at submit time and the request is implicit-denied instead of going to `CONSENSUS_NEEDED`. When you want an agent-submitted activity to require admin approval, combine clauses: `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1`. See the managing-policies `SKILL.md` for a full explanation.
+
 ### User struct
 
 | Field | Type |

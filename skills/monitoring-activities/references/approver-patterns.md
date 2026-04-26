@@ -61,7 +61,7 @@ POST /public/v1/submit/create_users
 }
 ```
 
-**Step 2:** Create a policy that triggers consensus and includes the admin in the approval expression.
+**Step 2:** Create a policy that triggers consensus and includes **both the submitting agent and the admin** in the approval expression.
 
 Example — agent transactions above 0.5 ETH require admin approval:
 
@@ -73,12 +73,14 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('admin')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
   "condition": "activity.action == 'SIGN' && eth.tx.value > 500000000000000000"
 }
 ```
 
-When the agent submits a transfer above 0.5 ETH, the activity enters `CONSENSUS_NEEDED`. The admin reviews with Claude Code using their own credentials and approves or rejects.
+When the agent submits a transfer above 0.5 ETH, its auto-vote satisfies the `agent` clause and the activity enters `CONSENSUS_NEEDED`. The admin reviews with Claude Code using their own credentials and approves (satisfying the `admin` clause) or rejects.
+
+> **Why the `agent` clause?** Without it — i.e. a consensus of just `admin.count() >= 1` — the agent's auto-vote would contribute 0 to the admin count, consensus would evaluate to false at submit time, and the ALLOW would never fire. The request would be implicit-denied rather than entering `CONSENSUS_NEEDED`. See [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
 
 **When to use:** Teams that want human review without exposing root credentials.
 
@@ -117,13 +119,13 @@ A dedicated agent that programmatically approves or rejects other agents' activi
 }
 ```
 
-**Step 3:** Create a policy on the worker agent that requires the approver's consensus:
+**Step 3:** Create a policy on the worker agent that requires the approver agent's consensus. The worker's submitting tag (`agent`) must appear in consensus alongside the approver requirement — otherwise the request is implicit-denied at submit time instead of entering `CONSENSUS_NEEDED` (see [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule)):
 
 ```json
 {
   "policyName": "worker-needs-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WORKER_WALLET_ID>'"
 }
 ```
@@ -167,41 +169,41 @@ The approver agent runs a polling loop:
 
 ## Combining patterns: agent + human
 
-Require both automated and human approval:
+Require both automated and human approval. The first clause represents the submitting agent (so the activity can enter `CONSENSUS_NEEDED` — see [the submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule)):
 
 ```json
 {
   "policyName": "high-value-dual-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
   "condition": "activity.action == 'SIGN' && eth.tx.value > 1000000000000000000"
 }
 ```
 
-For ETH transfers above 1 ETH: the agent approver provides fast automated risk checks, the human admin provides judgment. Both must approve before the transaction proceeds.
+For ETH transfers above 1 ETH: the approver agent provides fast automated risk checks, the human admin provides judgment. Both must approve before the transaction proceeds.
 
 ## Tiered approval example
 
-Different thresholds for different amounts:
+Different thresholds for different amounts. In every tier the first consensus clause names the submitting agent so the activity can enter `CONSENSUS_NEEDED` (see [the submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule)):
 
-**Low value (< 0.1 ETH):** Agent auto-approves
+**Low value (< 0.1 ETH):** Approver agent auto-approves
 
 ```json
 {
-  "policyName": "low-value-agent-approval",
+  "policyName": "low-value-approver-auto",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
   "condition": "activity.action == 'SIGN' && eth.tx.value <= 100000000000000000"
 }
 ```
 
-**Medium value (0.1 - 1 ETH):** Agent + human
+**Medium value (0.1 - 1 ETH):** Approver agent + human admin
 
 ```json
 {
   "policyName": "medium-value-dual-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
   "condition": "activity.action == 'SIGN' && eth.tx.value > 100000000000000000 && eth.tx.value <= 1000000000000000000"
 }
 ```
@@ -212,7 +214,7 @@ Different thresholds for different amounts:
 {
   "policyName": "high-value-two-admins",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('admin')).count() >= 2",
+  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 2",
   "condition": "activity.action == 'SIGN' && eth.tx.value > 1000000000000000000"
 }
 ```

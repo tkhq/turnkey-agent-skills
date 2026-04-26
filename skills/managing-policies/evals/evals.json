@@ -90,14 +90,37 @@
     },
     {
       "id": 9,
-      "prompt": "Require that two users with the 'admin' tag approve any signing request above 1 ETH.",
-      "expected_output": "ALLOW with consensus using filter + count >= 2 on admin tag, condition on eth.tx.value",
-      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "prompt": "My agent (tagged 'agent') needs to sign transactions above 1 ETH, but every such signing request must be approved by two users tagged 'admin'. Create the policy.",
+      "expected_output": "ALLOW whose consensus includes both the submitting agent clause (approvers.any on 'agent' tag) AND the admin threshold (filter + count >= 2 on 'admin' tag), condition on eth.tx.value > 1 ETH. Explains the submitter-in-consensus rule: without the agent clause the request would be implicit-denied at submit time instead of entering CONSENSUS_NEEDED.",
+      "files": [
+        "skills/managing-policies/SKILL.md",
+        "skills/managing-policies/references/policy-api-examples.md"
+      ],
+      "gradeFullResponse": true,
       "assertions": [
+        { "type": "contains", "value": "EFFECT_ALLOW" },
         { "type": "contains", "value": "filter" },
         { "type": "contains", "value": "admin" },
         { "type": "contains", "value": "count()" },
-        { "type": "contains", "value": ">= 2" }
+        { "type": "contains", "value": ">= 2" },
+        { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"]agent['\"]\\)", "flags": "s" },
+        { "type": "regex", "value": "(submitter|implicit.deny|CONSENSUS_NEEDED|auto.vote)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "My agent submits a SIGN activity and the admin approves it via Turnkey. I want a policy that says: any SIGN activity from my agent must be approved by an admin. I drafted this: consensus = \"approvers.filter(user, user.tags.contains('admin')).count() >= 1\", condition = \"activity.action == 'SIGN'\". Is this correct?",
+      "expected_output": "Identifies the submitter-in-consensus bug: the agent's auto-vote contributes 0 to the admin count, so at submit time the consensus evaluates to false, the ALLOW doesn't fire, and the request is implicit-denied instead of entering CONSENSUS_NEEDED. Proposes the fix: add an `approvers.any(user, user.tags.contains('agent'))` clause combined with `&&` to the admin clause, and adds wallet.id scoping (Rule 2). Refuses to create the policy as drafted.",
+      "files": [
+        "skills/managing-policies/SKILL.md",
+        "skills/managing-policies/references/policy-language.md"
+      ],
+      "gradeFullResponse": true,
+      "assertions": [
+        { "type": "regex", "value": "(submitter|auto.vote|implicit.deny|CONSENSUS_NEEDED)", "flags": "i" },
+        { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"]agent['\"]\\)", "flags": "s" },
+        { "type": "contains", "value": "&&" },
+        { "type": "regex", "value": "(wallet\\.id|scope|not.recommend|don.t|do not|fix|should)", "flags": "i" }
       ]
     }
   ]

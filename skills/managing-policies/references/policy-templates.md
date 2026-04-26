@@ -77,6 +77,8 @@ This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless o
 }
 ```
 
+This assumes the submitting user is tagged `trader` — their auto-vote then contributes to the count (1 of 2), a second trader approves to reach the threshold, and the activity completes. **If a non-trader would submit this signing request**, the submitter's vote counts toward nothing, consensus stays at 0, and the ALLOW never fires at submit time. In that case add a submitter clause, e.g. `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('trader')).count() >= 2`. See the submitter-in-consensus rule in the main skill.
+
 ### Solana: restrict to a specific program
 
 ```json

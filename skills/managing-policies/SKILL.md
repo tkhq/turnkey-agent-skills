@@ -93,6 +93,27 @@ condition: "wallet.id == 'wlt_123' || private_key.id == 'pk_456'"
 
 **Fix:** Split into two separate policies — one for wallet signing, one for private key signing.
 
+### The submitter-in-consensus rule
+
+Consensus is evaluated against the current approver list at submit time. The submitter's auto-vote only counts toward clauses their user ID or tags satisfy. **If the consensus expression references only tags or IDs the submitter doesn't have, the ALLOW doesn't fire on submission and the request is implicit-denied — it never reaches `CONSENSUS_NEEDED`.**
+
+**This will break** (an agent-tagged user submits, consensus names only `admin`):
+```
+consensus: "approvers.filter(user, user.tags.contains('admin')).count() >= 1"
+condition: "activity.action == 'SIGN' && eth.tx.value > 500000000000000000"
+```
+The agent's vote contributes 0 to the admin count. Consensus evaluates to false at submit time, no ALLOW matches, implicit deny — not `CONSENSUS_NEEDED`.
+
+**Fix:** Include a clause the submitter satisfies, combined with the approver requirement:
+```
+consensus: "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1"
+```
+The agent's auto-vote satisfies the first clause immediately, the second clause remains pending, so the engine correctly enters `CONSENSUS_NEEDED`. The admin then approves and the activity completes.
+
+**When this applies:** Any policy whose `condition` can be triggered by a user whose ID or tags aren't referenced by any clause in `consensus`. Single-submitter policies like `approvers.any(user, user.tags.contains('agent'))` on an agent-submitted activity are fine — the submitter satisfies the only clause. Multi-party policies where the submitter is also in the required set (e.g., `trader.count() >= 2` with a trader-tagged submitter) are fine for the same reason.
+
+**Symptom to recognize:** An activity denied at submit time when you expected `CONSENSUS_NEEDED`. Call `get_policy_evaluations` — you'll see your ALLOW listed with `consensusMatched: false` because the submitter contributes to no clause.
+
 ## Policy templates and anti-patterns
 
 For ready-to-use ALLOW templates (wallet-scoped signing, address allowlists, spending caps, ABI-restricted contract calls, multi-sig, Solana program restrictions, admin blocks) and anti-patterns to avoid (unscoped ALLOWs, mixed wallet/private_key contexts, DENY-all lockouts, wrong unit math), see [references/policy-templates.md](references/policy-templates.md).
@@ -259,6 +280,9 @@ Check units. `eth.tx.value` is in wei (1 ETH = `1000000000000000000`). `tron.tx.
 
 **Agent denied unexpectedly**
 Use `get_policy_evaluations` to see which policy matched. Common causes: a DENY policy's condition is broader than intended, or the ALLOW policy's consensus doesn't match the agent's user ID or tag.
+
+**Activity denied at submit time when `CONSENSUS_NEEDED` was expected**
+The submitter isn't referenced by any clause in the consensus expression. See [The submitter-in-consensus rule](#the-submitter-in-consensus-rule) — add a clause the submitter satisfies (typically `approvers.any(user, user.tags.contains('agent'))`) to the consensus.
 
 **Locked out (no users can act)**
 Only root quorum can fix this. Root users bypass all policies. Use root quorum to delete the problematic policy.

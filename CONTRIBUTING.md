@@ -37,6 +37,55 @@ After running evals, `npm test` will grade any solutions in `evals-workspace/` a
 
 Eval outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` definitions are committed.
 
+## Maintaining API Schemas
+
+`tests/api-schemas.test.ts` validates every documented `POST /public/v1/{submit,query}/<endpoint>` JSON body against JSON Schemas extracted from the bundled `@turnkey/sdk-server` types (`dist/__inputs__/public_api.types.d.ts`). This catches drift like a missing required field (`oauthProviders`) or a stale activity-type version (`CREATE_USERS_V3` vs `V4`) before users hit it at runtime.
+
+The schemas live in two checked-in fixtures:
+
+- `tests/fixtures/api-schemas.json` — JSON Schema document, one `definitions[<TypeName>]` entry per SDK type
+- `tests/fixtures/endpoint-to-intent.json` — `/public/v1/{submit,query}/<endpoint>` → `{ intent, activityType? }` mapping
+
+### When to refresh
+
+After bumping `@turnkey/sdk-server` (or accepting a Renovate PR that does so), regenerate the fixtures:
+
+```bash
+npm run refresh-api-schemas
+```
+
+The script reads the SDK's bundled type definitions, walks the AST, and writes both fixtures. Re-running it without an SDK change must produce **no diff** — that's the idempotence guarantee. Diffs after an SDK bump should be reviewed alongside any documentation updates the same PR makes.
+
+If the schema diff introduces a new required field on an intent your skill documents, the test will fail until the documented body includes it. That's the point — fix the docs (don't paper over the failure).
+
+### Skipping a JSON block
+
+Some examples are intentionally partial (e.g. documenting a query-by-address shortcut whose SDK type marks the wallet ID required even though the live API resolves it from the address). Mark them with an HTML comment between the endpoint header and the JSON body:
+
+````markdown
+```
+POST /public/v1/query/get_wallet_account
+```
+
+<!-- schema-skip: docs the by-address lookup shortcut; SDK type marks `walletId` required but the live API resolves wallet from `address` -->
+
+```json
+{
+  "organizationId": "<ORG_ID>",
+  "address": "<ADDRESS>"
+}
+```
+````
+
+The rationale is mandatory and reviewed. A guardrail in the test suite fails CI if skipped blocks exceed 25% of validated blocks, so this mechanism cannot be used to silently disable coverage.
+
+### Body convention
+
+The validator auto-detects two body shapes documented in the skills:
+
+- **Parameters payload** (most submit / all query endpoints) — validated directly against the mapped intent / request schema.
+- **Activity envelope** `{ type, timestampMs, organizationId, parameters }` (used in a handful of walk-throughs) — `parameters` is validated against the intent schema and `type` is cross-checked against the mapped `activityType`.
+
 ## Adding a New Skill
 
 Skills live directly under `skills/` in a flat layout — no category subdirectories. Follow these steps:
@@ -99,13 +148,16 @@ turnkey-agent-skills/
 │   ├── solana-signing.ts
 │   └── bitcoin-signing.ts
 ├── scripts/
-│   └── run-evals.ts                      # Eval runner entry point
+│   ├── run-evals.ts                      # Eval runner entry point
+│   └── refresh-api-schemas.ts            # Regenerates tests/fixtures/api-*.json
 └── tests/
     ├── skill-structure.test.ts           # Layer 1: frontmatter + sections
     ├── code-blocks.test.ts               # Layer 2: syntax checking
     ├── reference-compiles.test.ts        # Layer 3: full type-checking
-    ├── evals.test.ts                     # Layer 4: assertion grading
+    ├── api-schemas.test.ts               # Layer 4: JSON body schema validation
+    ├── evals.test.ts                     # Layer 5: assertion grading
     ├── plugin-dir.test.ts                # Plugin packaging checks
+    ├── fixtures/                         # Generated API schema + endpoint mapping
     ├── grader.ts                         # Assertion runner
     └── helpers.ts                        # Shared test utilities
 ```

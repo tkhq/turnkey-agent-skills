@@ -1,5 +1,5 @@
 /**
- * Layer 4 — Eval grading tests
+ * Layer 5 — Eval grading tests
  *
  * For each eval in evals.json, looks for a generated solution at:
  *   evals-workspace/<skill_name>/eval-<id>/solution.ts

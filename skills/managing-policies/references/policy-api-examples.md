@@ -386,8 +386,8 @@ POST /public/v1/submit/create_smart_contract_interface
 
 ```json
 {
-  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-  "abi": "[{\"type\":\"function\",\"name\":\"transfer\",\"inputs\":[{\"name\":\"to\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}]}]",
+  "smartContractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+  "smartContractInterface": "[{\"type\":\"function\",\"name\":\"transfer\",\"inputs\":[{\"name\":\"to\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}]}]",
   "type": "SMART_CONTRACT_INTERFACE_TYPE_ETHEREUM",
   "label": "USDC ERC-20",
   "notes": "USDC contract ABI for function-level policy control"

@@ -197,6 +197,8 @@ Query by address or account ID:
 POST /public/v1/query/get_wallet_account
 ```
 
+<!-- schema-skip: docs the by-address lookup shortcut; SDK type marks `walletId` required but the live API resolves wallet from `address` -->
+
 ```json
 {
   "organizationId": "<ORG_ID>",

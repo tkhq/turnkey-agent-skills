@@ -74,7 +74,8 @@ POST /public/v1/submit/create_policy
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 500000000000000000"
+  "condition": "activity.action == 'SIGN' && eth.tx.value > 500000000000000000",
+  "notes": "Large ETH transfers require an admin to co-approve the agent's submission"
 }
 ```
 

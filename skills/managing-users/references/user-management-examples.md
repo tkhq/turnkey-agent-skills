@@ -224,7 +224,7 @@ POST /public/v1/submit/update_user_email
 ```json
 {
   "userId": "usr_...",
-  "email": "new-email@example.com"
+  "userEmail": "new-email@example.com"
 }
 ```
 

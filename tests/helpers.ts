@@ -58,3 +58,31 @@ export function findReferenceFiles(dir: string): string[] {
 export function relativePath(absolutePath: string): string {
   return absolutePath.replace(PROJECT_ROOT + "/", "");
 }
+
+export interface CodeBlock {
+  code: string;
+  /** 1-based index within the file, for readable test names */
+  index: number;
+  /** First non-empty line of the snippet, truncated, for test names */
+  preview: string;
+}
+
+/** Extract every fenced ```typescript or ```ts code block from a markdown string. */
+export function extractTypeScriptBlocks(markdown: string): CodeBlock[] {
+  const blocks: CodeBlock[] = [];
+  const regex = /```(?:typescript|ts)\n([\s\S]*?)```/g;
+  let match: RegExpExecArray | null;
+  let index = 1;
+
+  while ((match = regex.exec(markdown)) !== null) {
+    const code = match[1];
+    const firstLine = code
+      .split("\n")
+      .find((l) => l.trim().length > 0)
+      ?.trim()
+      .slice(0, 60) ?? "(empty)";
+    blocks.push({ code, index: index++, preview: firstLine });
+  }
+
+  return blocks;
+}

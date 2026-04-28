@@ -73,7 +73,7 @@ const client = turnkey.apiClient();
 Skills describe operations using HTTP endpoints (e.g., `POST /public/v1/query/list_wallets`). The SDK exposes these as typed TypeScript methods in `camelCase`:
 
 - `snake_case` endpoint → `camelCase` method: `create_wallet` → `client.createWallet(...)`
-- Query endpoints rename `list_` to `get`: `list_wallets` → `client.getWallets()`
+- Most query endpoints rename `list_` to `get`: `list_wallets` → `client.getWallets()`. A few retain `list` (e.g., `list_user_tags` → `client.listUserTags()`, `list_private_key_tags` → `client.listPrivateKeyTags()`) — rely on the SDK's TypeScript types for the exact method name when in doubt.
 - Rely on the SDK's TypeScript types for exact method names and parameters
 
 For example, when a skill shows:

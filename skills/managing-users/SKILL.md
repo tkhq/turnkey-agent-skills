@@ -11,7 +11,7 @@ metadata:
 
 # Managing Users
 
-> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_users` → `client.getUsers(...)`, `create_users` → `client.createUsers(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
+> **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_users` → `client.getUsers(...)`, `list_user_tags` → `client.listUserTags(...)` (exception: keeps `list`), `create_users` → `client.createUsers(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
 
 ## Overview
 

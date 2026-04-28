@@ -103,7 +103,7 @@ const compactSignature = Buffer.from(r + s, "hex");
 
 ## Sign a UTF-8 message
 
-Use when signing a plain text string.
+Use when signing a plain text string with a secp256k1 key. Pick the hash function from the curve/ecosystem table below — `HASH_FUNCTION_NO_OP` will fail here because secp256k1 requires a 32-byte digest and `"Hello from Turnkey"` is only 18 bytes.
 
 ```typescript
 const response = await client.signRawPayload({
@@ -111,9 +111,11 @@ const response = await client.signRawPayload({
   signWith: process.env.SIGN_WITH!,
   payload: "Hello from Turnkey",
   encoding: "PAYLOAD_ENCODING_TEXT_UTF8",
-  hashFunction: "HASH_FUNCTION_NO_OP",
+  hashFunction: "HASH_FUNCTION_KECCAK256",
 });
 ```
+
+This signs `keccak256(utf8_bytes("Hello from Turnkey"))`. It is **not** an Ethereum `personal_sign` / EIP-191 signature — `personal_sign` prepends `"\x19Ethereum Signed Message:\n<len>"` before hashing. If you need an EIP-191-compatible signature that `ecrecover` will verify, either prepend that prefix to the payload yourself before sending, or use the SDK's higher-level `signMessage()` helper, which handles the prefix automatically. For ed25519 keys (Solana, Aptos, Sui, TON), use `HASH_FUNCTION_NOT_APPLICABLE` instead.
 
 ## Batch signing (multiple payloads, same key)
 
@@ -180,6 +182,9 @@ The signed authorization is then included in a Type 4 EVM transaction's `authori
 
 **Wrong hash function**
 Using `HASH_FUNCTION_KECCAK256` on a pre-hashed payload will double-hash it. Use `HASH_FUNCTION_NO_OP` if you provide a pre-hashed input.
+
+**Payload too short for `HASH_FUNCTION_NO_OP`**
+`NO_OP` passes bytes straight to the signer, which requires a 32-byte digest for secp256k1. Signing a UTF-8 string or non-32-byte hex with `NO_OP` returns `Turnkey error 3: expected a 32-bytes-long digest`. Either pre-hash to 32 bytes, or pick a hash function (`KECCAK256` for EVM, `SHA256` for Bitcoin/Cosmos) and let Turnkey hash for you.
 
 **Invalid payload encoding**
 A payload like `"hello"` with `PAYLOAD_ENCODING_HEXADECIMAL` will fail — it's not valid hex. Either hex-encode it first (`Buffer.from("hello").toString("hex")`) or use `PAYLOAD_ENCODING_TEXT_UTF8`.

@@ -27,7 +27,7 @@ POST /public/v1/query/get_api_keys
     {
       "apiKeyId": "key_...",
       "apiKeyName": "alice-key",
-      "publicKey": "04abc123...",
+      "publicKey": "02abc123...",
       "curveType": "API_KEY_CURVE_P256",
       "createdAt": { "seconds": "1700000000", "nanos": "0" },
       "updatedAt": { "seconds": "1700000000", "nanos": "0" }
@@ -62,7 +62,7 @@ POST /public/v1/submit/create_api_keys
   "userId": "usr_...",
   "apiKeys": [{
     "apiKeyName": "new-key",
-    "publicKey": "04def456...",
+    "publicKey": "03def456...",
     "curveType": "API_KEY_CURVE_P256"
   }]
 }

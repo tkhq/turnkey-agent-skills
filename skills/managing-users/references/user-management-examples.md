@@ -55,7 +55,7 @@ POST /public/v1/query/list_users
         {
           "apiKeyId": "key_...",
           "apiKeyName": "alice-key",
-          "publicKey": "04abc...",
+          "publicKey": "02abc...",
           "curveType": "API_KEY_CURVE_P256"
         }
       ],
@@ -122,7 +122,7 @@ POST /public/v1/submit/create_users
     "userEmail": "alice@example.com",
     "apiKeys": [{
       "apiKeyName": "alice-key",
-      "publicKey": "04abc123def456...",
+      "publicKey": "02abc123def456...",
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
@@ -159,7 +159,7 @@ Agent users should be non-root with a tag for policy targeting. Do not include `
     "userName": "trading-agent",
     "apiKeys": [{
       "apiKeyName": "agent-key-v1",
-      "publicKey": "04fed987cba654...",
+      "publicKey": "03fed987cba654...",
       "curveType": "API_KEY_CURVE_P256"
     }],
     "authenticators": [],
@@ -182,14 +182,14 @@ Each user's `userTags` contains tag **IDs**. The `trading` and `monitoring` tags
   "users": [
     {
       "userName": "agent-1",
-      "apiKeys": [{ "apiKeyName": "agent-1-key", "publicKey": "04aaa...", "curveType": "API_KEY_CURVE_P256" }],
+      "apiKeys": [{ "apiKeyName": "agent-1-key", "publicKey": "02aaa...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
       "oauthProviders": [],
       "userTags": ["tag_agent456", "tag_trading789"]
     },
     {
       "userName": "agent-2",
-      "apiKeys": [{ "apiKeyName": "agent-2-key", "publicKey": "04bbb...", "curveType": "API_KEY_CURVE_P256" }],
+      "apiKeys": [{ "apiKeyName": "agent-2-key", "publicKey": "03bbb...", "curveType": "API_KEY_CURVE_P256" }],
       "authenticators": [],
       "oauthProviders": [],
       "userTags": ["tag_agent456", "tag_monitoring012"]

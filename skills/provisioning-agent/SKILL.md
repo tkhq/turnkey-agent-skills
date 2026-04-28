@@ -173,11 +173,15 @@ const keyPair = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
 const pubJwk = keyPair.publicKey.export({ format: "jwk" }) as { x: string; y: string };
 const privJwk = keyPair.privateKey.export({ format: "jwk" }) as { d: string };
 
-const publicKeyHex =
-  "04" +
-  Buffer.from(pubJwk.x, "base64url").toString("hex") +
-  Buffer.from(pubJwk.y, "base64url").toString("hex");
-const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex");
+// SEC1-compressed P-256 public key: 33 bytes total.
+// Prefix is 0x02 when Y is even, 0x03 when Y is odd. X is the 32-byte
+// big-endian X coordinate. Pad to 32 bytes so a leading-zero coordinate
+// doesn't produce a short hex string (the stamper requires exactly 33 bytes).
+const xHex = Buffer.from(pubJwk.x, "base64url").toString("hex").padStart(64, "0");
+const yBuf = Buffer.from(Buffer.from(pubJwk.y, "base64url").toString("hex").padStart(64, "0"), "hex");
+const prefix = (yBuf[yBuf.length - 1] & 1) === 0 ? "02" : "03";
+const publicKeyHex = prefix + xHex;
+const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex").padStart(64, "0");
 
 const envPath = path.resolve(process.env.AGENT_ENV_PATH ?? "./agent.env");
 
@@ -212,7 +216,7 @@ Use the printed `AGENT_PUBLIC_KEY` as `<AGENT_PUBLIC_KEY>` in the request below.
 
 #### Option B — Bring your own public key
 
-If the human has already generated the key pair (e.g., in an HSM or existing secrets manager), skip the script above and confirm with them that the private key is already persisted in its final destination. Paste their public key (uncompressed hex, `04` + X + Y) as `<AGENT_PUBLIC_KEY>` below.
+If the human has already generated the key pair (e.g., in an HSM or existing secrets manager), skip the script above and confirm with them that the private key is already persisted in its final destination. Paste their public key (compressed hex — 33 bytes / 66 hex chars, prefixed with `02` or `03` followed by the 32-byte X coordinate) as `<AGENT_PUBLIC_KEY>` below. If their HSM or secrets manager produced an uncompressed `04` + X + Y key, see the root [`SKILL.md`](../../SKILL.md) "Generating API key pairs" section for the compression recipe — Turnkey rejects uncompressed keys when verifying stamped requests, even though the initial registration call accepts them.
 
 #### Register the public key and assign the tag
 

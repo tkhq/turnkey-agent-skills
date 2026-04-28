@@ -34,7 +34,7 @@ POST /public/v1/query/get_api_keys
     {
       "apiKeyId": "key-old-001",
       "apiKeyName": "agent-key-v1",
-      "publicKey": "04abc123...",
+      "publicKey": "02abc123...",
       "curveType": "API_KEY_CURVE_P256",
       "createdAt": { "seconds": "1700000000", "nanos": "0" }
     }

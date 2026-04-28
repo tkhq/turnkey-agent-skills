@@ -13,13 +13,13 @@
     },
     {
       "id": 2,
-      "prompt": "Create a non-root agent user called 'trading-bot' with an API key for Turnkey. The agent's public key is 04abc123.",
+      "prompt": "Create a non-root agent user called 'trading-bot' with an API key for Turnkey. The agent's public key is 02abc123.",
       "expected_output": "Uses create_users with the agent name, public key, P256 curve, and an agent tag. Does not make the user root.",
       "files": ["skills/managing-users/references/user-management-examples.md"],
       "assertions": [
         { "type": "regex", "pattern": "\\b(create_users|createUsers)\\b" },
         { "type": "contains", "value": "trading-bot" },
-        { "type": "contains", "value": "04abc123" },
+        { "type": "contains", "value": "02abc123" },
         { "type": "contains", "value": "API_KEY_CURVE_P256" },
         { "type": "contains", "value": "userTags" },
         { "type": "contains", "value": "authenticators" },
@@ -40,7 +40,7 @@
     },
     {
       "id": 4,
-      "prompt": "Rotate the API key for my agent user usr_agent123. The new public key is 04def456.",
+      "prompt": "Rotate the API key for my agent user usr_agent123. The new public key is 03def456.",
       "expected_output": "Follows the 4-step rotation: create new key, verify with whoami, delete old key (signed with new key), update runtime",
       "files": ["skills/managing-users/references/api-key-examples.md"],
       "assertions": [

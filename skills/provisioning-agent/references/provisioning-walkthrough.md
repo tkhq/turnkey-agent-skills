@@ -117,7 +117,7 @@ POST /public/v1/submit/create_users
       "apiKeys": [
         {
           "apiKeyName": "agent-key-v1",
-          "publicKey": "04fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543",
+          "publicKey": "02fedcba0987654321fedcba0987654321fedcba0987654321fedcba09876543",
           "curveType": "API_KEY_CURVE_P256"
         }
       ],
@@ -287,7 +287,7 @@ POST /public/v1/query/get_policy_evaluations
 
 ```env
 # AGENT CREDENTIALS (scoped, non-root)
-TURNKEY_API_PUBLIC_KEY=04fedcba0987654321...    # agent's public key from Step 3
+TURNKEY_API_PUBLIC_KEY=02fedcba0987654321...    # agent's compressed public key from Step 3 (33 bytes / 66 hex chars)
 TURNKEY_API_PRIVATE_KEY=<agent-private-key>      # generated locally, never sent to Turnkey
 TURNKEY_ORGANIZATION_ID=org-12345678-abcd-1234-abcd-1234567890ab
 SIGN_WITH=0x1234abcd5678ef901234abcd5678ef901234abcd

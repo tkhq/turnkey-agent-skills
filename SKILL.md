@@ -131,17 +131,21 @@ export function generateApiKeyPair(): { publicKeyHex: string; privateKeyHex: str
   const pubJwk = keyPair.publicKey.export({ format: "jwk" }) as { x: string; y: string };
   const privJwk = keyPair.privateKey.export({ format: "jwk" }) as { d: string };
 
-  const publicKeyHex =
-    "04" +
-    Buffer.from(pubJwk.x, "base64url").toString("hex") +
-    Buffer.from(pubJwk.y, "base64url").toString("hex");
-  const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex");
+  // SEC1-compressed P-256 public key: 33 bytes total.
+  // Prefix is 0x02 when Y is even, 0x03 when Y is odd. X is the 32-byte
+  // big-endian X coordinate. Pad to 32 bytes so a leading-zero coordinate
+  // doesn't produce a short hex string (the stamper requires exactly 33 bytes).
+  const xHex = Buffer.from(pubJwk.x, "base64url").toString("hex").padStart(64, "0");
+  const yBuf = Buffer.from(Buffer.from(pubJwk.y, "base64url").toString("hex").padStart(64, "0"), "hex");
+  const prefix = (yBuf[yBuf.length - 1] & 1) === 0 ? "02" : "03";
+  const publicKeyHex = prefix + xHex;
+  const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex").padStart(64, "0");
 
   return { publicKeyHex, privateKeyHex };
 }
 ```
 
-Use `publicKeyHex` as the `publicKey` field when calling `create_api_keys` or `create_users`. `privateKeyHex` becomes the agent's `TURNKEY_API_PRIVATE_KEY`.
+Use `publicKeyHex` as the `publicKey` field when calling `create_api_keys` or `create_users`. It is a 33-byte SEC1-compressed P-256 public key (66 hex chars, prefixed with `02` or `03`) — Turnkey rejects the uncompressed (`04` + X + Y, 65-byte) form when verifying stamped requests. `privateKeyHex` becomes the agent's `TURNKEY_API_PRIVATE_KEY` (32-byte big-endian scalar, 64 hex chars).
 
 ### Destination for the private key
 

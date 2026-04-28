@@ -38,7 +38,7 @@
     },
     {
       "id": 4,
-      "prompt": "Rotate my agent's API key. The agent user ID is usr_agent and the new public key is 04def456.",
+      "prompt": "Rotate my agent's API key. The agent user ID is usr_agent and the new public key is 03def456.",
       "expected_output": "Follows correct rotation order: create new key, verify with whoami (signed with new key), delete old key (signed with new key), update runtime",
       "files": ["skills/managing-agent/references/key-rotation-examples.md"],
       "assertions": [
@@ -47,7 +47,7 @@
         { "type": "regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\b" },
         { "type": "regex", "pattern": "(create_api_keys|createApiKeys)[\\s\\S]*?(whoami|Whoami|getWhoami)" },
         { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(delete_api_keys|deleteApiKeys)" },
-        { "type": "contains", "value": "04def456" }
+        { "type": "contains", "value": "03def456" }
       ]
     },
     {

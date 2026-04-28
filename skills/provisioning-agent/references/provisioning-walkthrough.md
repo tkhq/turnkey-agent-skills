@@ -6,7 +6,7 @@ Complete request/response JSON for provisioning an Ethereum agent in the parent 
 
 ## Request body convention
 
-The JSON bodies below are the `parameters` object — the shape SDK methods accept. For raw HTTP against `POST /public/v1/submit/*` endpoints, wrap in the activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`POST /public/v1/query/*`) take the body as shown. Activity types follow the endpoint path (`create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V3`, `create_policy` → `ACTIVITY_TYPE_CREATE_POLICY_V3`, `create_user_tag` → `ACTIVITY_TYPE_CREATE_USER_TAG`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`). See the root [`SKILL.md`](../../../SKILL.md) for the full convention.
+The JSON bodies below are the `parameters` object — the shape SDK methods accept. For raw HTTP against `POST /public/v1/submit/*` endpoints, wrap in the activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`POST /public/v1/query/*`) take the body as shown. Activity types follow the endpoint path (`create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V3`, `create_policy` → `ACTIVITY_TYPE_CREATE_POLICY_V3`, `create_user_tag` → `ACTIVITY_TYPE_CREATE_USER_TAG`, `sign_transaction` → `ACTIVITY_TYPE_SIGN_TRANSACTION_V2`). See the root [`SKILL.md`](../../../SKILL.md) for the full convention.
 
 ## Step 1: Check for existing wallets
 
@@ -152,7 +152,7 @@ Save: `userId` = `usr-agent-003`. The `agent` tag enables policy targeting.
 
 **Present this policy to the human and get explicit confirmation.**
 
-"This policy allows any user with the 'agent' tag to sign transactions using wallet `wlt-agent-9012`. It does not restrict destination addresses or amounts. The agent cannot perform any other actions (default deny)."
+"This policy allows any user with the 'agent' tag to sign chain-aware transactions using wallet `wlt-agent-9012`. It does not allow raw payload signing, and it does not restrict destination addresses or amounts. The agent cannot perform any other actions (default deny)."
 
 ```
 POST /public/v1/submit/create_policy
@@ -163,8 +163,8 @@ POST /public/v1/submit/create_policy
   "policyName": "agent-can-sign",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN' && wallet.id == 'wlt-agent-9012'",
-  "notes": "Allow agent to sign with its designated wallet"
+  "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == 'wlt-agent-9012'",
+  "notes": "Allow agent to sign chain-aware transactions with its designated wallet; raw payload signing is excluded"
 }
 ```
 
@@ -220,7 +220,7 @@ POST /public/v1/query/list_policies
       "policyName": "agent-can-sign",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('agent'))",
-      "condition": "activity.action == 'SIGN' && wallet.id == 'wlt-agent-9012'"
+      "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == 'wlt-agent-9012'"
     },
     {
       "policyId": "pol-deny-large-001",
@@ -236,18 +236,17 @@ Confirm with the human that this matches their intent before proceeding.
 
 ## Step 5: Verify with agent credentials
 
-**Switch to the agent's credentials for this request.** Sign it with the agent's API key, not the root key.
+**Switch to the agent's credentials for this request.** Sign a chain-aware test transaction with the agent's API key, not the root key. Do not use `sign_raw_payload` unless the human explicitly approved it as an exception.
 
 ```
-POST /public/v1/submit/sign_raw_payload
+POST /public/v1/submit/sign_transaction
 ```
 
 ```json
 {
   "signWith": "0x1234abcd5678ef901234abcd5678ef901234abcd",
-  "payload": "48656c6c6f2c205475726e6b657921",
-  "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
-  "hashFunction": "HASH_FUNCTION_SHA256"
+  "unsignedTransaction": "0x02f86c...",
+  "type": "TRANSACTION_TYPE_ETHEREUM"
 }
 ```
 
@@ -258,12 +257,10 @@ POST /public/v1/submit/sign_raw_payload
   "activity": {
     "id": "act-sign-test-005",
     "status": "ACTIVITY_STATUS_COMPLETED",
-    "type": "ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2",
+    "type": "ACTIVITY_TYPE_SIGN_TRANSACTION_V2",
     "result": {
-      "signRawPayloadResult": {
-        "r": "a1b2c3d4...",
-        "s": "e5f6a7b8...",
-        "v": "1b"
+      "signTransactionResult": {
+        "signedTransaction": "0x02f86c..."
       }
     }
   }

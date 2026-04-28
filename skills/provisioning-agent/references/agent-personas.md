@@ -18,17 +18,19 @@ Ask the human to confirm each:
 - **Destination addresses**: Are transfers restricted to specific addresses?
 - **Spending cap**: Is there a per-transaction limit? (in wei for ETH, lamports for SOL, satoshis for BTC)
 - **Contract restrictions**: Are contract calls limited to specific addresses or function names? (function-level requires ABI upload)
-- **Raw payload signing**: Is `sign_raw_payload` allowed, or only chain-aware `sign_transaction`?
+- **Raw payload signing**: Default to chain-aware signing (`sign_transaction` or managed chain endpoints). Is `sign_raw_payload` absolutely required? If not, leave it excluded.
 
 ### Base ALLOW (always required)
+
+This base policy intentionally excludes `sign_raw_payload` so the policy engine can inspect chain-specific transaction fields.
 
 ```json
 {
   "policyName": "worker-agent-sign",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'",
-  "notes": "Base signing permission — scope to specific wallet"
+  "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == '<WALLET_ID>'",
+  "notes": "Base chain-aware signing permission — raw payload signing excluded"
 }
 ```
 

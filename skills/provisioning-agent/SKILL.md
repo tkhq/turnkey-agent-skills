@@ -62,7 +62,7 @@ const client = turnkey.apiClient();
 
 Endpoints map to `camelCase` SDK methods (e.g., `create_wallet` → `client.createWallet({...})`, `list_policies` → `client.getPolicies()`). For the full mapping convention and direct-HTTP fallback, see the root [`SKILL.md`](../../SKILL.md) and the `getting-started` skill.
 
-**Raw HTTP note:** the JSON bodies shown in each step below are the `parameters` object the SDK takes. For raw HTTP against `submit` endpoints (`create_wallet`, `create_user_tag`, `create_users`, `create_policy`, `sign_raw_payload`), wrap in an activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`list_wallets`, `list_user_tags`, `list_policies`, `get_policy_evaluations`) do not need the envelope. See the root [`SKILL.md`](../../SKILL.md) "Request body convention" for details.
+**Raw HTTP note:** the JSON bodies shown in each step below are the `parameters` object the SDK takes. For raw HTTP against `submit` endpoints (`create_wallet`, `create_user_tag`, `create_users`, `create_policy`, `sign_transaction`), wrap in an activity envelope: `{"type": "ACTIVITY_TYPE_*", "timestampMs": "<ms>", "organizationId": "<ORG_ID>", "parameters": {...}}`. Query endpoints (`list_wallets`, `list_user_tags`, `list_policies`, `get_policy_evaluations`) do not need the envelope. See the root [`SKILL.md`](../../SKILL.md) "Request body convention" for details.
 
 **Step 4 requires a second client** initialized with the **agent's** newly-generated key pair — see the callout in Step 4 before verifying.
 
@@ -79,7 +79,7 @@ Before making API calls, lock these decisions with the human:
 - Which destination addresses are allowed?
 - Is there a per-transaction spending cap?
 - Are contract calls restricted to specific addresses or functions?
-- Is raw payload signing allowed, or only chain-aware transaction signing?
+- Default to chain-aware transaction signing (`sign_transaction` or managed chain endpoints) so policy conditions like `eth.tx.*`, `solana.tx.*`, and `bitcoin.tx.*` can be evaluated. Is `sign_raw_payload` absolutely required? If not, exclude it from the agent's policy.
 
 See [references/agent-personas.md](references/agent-personas.md) for Worker and Observer templates that turn these decisions into policies.
 
@@ -250,7 +250,7 @@ This is the security-critical step. Non-root users have zero permissions by defa
 
 **Present the policy to the human and get explicit confirmation before creating it.**
 
-Minimum viable ALLOW — agent can sign with one specific wallet:
+Minimum viable ALLOW — agent can sign chain-aware transactions with one specific wallet. This deliberately excludes `sign_raw_payload` by default so chain-specific policy fields remain available:
 
 ```
 POST /public/v1/submit/create_policy
@@ -261,10 +261,12 @@ POST /public/v1/submit/create_policy
   "policyName": "agent-can-sign",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'",
-  "notes": "Allow agent to sign with its designated wallet"
+  "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == '<WALLET_ID>'",
+  "notes": "Allow agent to sign chain-aware transactions with its designated wallet; raw payload signing is excluded"
 }
 ```
+
+If the human explicitly requires `sign_raw_payload`, create a separate narrowly-scoped ALLOW only after explaining that raw payload signing cannot be inspected with `eth.tx.*`, `solana.tx.*`, or `bitcoin.tx.*` policy conditions.
 
 ### Tightening the ALLOW (based on decision gates)
 
@@ -318,18 +320,17 @@ POST /public/v1/query/list_policies
 
 > **STOP — switch credentials now.** Steps 1-3 used root credentials. Step 4 must use the agent's key pair: the public key registered in Step 2b, and the matching private key from whichever destination you chose in Step 2b (the generated `agent.env` file, your secrets manager, or the key pair you brought in yourself). Re-initialize your SDK client (or point `TURNKEY_API_PUBLIC_KEY` / `TURNKEY_API_PRIVATE_KEY` at that destination) before continuing. If you continue using root credentials, this verification will pass regardless of whether the agent's policy is correct — defeating the purpose of the test.
 
-Sign a test payload to confirm the agent can actually sign:
+Sign a test transaction using the chain-aware path selected in the decision gates. Do not verify provisioning with `sign_raw_payload` unless the human explicitly approved raw signing as an exception; raw payloads do not expose chain-specific transaction fields for policy evaluation.
 
 ```
-POST /public/v1/submit/sign_raw_payload
+POST /public/v1/submit/sign_transaction
 ```
 
 ```json
 {
   "signWith": "<WALLET_ADDRESS>",
-  "payload": "48656c6c6f2c205475726e6b657921",
-  "encoding": "PAYLOAD_ENCODING_HEXADECIMAL",
-  "hashFunction": "HASH_FUNCTION_SHA256"
+  "unsignedTransaction": "<UNSIGNED_TRANSACTION_HEX_OR_BASE64>",
+  "type": "TRANSACTION_TYPE_ETHEREUM"
 }
 ```
 

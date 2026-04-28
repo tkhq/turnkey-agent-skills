@@ -8,7 +8,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check": "tsc --noEmit && vitest run",
-    "evals": "tsx scripts/run-evals.ts"
+    "evals": "tsx scripts/run-evals.ts",
+    "refresh-api-schemas": "tsx scripts/refresh-api-schemas.ts"
   },
   "devDependencies": {
     "@solana/web3.js": "^1.87.0",

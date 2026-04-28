@@ -192,5 +192,5 @@ A payload like `"hello"` with `PAYLOAD_ENCODING_HEXADECIMAL` will fail — it's 
 **Ed25519 key with SHA256 hash function**
 Ed25519 keys require `HASH_FUNCTION_NOT_APPLICABLE`. Using `SHA256` or `KECCAK256` with an Ed25519 key will fail.
 
-**`v` field is empty for Ed25519**
-Ed25519 signatures don't have a recovery parameter. The `v` field will be empty — this is expected.
+**`v` field for Ed25519**
+Ed25519 signatures don't have a recovery parameter. The `v` field will be `"00"` — this is expected and can be ignored for Ed25519.

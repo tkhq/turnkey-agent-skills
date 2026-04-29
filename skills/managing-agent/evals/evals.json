@@ -53,10 +53,12 @@
     {
       "id": 5,
       "prompt": "My agent is compromised. Shut it down immediately.",
-      "expected_output": "Deletes all API keys for the agent user immediately. Emphasizes this is instant. Optionally suggests cleanup of policies and user after.",
+      "expected_output": "Verifies the target is the intended non-root agent user, then uses delete_users for immediate revocation after explicit confirmation. Warns not to delete root/admin/human users and notes delete_api_keys fails for a user's only credential.",
       "files": [],
       "assertions": [
-        { "type": "regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\b" },
+        { "type": "regex", "pattern": "\\b(get_user|getUser)\\b" },
+        { "type": "regex", "pattern": "\\b(delete_users|deleteUsers)\\b" },
+        { "type": "regex", "value": "(non.root|not root|root|admin|human|intended.*agent|confirm.*user)", "flags": "i" },
         { "type": "regex", "value": "(immediate|instant|right away|cannot.*authenticate)", "flags": "i" }
       ]
     },

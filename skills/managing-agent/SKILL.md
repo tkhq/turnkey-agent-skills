@@ -22,7 +22,7 @@ Base URL: `https://api.turnkey.com`
 ## Rules (mandatory)
 
 1. **Human confirmation before any policy change.** Display the updated policy and explain what changes. Wait for explicit approval.
-2. **When revoking access, delete keys first.** Key deletion is instant. Policy and user cleanup can happen after.
+2. **Before deleting an agent user, verify it is the intended non-root agent.** Deleting users is permanent. If the target might be a root, admin, or human user — or you cannot confirm the target is the disposable provisioned agent — do not call `delete_users`; stop and ask the human to confirm the exact user.
 
 ## Prerequisites
 
@@ -188,23 +188,12 @@ For the complete rotation workflow with full request/response, see [references/k
 
 ## I need to revoke agent access immediately
 
-Delete all of the agent's API keys. This takes effect **immediately** — key deletion is instant, and the agent can no longer authenticate the moment the request succeeds. When responding to a compromise or shutdown request, state this explicitly in your reply so the operator knows no further mitigation is needed to stop signing.
+For emergency shutdown of a provisioned agent, prefer deleting the **agent user**. This immediately revokes all of that user's credentials and avoids the `delete_api_keys` failure case where Turnkey refuses to leave a surviving user with zero valid auth methods.
+
+**Safety gate — do not skip:** before deletion, confirm the target is the intended disposable, non-root agent user. Check the user record and match it against the operator's intent (agent user ID, name, tags, and known provisioning notes). If the user might be root/admin/human, or if you cannot confirm it is the agent, do **not** delete it. Stop and ask the human to confirm the exact user first.
 
 ```
-POST /public/v1/submit/delete_api_keys
-```
-
-```json
-{
-  "userId": "<AGENT_USER_ID>",
-  "apiKeyIds": ["<KEY_ID_1>", "<KEY_ID_2>"]
-}
-```
-
-If you don't know the key IDs, list them first:
-
-```
-POST /public/v1/query/get_api_keys
+POST /public/v1/query/get_user
 ```
 
 ```json
@@ -214,9 +203,26 @@ POST /public/v1/query/get_api_keys
 }
 ```
 
-**After revoking keys**, optionally clean up:
-- Delete the agent's policies (if they were user-specific)
-- Delete the agent user with `delete_users`
+After the safety gate passes, present the deletion call, warn that it is permanent and irreversible, and wait for explicit human confirmation:
+
+```
+POST /public/v1/submit/delete_users
+```
+
+```json
+{
+  "userIds": ["<AGENT_USER_ID>"]
+}
+```
+
+This takes effect **immediately** when the request succeeds: the deleted agent user can no longer authenticate or sign. When responding to a compromise or shutdown request, state this explicitly so the operator knows access has stopped.
+
+Use `delete_api_keys` only when removing one compromised key from a user that will still have another valid credential (for example, after key rotation). Do not use it to delete the user's only credential; Turnkey will reject that with `user missing valid credential`.
+
+If the safety gate does not pass, do not delete the user. Instead, stop and ask for operator review; if the goal is only to stop signing while identity is investigated, use a narrowly-scoped DENY policy or remove the agent-specific ALLOW policy with explicit human approval.
+
+**After revoking access**, optionally clean up:
+- Delete the agent's policies (if they were user-specific and no longer needed)
 - The wallet remains — it may hold funds that need to be transferred first
 
 ---

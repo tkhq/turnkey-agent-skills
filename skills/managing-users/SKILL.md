@@ -242,7 +242,34 @@ POST /public/v1/submit/delete_api_keys
 }
 ```
 
-Deleting all of a user's API keys immediately revokes their API access. This is the fastest way to cut off a compromised agent.
+Use `delete_api_keys` to remove specific compromised or retired keys only when the user will retain another valid credential, such as after key rotation. Do not use it as emergency shutdown for a single-key agent; Turnkey rejects deleting a user's only valid credential.
+
+For emergency shutdown of a disposable, non-root agent user, first verify the target user and then delete the user:
+
+```
+POST /public/v1/query/get_user
+```
+
+```json
+{
+  "organizationId": "<ORG_ID>",
+  "userId": "<AGENT_USER_ID>"
+}
+```
+
+Confirm the record is the intended disposable, non-root agent before continuing. Then delete the user:
+
+```
+POST /public/v1/submit/delete_users
+```
+
+```json
+{
+  "userIds": ["<AGENT_USER_ID>"]
+}
+```
+
+Deleting the agent user is permanent and immediately revokes all of that user's credentials. Do not delete root, admin, or human users without explicit operator review.
 
 ### Key rotation pattern
 

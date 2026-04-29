@@ -66,12 +66,15 @@
     {
       "id": 6,
       "prompt": "My agent is compromised. Revoke its access immediately. The user ID is usr_agent and it has keys key_1 and key_2.",
-      "expected_output": "Deletes all API keys for the agent user immediately using delete_api_keys",
+      "expected_output": "Uses get_user to verify usr_agent is the intended disposable non-root agent, then uses delete_users after explicit confirmation. Does not use API key deletion for emergency shutdown unless the user retains another valid credential.",
       "files": ["skills/managing-users/references/api-key-examples.md"],
       "assertions": [
-        { "type": "regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\b" },
-        { "type": "contains", "value": "key_1" },
-        { "type": "contains", "value": "key_2" }
+        { "type": "regex", "pattern": "\\b(get_user|getUser)\\b" },
+        { "type": "regex", "pattern": "\\b(delete_users|deleteUsers)\\b" },
+        { "type": "contains", "value": "usr_agent" },
+        { "type": "regex", "pattern": "(disposable|non-root|not.*root|not.*admin|not.*human)", "flags": "i" },
+        { "type": "regex", "pattern": "(confirm|confirmation|irreversible|permanent)", "flags": "i" },
+        { "type": "not_contains", "value": "delete_api_keys" }
       ]
     },
     {

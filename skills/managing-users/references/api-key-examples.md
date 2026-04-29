@@ -89,6 +89,8 @@ Optionally pass `"expirationSeconds": "<SECONDS>"` on an API key to have it auto
 
 ## Delete API keys
 
+Use this to remove specific retired or compromised keys only when the user keeps another valid credential.
+
 ```
 POST /public/v1/submit/delete_api_keys
 ```
@@ -100,7 +102,7 @@ POST /public/v1/submit/delete_api_keys
 }
 ```
 
-Deleting all of a user's API keys immediately revokes their API access.
+Do not use `delete_api_keys` to remove a user's only valid credential. Turnkey rejects that request with `user missing valid credential`.
 
 ## Key rotation workflow
 
@@ -164,20 +166,32 @@ Replace `TURNKEY_API_PUBLIC_KEY` and `TURNKEY_API_PRIVATE_KEY` in the agent's en
 
 ## Emergency: Revoke agent access immediately
 
-If an agent is compromised, delete all its API keys in one call:
+If a disposable, non-root agent is compromised, shut it down by deleting the agent user. First verify the target user with `get_user` and confirm it is the intended disposable agent, not a root/admin/human user:
 
 ```
-POST /public/v1/submit/delete_api_keys
+POST /public/v1/query/get_user
 ```
 
 ```json
 {
-  "userId": "usr_agent",
-  "apiKeyIds": ["key_1", "key_2"]
+  "organizationId": "<ORG_ID>",
+  "userId": "usr_agent"
 }
 ```
 
-The agent can no longer authenticate. This takes effect immediately — no waiting for session expiry.
+After the safety check passes, warn that deletion is permanent and wait for explicit human confirmation:
+
+```
+POST /public/v1/submit/delete_users
+```
+
+```json
+{
+  "userIds": ["usr_agent"]
+}
+```
+
+The agent can no longer authenticate or sign once `delete_users` succeeds. Use `delete_api_keys` only for users that will retain another valid credential, such as during key rotation.
 
 ## Supported key curves
 

@@ -68,6 +68,46 @@ describe("skill discovery", () => {
   });
 });
 
+describe("managing-users emergency revocation guidance", () => {
+  const managingUsersSkill = readFileSync(
+    join(SKILLS_ROOT, "managing-users", "SKILL.md"),
+    "utf-8",
+  );
+  const apiKeyExamples = readFileSync(
+    join(SKILLS_ROOT, "managing-users", "references", "api-key-examples.md"),
+    "utf-8",
+  );
+  const evalsData = JSON.parse(
+    readFileSync(join(SKILLS_ROOT, "managing-users", "evals", "evals.json"), "utf-8"),
+  ) as EvalsFile;
+
+  it("routes compromised disposable agents through get_user plus delete_users", () => {
+    const emergencyDocs = `${managingUsersSkill}\n${apiKeyExamples}`;
+    expect(emergencyDocs).toMatch(/\bget_user\b/);
+    expect(emergencyDocs).toMatch(/\bdelete_users\b/);
+    expect(emergencyDocs).toMatch(/disposable[,\s-]+non-root agent/i);
+    expect(emergencyDocs).toMatch(/delete_api_keys[\s\S]*another valid credential/i);
+    expect(emergencyDocs).not.toMatch(/delet(?:e|ing) all (?:of )?a user's API keys immediately revokes/i);
+  });
+
+  it("keeps the compromised-agent eval aligned with user deletion", () => {
+    const compromisedEval = evalsData.evals.find((evalItem) =>
+      evalItem.prompt.toLowerCase().includes("compromised"),
+    );
+    expect(compromisedEval, "Missing compromised-agent eval").toBeDefined();
+    expect(compromisedEval?.expected_output).toMatch(/\bget_user\b/);
+    expect(compromisedEval?.expected_output).toMatch(/\bdelete_users\b/);
+    expect(compromisedEval?.expected_output).not.toMatch(/\bdelete_api_keys\b/);
+    expect(compromisedEval?.assertions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: "regex", pattern: expect.stringContaining("get_user") }),
+        expect.objectContaining({ type: "regex", pattern: expect.stringContaining("delete_users") }),
+        expect.objectContaining({ type: "not_contains", value: "delete_api_keys" }),
+      ]),
+    );
+  });
+});
+
 for (const filePath of skillFiles) {
   const name = relativePath(filePath);
   const content = readFileSync(filePath, "utf-8");

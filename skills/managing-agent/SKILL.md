@@ -271,7 +271,7 @@ Verify the public key format is correct (hex-encoded P-256). Check that the `cur
 List all policies to check for conflicting DENY policies that override the updated ALLOW. Remember: DENY always wins.
 
 **Agent still has access after key deletion**
-Verify all keys were deleted, not just one. Use `get_api_keys` to confirm zero keys remain for the user. If using sessions, those may need to expire separately.
+Verify the specific compromised or retired key was deleted. If the goal is full emergency shutdown for a disposable non-root agent, use the `get_user` safety gate plus `delete_users` flow above instead of trying to remove every API key; Turnkey rejects deleting a user's only valid credential.
 
 **New chain added but agent can't sign on it**
 Policies are chain-specific. An ALLOW with `eth.tx.to in [...]` doesn't cover Solana, Tron, Tempo, or Bitcoin. Create a separate policy with the appropriate namespace (`solana.tx.*`, `tron.tx.*`, `tempo.tx.*`, `bitcoin.tx.*`).

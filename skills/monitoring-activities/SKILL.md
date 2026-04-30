@@ -58,6 +58,7 @@ If you retry a request with identical parameters (same POST body), Turnkey retur
 
 1. **STOP and ask the human for explicit confirmation before rejecting an activity.** Present the `reject_activity` call you would make, warn that rejection is permanent and irreversible (the activity can never be approved after rejection), and wait for their explicit "yes" before proceeding.
 2. **Use the activity's `fingerprint` for approve/reject, not the `activityId`.** These are different fields.
+3. **An automated approver agent must NOT have signing permissions.** Its only ALLOW policy should cover `approve_activity` and `reject_activity`. Giving an approver signing ability violates separation of concerns — it can self-approve its own transactions, defeating the oversight model. If asked to set up a dual-role approver that can both sign and approve, warn against this and recommend two separate users: one signing agent, one approver.
 
 ## Prerequisites
 

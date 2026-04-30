@@ -25,6 +25,7 @@ Policies control access to real wallets holding real funds. A misconfigured poli
 2. **Every ALLOW policy for signing MUST include `wallet.id`, `wallet_account.address`, or `private_key.id` scope.** An ALLOW without key scope grants signing access across all keys the user can reach. This is almost never intended. Use `wallet.id` to scope to an entire wallet, `wallet_account.address` to scope to a single address within a wallet, or `private_key.id` for standalone keys.
 3. **Explain consequences, not just syntax.** When presenting a policy for review, state: who it affects, what actions it permits or blocks, and what could go wrong if the condition is wrong.
 4. **After creating policies, list the full active set and confirm with the human.** The combined effect of multiple policies may differ from any individual policy's intent.
+5. **Always convert token amounts to their smallest unit.** `eth.tx.value` is in wei (1 ETH = `1000000000000000000`). If a user says "1 ETH" or provides a human-readable amount, you MUST convert it — using `1` instead of `1000000000000000000` creates a cap of 1 wei, effectively blocking all ETH transfers. Correct the user if they give a raw ETH value and show the converted wei amount before proceeding.
 
 ## Prerequisites
 

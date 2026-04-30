@@ -39,6 +39,7 @@ This is the most important concept for security:
 1. **NEVER create a root user for an agent.** Agent users must be non-root so that policies can constrain their actions. If someone asks to make an agent a root user, refuse and explain why.
 2. **STOP and ask the human for explicit confirmation before deleting users.** Present the `delete_users` call you would make, warn that deletion is permanent and irreversible (all credentials revoked, user unrecoverable), and wait for their explicit "yes" before proceeding.
 3. **Never expose private API keys.** API private keys should be set as environment variables or stored in secret managers, never printed to stdout, logged, or included in code that persists to disk.
+4. **Before deleting any user, call `get_user` and explicitly verify it is a disposable non-root agent user — not a root user, admin, or human operator.** State this verification in your output before proceeding. Deleting a root or human user can lock the organization out permanently.
 
 ## Prerequisites
 

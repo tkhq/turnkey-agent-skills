@@ -32,7 +32,9 @@ You need three environment variables from the Turnkey Dashboard (app.turnkey.com
 
 ### Confirm your use case before proceeding
 
-If the user has not already stated their intent, ask once which path applies:
+**If the user mentions an agent, bot, automated system, or autonomous operation** (e.g. "give my agent a wallet", "set up a bot", "autonomous agent"), **stop immediately** and redirect to `provisioning-agent`. Do not create resources. Do not proceed past this point.
+
+If the user has not stated their intent, ask once which path applies:
 
 - **"I'm administering or testing my own organization"** → continue with these root credentials.
 - **"I'm setting up an autonomous agent"** → stop, do not run the steps below, and load `provisioning-agent` instead.

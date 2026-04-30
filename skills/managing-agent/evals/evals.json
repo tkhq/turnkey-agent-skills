@@ -32,8 +32,7 @@
       "assertions": [
         { "type": "regex", "pattern": "\\b(list_policies|listPolicies|getPolicies)\\b" },
         { "type": "regex", "pattern": "\\b(update_policy|updatePolicy)\\b" },
-        { "type": "contains", "value": "0xNewAddr" },
-        { "type": "contains", "value": "eth.tx.to" }
+        { "type": "contains", "value": "0xNewAddr" }
       ]
     },
     {

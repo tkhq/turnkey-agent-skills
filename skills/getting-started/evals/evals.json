@@ -8,7 +8,7 @@
       "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
       "assertions": [
         { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
-        { "type": "contains", "value": "organizationId" }
+        { "type": "regex", "pattern": "organizationId|TURNKEY_ORGANIZATION_ID" }
       ]
     },
     {

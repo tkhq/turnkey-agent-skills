@@ -34,6 +34,7 @@
       "id": 3,
       "prompt": "Create a signing policy for my agent. Just let it sign anything.",
       "expected_output": "Warns about unscoped signing and recommends adding wallet.id scope. Defaults to chain-aware signing and does not create an ALLOW with only activity.action == 'SIGN' or raw payload signing.",
+      "gradeFullResponse": true,
       "files": ["skills/provisioning-agent/references/agent-personas.md"],
       "assertions": [
         { "type": "contains", "value": "wallet.id" },

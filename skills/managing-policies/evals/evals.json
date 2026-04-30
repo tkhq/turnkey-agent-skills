@@ -57,11 +57,12 @@
     {
       "id": 6,
       "prompt": "Create a policy that only allows my agent to send ETH to addresses 0xAAA and 0xBBB on Base (chain ID 8453).",
-      "expected_output": "EFFECT_ALLOW with address allowlist using 'in' syntax and chain_id condition",
+      "expected_output": "EFFECT_ALLOW with wallet.id scope, address allowlist using 'in' syntax, and chain_id condition",
       "files": ["skills/managing-policies/references/policy-api-examples.md"],
       "assertions": [
         { "type": "contains", "value": "EFFECT_ALLOW" },
         { "type": "contains", "value": "eth.tx.to" },
+        { "type": "contains", "value": "wallet.id" },
         { "type": "contains", "value": "0xAAA" },
         { "type": "contains", "value": "0xBBB" },
         { "type": "contains", "value": "8453" }
@@ -80,10 +81,11 @@
     {
       "id": 8,
       "prompt": "I want to restrict my agent's Solana transactions to only the System Program. Also block any transactions that use address table lookups.",
-      "expected_output": "Two policies: ALLOW with program_keys restriction, DENY with address_table_lookups.count() > 0",
+      "expected_output": "Two policies: wallet-scoped ALLOW with program_keys restriction, DENY with address_table_lookups.count() > 0",
       "files": ["skills/managing-policies/references/policy-api-examples.md"],
       "assertions": [
         { "type": "contains", "value": "program_keys" },
+        { "type": "contains", "value": "wallet.id" },
         { "type": "contains", "value": "11111111111111111111111111111111" },
         { "type": "contains", "value": "address_table_lookups" }
       ]
@@ -91,7 +93,7 @@
     {
       "id": 9,
       "prompt": "My agent (tagged 'agent') needs to sign transactions above 1 ETH, but every such signing request must be approved by two users tagged 'admin'. Create the policy.",
-      "expected_output": "ALLOW whose consensus includes both the submitting agent clause (approvers.any on 'agent' tag) AND the admin threshold (filter + count >= 2 on 'admin' tag), condition on eth.tx.value > 1 ETH. Explains the submitter-in-consensus rule: without the agent clause the request would be implicit-denied at submit time instead of entering CONSENSUS_NEEDED.",
+      "expected_output": "ALLOW whose consensus includes both the submitting agent clause (approvers.any on 'agent' tag) AND the admin threshold (filter + count >= 2 on 'admin' tag), condition includes wallet.id scope and eth.tx.value > 1 ETH. Explains the submitter-in-consensus rule: without the agent clause the request would be implicit-denied at submit time instead of entering CONSENSUS_NEEDED.",
       "files": [
         "skills/managing-policies/SKILL.md",
         "skills/managing-policies/references/policy-api-examples.md"
@@ -103,6 +105,7 @@
         { "type": "contains", "value": "admin" },
         { "type": "contains", "value": "count()" },
         { "type": "contains", "value": ">= 2" },
+        { "type": "contains", "value": "wallet.id" },
         { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"]agent['\"]\\)", "flags": "s" },
         { "type": "regex", "value": "(submitter|implicit.deny|CONSENSUS_NEEDED|auto.vote)", "flags": "i" }
       ]

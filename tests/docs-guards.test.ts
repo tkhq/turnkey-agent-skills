@@ -126,6 +126,71 @@ const STRUCTURED_LANGS = new Set([
   "sh",
   "shell",
 ]);
+const SIGNING_ALLOW_PATTERN =
+  /\b(activity\.action\s*==\s*'SIGN'|ACTIVITY_TYPE_(?:SIGN|ETH_SEND|SOL_SEND)|(?:eth|solana|bitcoin|tron|tempo)\.tx\.|eth\.eip_7702_authorization\.)/;
+const KEY_SCOPE_PATTERN =
+  /\b(?:wallet\.id|wallet_account\.address|private_key\.id)\b/;
+
+function isIntentionalAntiPattern(markdown: string, startLine: number): boolean {
+  const lines = markdown.split("\n");
+  for (let i = startLine - 2; i >= Math.max(0, startLine - 16); i--) {
+    const line = lines[i] ?? "";
+    if (/^##\s+Anti-patterns/i.test(line)) return true;
+    if (/^##\s+/.test(line)) return false;
+  }
+  return false;
+}
+
+function walkPolicyObjects(
+  node: unknown,
+  visit: (obj: Record<string, unknown>) => void,
+): void {
+  if (Array.isArray(node)) {
+    node.forEach((child) => walkPolicyObjects(child, visit));
+    return;
+  }
+  if (!node || typeof node !== "object") return;
+
+  const obj = node as Record<string, unknown>;
+  const effect = obj.effect ?? obj.policyEffect;
+  const condition = obj.condition ?? obj.policyCondition;
+  if (effect === "EFFECT_ALLOW" && typeof condition === "string") {
+    visit(obj);
+  }
+  for (const child of Object.values(obj)) {
+    walkPolicyObjects(child, visit);
+  }
+}
+
+function checkPolicyAllowKeyScope(markdown: string): string[] {
+  const violations: string[] = [];
+  for (const block of extractFencedBlocks(markdown)) {
+    if (block.lang !== "json") continue;
+    if (isIntentionalAntiPattern(markdown, block.startLine)) continue;
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(block.body);
+    } catch {
+      continue;
+    }
+
+    walkPolicyObjects(parsed, (policy) => {
+      const condition = (policy.condition ?? policy.policyCondition) as string;
+      if (!SIGNING_ALLOW_PATTERN.test(condition)) return;
+      if (KEY_SCOPE_PATTERN.test(condition)) return;
+
+      const label =
+        typeof policy.policyName === "string"
+          ? ` policy "${policy.policyName}"`
+          : "";
+      violations.push(
+        `block at line ${block.startLine}${label}: signing EFFECT_ALLOW condition lacks wallet.id, wallet_account.address, or private_key.id scope: ${condition}`,
+      );
+    });
+  }
+  return violations;
+}
 
 function checkMarkdownFile(absPath: string): string[] {
   const content = readFileSync(absPath, "utf-8");
@@ -163,6 +228,8 @@ function checkMarkdownFile(absPath: string): string[] {
     });
   }
 
+  violations.push(...checkPolicyAllowKeyScope(content));
+
   return violations;
 }
 
@@ -177,13 +244,13 @@ const markdownFiles = [
 ];
 const evalFiles = findEvalsFiles(SKILLS_ROOT);
 
-describe("docs guards: no uncompressed P-256 public keys in skill content", () => {
+describe("docs guards: markdown examples stay within security invariants", () => {
   for (const filePath of markdownFiles) {
-    it(`${relativePath(filePath)} has no uncompressed-key patterns in code/JSON/env blocks`, () => {
+    it(`${relativePath(filePath)} satisfies code/JSON/env block guards`, () => {
       const violations = checkMarkdownFile(filePath);
       expect(
         violations,
-        `Found uncompressed-key violations:\n  - ${violations.join("\n  - ")}`,
+        `Found docs guard violations:\n  - ${violations.join("\n  - ")}`,
       ).toEqual([]);
     });
   }

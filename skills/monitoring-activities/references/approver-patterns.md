@@ -74,7 +74,7 @@ POST /public/v1/submit/create_policy
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 500000000000000000",
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 500000000000000000",
   "notes": "Large ETH transfers require an admin to co-approve the agent's submission"
 }
 ```
@@ -177,7 +177,7 @@ Require both automated and human approval. The first clause represents the submi
   "policyName": "high-value-dual-approval",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 1000000000000000000"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 1000000000000000000"
 }
 ```
 
@@ -194,7 +194,7 @@ Different thresholds for different amounts. In every tier the first consensus cl
   "policyName": "low-value-approver-auto",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value <= 100000000000000000"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value <= 100000000000000000"
 }
 ```
 
@@ -205,7 +205,7 @@ Different thresholds for different amounts. In every tier the first consensus cl
   "policyName": "medium-value-dual-approval",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 100000000000000000 && eth.tx.value <= 1000000000000000000"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 100000000000000000 && eth.tx.value <= 1000000000000000000"
 }
 ```
 
@@ -216,6 +216,6 @@ Different thresholds for different amounts. In every tier the first consensus cl
   "policyName": "high-value-two-admins",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 2",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 1000000000000000000"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 1000000000000000000"
 }
 ```

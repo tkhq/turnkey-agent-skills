@@ -191,7 +191,7 @@ POST /public/v1/submit/update_policy
   "policyId": "<POLICY_ID>",
   "policyName": "updated-name",
   "policyEffect": "EFFECT_ALLOW",
-  "policyCondition": "eth.tx.to in ['<ADDR_1>', '<ADDR_2>']",
+  "policyCondition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>']",
   "policyConsensus": "approvers.any(user, user.id == '<USER_ID>')",
   "policyNotes": "Updated notes"
 }

@@ -41,7 +41,7 @@ POST /public/v1/query/list_policies
       "policyName": "agent-eth-allowlist",
       "effect": "EFFECT_ALLOW",
       "consensus": "approvers.any(user, user.tags.contains('agent'))",
-      "condition": "eth.tx.to in ['0xAddr1', '0xAddr2']"
+      "condition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xAddr2']"
     }
   ]
 }
@@ -77,7 +77,7 @@ Add `0xNewAddr3` to an existing ALLOW:
   "policyName": "agent-eth-allowlist",
   "policyEffect": "EFFECT_ALLOW",
   "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
-  "policyCondition": "eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
+  "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
   "policyNotes": "Added 0xNewAddr3"
 }
 ```
@@ -94,7 +94,7 @@ Remove `0xAddr2`:
   "policyName": "agent-eth-allowlist",
   "policyEffect": "EFFECT_ALLOW",
   "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
-  "policyCondition": "eth.tx.to in ['0xAddr1', '0xNewAddr3']",
+  "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xNewAddr3']",
   "policyNotes": "Removed 0xAddr2"
 }
 ```
@@ -109,7 +109,7 @@ If the agent should only call `transfer()` on a specific contract, and you've al
   "policyName": "agent-usdc-transfer-only",
   "policyEffect": "EFFECT_ALLOW",
   "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
-  "policyCondition": "eth.tx.to == '0xUSDC_CONTRACT' && eth.tx.function_name == 'transfer'",
+  "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to == '0xUSDC_CONTRACT' && eth.tx.function_name == 'transfer'",
   "policyNotes": "Restrict to transfer() on USDC only"
 }
 ```
@@ -127,7 +127,7 @@ POST /public/v1/submit/create_policy
   "policyName": "agent-solana-sign",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')",
+  "condition": "wallet.id == 'wlt_abc' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')",
   "notes": "Allow agent to sign Solana System Program transactions"
 }
 ```

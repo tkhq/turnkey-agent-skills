@@ -277,7 +277,7 @@ If the human chose destination restrictions, add an address allowlist:
   "policyName": "agent-eth-allowlist",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
+  "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
 }
 ```
 

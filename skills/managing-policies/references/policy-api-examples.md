@@ -106,7 +106,7 @@ POST /public/v1/submit/update_policy
   "policyId": "pol_...",
   "policyName": "agent-eth-allowlist-updated",
   "policyEffect": "EFFECT_ALLOW",
-  "policyCondition": "eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
+  "policyCondition": "wallet.id == 'wlt_abc123' && eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
   "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
   "policyNotes": "Added 0xNewAddr3 to allowlist"
 }
@@ -183,7 +183,7 @@ The DENY policy matched because the transfer exceeded 0.1 ETH. Fix: lower the tr
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to in ['0xContractA', '0xContractB', '0xRecipient']"
+  "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['0xContractA', '0xContractB', '0xRecipient']"
 }
 ```
 
@@ -204,7 +204,7 @@ The DENY policy matched because the transfer exceeded 0.1 ETH. Fix: lower the tr
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.chain_id == 11155111"
+  "condition": "wallet.id == '<WALLET_ID>' && eth.tx.chain_id == 11155111"
 }
 ```
 
@@ -216,7 +216,7 @@ Sepolia chain ID = `11155111`. Base = `8453`. Mainnet = `1`.
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.id == '<AGENT_USER_ID>')",
-  "condition": "eth.tx.to == '0xUSDC_CONTRACT' && eth.tx.function_name == 'transfer'"
+  "condition": "wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>' && eth.tx.to == '0xUSDC_CONTRACT' && eth.tx.function_name == 'transfer'"
 }
 ```
 
@@ -225,7 +225,7 @@ Sepolia chain ID = `11155111`. Base = `8453`. Mainnet = `1`.
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "condition": "eth.eip_7702_authorization.address == '<DELEGATION_CONTRACT>' && eth.eip_7702_authorization.chain_id == 1 && activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'"
+  "condition": "private_key.id == '<PRIVATE_KEY_ID>' && eth.eip_7702_authorization.address == '<DELEGATION_CONTRACT>' && eth.eip_7702_authorization.chain_id == 1 && activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2'"
 }
 ```
 
@@ -239,7 +239,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
+  "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
 
@@ -269,7 +269,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.spl_transfers.all(t, t.token_mint == '<ALLOWED_MINT>')"
+  "condition": "wallet.id == '<WALLET_ID>' && solana.tx.spl_transfers.all(t, t.token_mint == '<ALLOWED_MINT>')"
 }
 ```
 
@@ -292,7 +292,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "bitcoin.tx.outputs.all(o, o.address in ['<ALLOWED_1>', '<ALLOWED_2>', '<CHANGE_ADDR>'])"
+  "condition": "wallet.id == '<WALLET_ID>' && bitcoin.tx.outputs.all(o, o.address in ['<ALLOWED_1>', '<ALLOWED_2>', '<CHANGE_ADDR>'])"
 }
 ```
 
@@ -306,7 +306,7 @@ Include the change address in the allowlist or the transaction will be denied.
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tron.tx.contract[0].type == 'TransferContract'"
+  "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].type == 'TransferContract'"
 }
 ```
 
@@ -327,7 +327,7 @@ Include the change address in the allowlist or the transaction will be denied.
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tron.tx.contract[0].contract_address == '<TRC20_CONTRACT>' && tron.tx.contract[0].data[0..8] == 'a9059cbb'"
+  "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].contract_address == '<TRC20_CONTRACT>' && tron.tx.contract[0].data[0..8] == 'a9059cbb'"
 }
 ```
 
@@ -351,7 +351,7 @@ Include the change address in the allowlist or the transaction will be denied.
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
+  "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
 }
 ```
 
@@ -372,7 +372,7 @@ Tempo does not support ABI uploads. Inspect encoded arguments by slicing `input`
 {
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tempo.tx.calls[0].to == '<TOKEN_CONTRACT>' && tempo.tx.calls[0].input[34..74] == '<RECIPIENT_NO_0x>'"
+  "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls[0].to == '<TOKEN_CONTRACT>' && tempo.tx.calls[0].input[34..74] == '<RECIPIENT_NO_0x>'"
 }
 ```
 

@@ -42,7 +42,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
   "policyName": "worker-eth-allowlist",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
+  "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
 }
 ```
 
@@ -61,7 +61,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
   "policyName": "worker-usdc-transfer-only",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
+  "condition": "wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>' && eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
 }
 ```
 
@@ -71,7 +71,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
   "policyName": "worker-solana-system-only",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
+  "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
 

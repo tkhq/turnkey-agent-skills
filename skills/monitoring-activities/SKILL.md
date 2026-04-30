@@ -194,7 +194,7 @@ A non-root user tagged 'admin' reviews and approves activities. Requires a polic
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
-  "condition": "activity.action == 'SIGN' && eth.tx.value > 500000000000000000"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 500000000000000000"
 }
 ```
 

@@ -37,13 +37,14 @@
     {
       "id": 4,
       "prompt": "I want to set up an automated agent that approves low-value transactions (under 0.1 ETH) without human review.",
-      "expected_output": "Describes the agent approver pattern: create approver user with tag, narrow ALLOW for approve/reject only, policy with consensus requiring approver, polling workflow",
+      "expected_output": "Describes the agent approver pattern: create approver user with tag, narrow ALLOW for approve/reject only, wallet-scoped signing policy with consensus requiring approver, polling workflow",
       "files": ["skills/monitoring-activities/references/approver-patterns.md"],
       "assertions": [
         { "type": "contains", "value": "approver" },
         { "type": "contains", "value": "ACTIVITY_TYPE_APPROVE_ACTIVITY" },
         { "type": "regex", "pattern": "\\b(create_users|createUsers)\\b" },
         { "type": "regex", "pattern": "\\b(create_policy|createPolicy)\\b" },
+        { "type": "contains", "value": "wallet.id" },
         { "type": "regex", "value": "(poll|list_activities|listActivities|CONSENSUS_NEEDED)", "flags": "i" },
         { "type": "contains", "value": "oauthProviders" }
       ]
@@ -51,11 +52,12 @@
     {
       "id": 5,
       "prompt": "I want high-value transactions above 1 ETH to require both an automated check AND a human admin approval.",
-      "expected_output": "Uses a combined consensus expression requiring both admin and approver tags, with the value condition in wei",
+      "expected_output": "Uses a combined consensus expression requiring both admin and approver tags, with wallet.id scope and the value condition in wei",
       "files": ["skills/monitoring-activities/references/approver-patterns.md"],
       "assertions": [
         { "type": "contains", "value": "admin" },
         { "type": "contains", "value": "approver" },
+        { "type": "contains", "value": "wallet.id" },
         { "type": "contains", "value": "1000000000000000000" },
         { "type": "regex", "value": "(count.*>=.*1.*&&.*count.*>=.*1|both|dual|combined)", "flags": "i" }
       ]

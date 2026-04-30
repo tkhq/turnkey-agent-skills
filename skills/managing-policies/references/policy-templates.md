@@ -37,7 +37,7 @@ More granular than `wallet.id` — restricts signing to a single address within 
   "policyName": "agent-eth-allowlist",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "eth.tx.to in ['<ADDR_1>', '<ADDR_2>', '<ADDR_3>']"
+  "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>', '<ADDR_3>']"
 }
 ```
 
@@ -60,7 +60,7 @@ This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless o
   "policyName": "agent-usdc-transfer-only",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.id == '<AGENT_USER_ID>')",
-  "condition": "eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
+  "condition": "wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>' && eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
 }
 ```
 
@@ -73,7 +73,7 @@ This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless o
   "policyName": "require-two-traders",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.filter(user, user.tags.contains('trader')).count() >= 2",
-  "condition": "activity.action == 'SIGN'"
+  "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'"
 }
 ```
 
@@ -86,7 +86,7 @@ This assumes the submitting user is tagged `trader` — their auto-vote then con
   "policyName": "agent-solana-system-program-only",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
+  "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
 
@@ -97,7 +97,7 @@ This assumes the submitting user is tagged `trader` — their auto-vote then con
   "policyName": "agent-tron-transfer-cap",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tron.tx.contract[0].type == 'TransferContract' && tron.tx.contract[0].amount < 10000000"
+  "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].type == 'TransferContract' && tron.tx.contract[0].amount < 10000000"
 }
 ```
 
@@ -110,7 +110,7 @@ Amount is in SUN (1 TRX = 1,000,000 SUN). This cap is 10 TRX.
   "policyName": "agent-tempo-approved-contract",
   "effect": "EFFECT_ALLOW",
   "consensus": "approvers.any(user, user.tags.contains('agent'))",
-  "condition": "tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
+  "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
 }
 ```
 

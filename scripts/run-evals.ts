@@ -243,7 +243,7 @@ function spawnWithStdin(
   env?: NodeJS.ProcessEnv,
 ): Promise<ProviderResponse> {
   return new Promise((resolve) => {
-    const child = spawn(command, args, {
+    const child = spawn(command, args, { // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process -- command is always a hardcoded string ("claude" or "sh"), never web user input
       env: env ?? process.env,
       stdio: ["pipe", "pipe", "pipe"],
       shell: command.includes(" "), // use shell for custom commands

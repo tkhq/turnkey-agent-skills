@@ -160,7 +160,7 @@ function runAssertion(code: string, a: Assertion, filePath?: string): AssertionR
 
     case "calls": {
       const pattern = new RegExp(`\\b${escapeRegex(a.value)}\\s*\\(`);
-      const passed = pattern.test(code);
+      const passed = pattern.test(code); // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos -- value is sanitized by escapeRegex before interpolation
       return {
         passed,
         assertion: a,
@@ -221,7 +221,7 @@ function runAssertion(code: string, a: Assertion, filePath?: string): AssertionR
 
     case "regex": {
       const re = new RegExp(a.pattern, a.flags);
-      const passed = re.test(code);
+      const passed = re.test(code); // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos -- pattern comes from developer-authored YAML fixtures, not user input
       return {
         passed,
         assertion: a,

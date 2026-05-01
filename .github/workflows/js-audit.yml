@@ -1,0 +1,141 @@
+name: JS dependency audit
+
+# Two modes:
+# 1. PR check: only fail if the PR introduces NEW vulnerabilities not on main (XOR).
+# 2. Daily cron: run full audit against main and alert Slack on any high/critical findings.
+
+concurrency:
+  cancel-in-progress: true
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # --- PR check: XOR against main ---
+  audit-xor:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+
+      - name: Audit PR branch
+        id: pr-audit
+        run: |
+          npm audit --omit=dev --audit-level=high --json > /tmp/pr-audit.json 2>&1 || true
+          jq -r '[.vulnerabilities // {} | to_entries[].value.via[]? | select(type == "object") | .url // empty] | sort | unique | .[]' \
+            /tmp/pr-audit.json > /tmp/pr-advisories.txt || true
+          echo "PR advisories:"
+          cat /tmp/pr-advisories.txt
+
+      - name: Checkout main branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: main
+          clean: false
+          path: __main
+
+      - name: Audit main branch
+        run: |
+          cd __main
+          npm audit --omit=dev --audit-level=high --json > /tmp/main-audit.json 2>&1 || true
+          jq -r '[.vulnerabilities // {} | to_entries[].value.via[]? | select(type == "object") | .url // empty] | sort | unique | .[]' \
+            /tmp/main-audit.json > /tmp/main-advisories.txt || true
+          echo "Main advisories:"
+          cat /tmp/main-advisories.txt
+
+      - name: Compare — fail only on NEW advisories
+        run: |
+          new_advisories=$(comm -23 /tmp/pr-advisories.txt /tmp/main-advisories.txt)
+
+          if [ -z "$new_advisories" ]; then
+            echo "No new vulnerabilities introduced by this PR."
+            exit 0
+          fi
+
+          echo "::error::This PR introduces new npm audit vulnerabilities not present on main:"
+          echo ""
+          echo "$new_advisories"
+          echo ""
+          echo "Run 'npm audit' and fix or remove the offending dependency."
+          exit 1
+
+  # --- Daily cron: full audit against main, alert on any findings ---
+  audit-main:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+
+      - name: Run npm audit
+        run: npm audit --omit=dev --audit-level=high
+
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: [audit-main]
+    if: failure()
+    steps:
+      - name: Send Slack notification
+        run: |
+          curl -X POST "${{ secrets.SLACK_AUDIT_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "JS Dependency Audit: High/Critical Vulnerabilities Found",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\nmain"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Production JS dependencies have high or critical severity vulnerabilities. Run `npm audit --omit=dev --audit-level=high` for details."
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Audit Run> | <${{ github.server_url }}/${{ github.repository }}/security/dependabot|View Dependabot Alerts>"
+                  }
+                }
+              ]
+            }'

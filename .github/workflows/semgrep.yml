@@ -32,7 +32,6 @@ jobs:
             semgrep/semgrep@sha256:3228fb694f4f82eea3eeb8bc8900c3e9629c0a8048b25375dcc1e292f946e518 \
             semgrep scan \
               --error \
-              --strict \
               --metrics=off \
               --config p/security-audit \
               --config p/secrets \

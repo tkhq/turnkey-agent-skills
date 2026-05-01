@@ -8,6 +8,16 @@ These skills enable AI agents to autonomously create wallets, derive addresses, 
 
 Turnkey stores private keys in secure enclaves (AWS Nitro, etc.) — keys are **never exposed** to application code. Every API request is cryptographically "stamped" (signed with your API key pair) before being sent, ensuring only authorized callers can trigger operations on your keys.
 
+For full documentation, please see our [docs site](https://docs.turnkey.com/home) or our [docs MCP server](https://docs.turnkey.com/mcp).
+
+## Why Use These Skills?
+
+These skills let you operate Turnkey through conversation instead of code. Point your AI agent at the skills and describe what you need — it handles the API calls, parameter formatting, and chain-specific details.
+
+- **Explore and test** — create wallets, sign transactions, and set policies without writing integration code. See [`managing-wallets`](skills/managing-wallets/SKILL.md) and [`signing-transactions`](skills/signing-transactions/SKILL.md).
+- **Administer your organization** — manage users, rotate API keys, and monitor activities conversationally. See [`managing-users`](skills/managing-users/SKILL.md), [`managing-policies`](skills/managing-policies/SKILL.md), and [`monitoring-activities`](skills/monitoring-activities/SKILL.md).
+- **Provision autonomous agents** — set up a scoped wallet with constrained credentials and governance policies so an agent can transact on-chain without human review. See [`provisioning-agent`](skills/provisioning-agent/SKILL.md).
+
 ## Environment Variables
 
 All skills require these three variables:
@@ -17,6 +27,15 @@ TURNKEY_API_PUBLIC_KEY=<your-api-public-key>
 TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
+
+> **⚠️ Security warning — these are root credentials**
+>
+> A root API key has full access to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It bypasses all policies. Before giving these credentials to an AI agent, consider your use case:
+>
+> - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
+> - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
+>
+> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded.
 
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
 
@@ -35,7 +54,7 @@ Install as a plugin so all skills are automatically discovered:
 Or reference skills directly in your prompt:
 ```
 Please read SKILL.md and help me sign an Ethereum transaction.
-Please read skills/core/turnkey-wallet-management/SKILL.md and create a wallet for me.
+Please read skills/managing-wallets/SKILL.md and create a wallet for me.
 ```
 
 Point your agent at the root `SKILL.md` when you're not sure which skill you need — it will route to the right one.
@@ -49,13 +68,13 @@ npx add-skill turnkey/turnkey-agent-skills
 
 Then invoke skills by name:
 ```
-$turnkey-wallet-management
-$turnkey-ethereum-evm
+$managing-wallets
+$signing-transactions
 ```
 
 ### OpenClaw
 
-Install from ClawHub (when published):
+Install from ClawHub (when published, forthcoming):
 ```
 clawhub install turnkey
 ```
@@ -71,44 +90,58 @@ Each `SKILL.md` is automatically indexed by the OpenClaw gateway.
 
 Paste the contents of a `SKILL.md` into your assistant's system prompt, or upload it as a knowledge file in the Assistants API. For multi-skill tasks, include the root `SKILL.md` as context so the assistant knows the full skill set.
 
+### Any AI assistant (local clone)
+
+If none of the above fit your setup — or you just want to try things quickly — clone the repo and point your assistant at the folder. This works with any AI assistant that can read files (Cursor, Cline, Windsurf, Aider, ChatGPT with file upload, etc.):
+
+```bash
+git clone https://github.com/turnkey/turnkey-agent-skills.git
+cd turnkey-agent-skills
+```
+
+Then reference the root `SKILL.md` (or a specific skill) in your prompt:
+
+```
+Please read SKILL.md in this repo and help me sign an Ethereum transaction.
+```
+
 ### Skill load order
 
 For multi-step tasks, skills should be loaded in a specific order. The root [`SKILL.md`](SKILL.md) documents this in detail, but the summary is:
 
-- **Signing** — wallet management → transaction signing → chain-specific skill (e.g. `turnkey-ethereum-evm`)
-- **Wallet only** — just `turnkey-wallet-management`
-- **Authentication** — just `turnkey-otp-auth` (it depends on wallet management internally)
+- **First-time setup** — `getting-started` (verifies credentials, creates your first wallet)
+- **Signing a transaction** — `managing-wallets` → `signing-transactions` (one skill covers EVM, Solana, Bitcoin, and 10+ other chains)
+- **Provisioning an agent** — `provisioning-agent` (pulls in `managing-wallets`, `managing-users`, and `managing-policies` as needed)
 
 Agents that load the root `SKILL.md` first will follow this order automatically.
 
 ## Skills
 
-### Core
+**Workflows** are guided multi-step procedures (start here if you're new). **Primitives** are individual operations (use these for ongoing work).
+
+### Workflows
+
+Guided multi-step procedures — start here for onboarding or agent setup.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| Wallet Management | `skills/core/turnkey-wallet-management/` | Create wallets, derive addresses, manage accounts |
-| Transaction Signing | `skills/core/turnkey-transaction-signing/` | Stamping overview; directs to chain-specific skills |
+| Getting Started | `skills/getting-started/` | Day-0 onboarding: verify credentials, create your first wallet |
+| Provisioning Agent | `skills/provisioning-agent/` | Create a scoped agent with constrained credentials and policies |
+| Managing Agent | `skills/managing-agent/` | Debug denied transactions, rotate keys, update agent policies |
 
-### Signing
+### Primitives
 
-| Skill | Path | Description |
-|-------|------|-------------|
-| Ethereum / EVM | `skills/signing/turnkey-ethereum-evm/` | EVM signing with ethers.js or viem — pick based on your stack |
-| Solana | `skills/signing/turnkey-solana-signing/` | Solana signing with `@turnkey/solana` |
-| Bitcoin | `skills/signing/turnkey-bitcoin-signing/` | Bitcoin signing with bitcoinjs-lib (P2WPKH + P2TR) |
-
-### Auth
+Individual operations — use for ongoing work and one-off tasks.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| OTP Authentication | `skills/auth/turnkey-otp-auth/` | Email OTP login with sub-organization management |
+| Managing Wallets | `skills/managing-wallets/` | Create wallets, derive addresses, add chains, import/export |
+| Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
+| Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
+| Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
+| Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
-### Meta
-
-| Skill | Path | Description |
-|-------|------|-------------|
-| Skill Making | `skills/meta/turnkey-skill-making/` | Guide for creating new skills — conventions, validation, evals |
+**Note**: You don't need to run `npm install` in this repo to use the skills — your AI assistant reads the `SKILL.md` files directly as prompts. The skills will, however, tell you to install `@turnkey/sdk-server` (and a chain-specific package if you're signing transactions) in your own project, since Turnkey's API requires a cryptographic stamp on every request that the SDK handles for you. The Running Examples section below is only for developers who want to run this repo's examples/ demos end-to-end.
 
 ## Running Examples
 
@@ -128,140 +161,6 @@ npx tsx examples/solana-signing.ts
 npx tsx examples/bitcoin-signing.ts
 ```
 
-## Running Evals
+## Contributing
 
-Each skill includes test cases in `skills/<category>/<skill-name>/evals/evals.json`. The automated eval runner discovers all evals, sends them through an LLM (with and without skill context), grades the output against assertions, and prints a summary.
-
-```bash
-# Run all evals with Claude (default provider)
-npm run evals
-
-# Run evals for a specific skill
-npm run evals -- --skill turnkey-ethereum-evm
-
-# Run a single eval
-npm run evals -- --skill turnkey-wallet-management --eval 1
-
-# Also run a baseline without skill context for comparison
-npm run evals -- --without-skill
-
-# Use OpenAI instead of Claude (requires OPENAI_API_KEY)
-npm run evals -- --provider openai --model gpt-4o
-
-# Use a custom command as the LLM provider
-npm run evals -- --provider custom --command "llm prompt -m claude-3.5-sonnet"
-
-# Other options
-npm run evals -- --concurrency 2    # limit parallel runs (default: 4)
-npm run evals -- --dry-run           # print prompts without executing
-npm run evals -- --verbose           # print full LLM responses
-```
-
-The runner extracts the largest TypeScript code block from each response, runs the assertions from `evals.json` against it, and writes results to `evals-workspace/report.json`. Generated solutions are saved to `evals-workspace/<skill-name>/eval-<id>/solution.ts`.
-
-After running evals, `npm test` will grade any solutions in `evals-workspace/` against their assertions.
-
-Eval outputs are gitignored (`evals-workspace/`). Only `evals/evals.json` definitions are committed.
-
-## Adding New Skills
-
-### Option A — Use the skill-making skill (recommended)
-
-If you're using an AI agent (Claude Code, etc.), load the skill-making guide and let it handle the structure for you:
-
-```
-Please read skills/meta/turnkey-skill-making/SKILL.md and create a new skill for <your description>.
-```
-
-The skill-making guide covers the full lifecycle: directory layout, frontmatter rules, required sections, reference examples, evals, and validation. The test suite enforces all conventions automatically.
-
-### Option B — Manual
-
-1. **Choose a category and create the directory:**
-
-   | Category | Path | Use for |
-   |----------|------|---------|
-   | Core | `skills/core/<name>/` | Foundational capabilities (wallets, signing model) |
-   | Signing | `skills/signing/<name>/` | Chain-specific transaction signing |
-   | Auth | `skills/auth/<name>/` | Authentication flows (OTP, OAuth, passkeys) |
-   | Meta | `skills/meta/<name>/` | Tooling and skill-authoring guides |
-
-2. **Create `SKILL.md`** with the required frontmatter:
-   ```yaml
-   ---
-   name: turnkey-your-skill-name
-   description: 'Single-line description of what this skill does and when to use it.'
-   compatibility: "Runtime requirements and required env vars."
-   depends_on:
-     - turnkey-wallet-management
-   metadata:
-     version: "1.0.0"
-     tags: ["turnkey", "your-tag-here"]
-     sdk_versions:
-       "@turnkey/sdk-server": "^5.1.0"
-   ---
-   ```
-   The `name` field must match the directory name exactly.
-
-3. **Include these required sections:** Overview, Prerequisites, Environment Variables, Instructions (or Examples, or Option A/Option B), Troubleshooting, Related Skills.
-
-4. **Add reference examples** in `references/`. Each TypeScript code block must be fully self-contained (all imports and setup) — these are type-checked by the test suite.
-
-5. **Add evals** in `evals/evals.json`. Include `compiles` assertions to catch real type errors. See `skills/meta/turnkey-skill-making/SKILL.md` for the full assertion reference.
-
-6. **Validate:**
-   ```bash
-   npm test        # structure, syntax, type-checking, evals
-   npm run check   # typecheck + tests
-   ```
-
-## Project Structure
-
-```
-turnkey-agent-skills/
-├── README.md
-├── SKILL.md                              # Root skill index
-├── skills/
-│   ├── core/
-│   │   ├── turnkey-wallet-management/
-│   │   │   ├── SKILL.md                  # Create wallets, derive addresses
-│   │   │   ├── references/
-│   │   │   └── evals/
-│   │   └── turnkey-transaction-signing/
-│   │       ├── SKILL.md                  # Stamping overview + chain routing
-│   │       ├── references/
-│   │       └── evals/
-│   ├── signing/
-│   │   ├── turnkey-ethereum-evm/
-│   │   │   ├── SKILL.md                  # EVM signing (ethers.js + viem)
-│   │   │   ├── references/
-│   │   │   └── evals/
-│   │   ├── turnkey-solana-signing/
-│   │   │   ├── SKILL.md                  # @turnkey/solana integration
-│   │   │   ├── references/
-│   │   │   └── evals/
-│   │   └── turnkey-bitcoin-signing/
-│   │       ├── SKILL.md                  # Bitcoin signing (P2WPKH + P2TR)
-│   │       ├── references/
-│   │       └── evals/
-│   ├── auth/
-│   │   └── turnkey-otp-auth/
-│   │       ├── SKILL.md                  # Email OTP login + sub-orgs
-│   │       ├── references/
-│   │       └── evals/
-│   └── meta/
-│       └── turnkey-skill-making/
-│           ├── SKILL.md                  # Guide for creating new skills
-│           └── references/
-├── examples/
-│   ├── wallet-management.ts
-│   ├── ethereum-ethers.ts
-│   ├── ethereum-viem.ts
-│   ├── solana-signing.ts
-│   └── bitcoin-signing.ts
-└── tests/
-    ├── skill-structure.test.ts           # Layer 1: frontmatter + sections
-    ├── code-blocks.test.ts               # Layer 2: syntax checking
-    ├── reference-compiles.test.ts        # Layer 3: full type-checking
-    └── evals.test.ts                     # Layer 4: assertion grading
-```
+Adding a new skill, running the eval harness, or exploring the project structure? See [CONTRIBUTING.md](CONTRIBUTING.md).

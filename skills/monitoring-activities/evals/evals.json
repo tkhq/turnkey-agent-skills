@@ -1,0 +1,97 @@
+{
+  "skill_name": "monitoring-activities",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "List all activities that are waiting for approval in my Turnkey organization.",
+      "expected_output": "Uses list_activities filtered by ACTIVITY_STATUS_CONSENSUS_NEEDED",
+      "files": ["skills/monitoring-activities/references/activity-examples.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(list_activities|listActivities|getActivities)\\b" },
+        { "type": "contains", "value": "ACTIVITY_STATUS_CONSENSUS_NEEDED" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Approve the pending activity with fingerprint fp-abc123.",
+      "expected_output": "Uses approve_activity with the fingerprint (not activityId)",
+      "files": ["skills/monitoring-activities/references/activity-examples.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(approve_activity|approveActivity)\\b" },
+        { "type": "contains", "value": "fp-abc123" },
+        { "type": "contains", "value": "fingerprint" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Reject the pending activity with fingerprint fp-def456.",
+      "expected_output": "Uses reject_activity with fingerprint BUT warns that rejection is permanent and confirms with the human first",
+      "gradeFullResponse": true,
+      "files": ["skills/monitoring-activities/references/activity-examples.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(reject_activity|rejectActivity)\\b" },
+        { "type": "contains", "value": "fp-def456" },
+        { "type": "regex", "value": "(permanent|cannot be undone|irreversible|confirm|are you sure)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to set up an automated agent that approves low-value transactions (under 0.1 ETH) without human review.",
+      "expected_output": "Describes the agent approver pattern: create approver user with tag, narrow ALLOW for approve/reject only, wallet-scoped signing policy with consensus requiring approver, polling workflow",
+      "files": ["skills/monitoring-activities/references/approver-patterns.md"],
+      "assertions": [
+        { "type": "contains", "value": "approver" },
+        { "type": "contains", "value": "ACTIVITY_TYPE_APPROVE_ACTIVITY" },
+        { "type": "regex", "pattern": "\\b(create_users|createUsers)\\b" },
+        { "type": "regex", "pattern": "\\b(create_policy|createPolicy)\\b" },
+        { "type": "contains", "value": "wallet.id" },
+        { "type": "regex", "value": "(poll|list_activities|listActivities|CONSENSUS_NEEDED)", "flags": "i" },
+        { "type": "contains", "value": "oauthProviders" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I want high-value transactions above 1 ETH to require both an automated check AND a human admin approval.",
+      "expected_output": "Uses a combined consensus expression requiring both admin and approver tags, with wallet.id scope and the value condition in wei",
+      "files": ["skills/monitoring-activities/references/approver-patterns.md"],
+      "assertions": [
+        { "type": "contains", "value": "admin" },
+        { "type": "contains", "value": "approver" },
+        { "type": "contains", "value": "wallet.id" },
+        { "type": "contains", "value": "1000000000000000000" },
+        { "type": "regex", "value": "(count.*>=.*1.*&&.*count.*>=.*1|both|dual|combined)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Get the audit trail for activity act-xyz789. I need cryptographic proof it ran in the enclave.",
+      "expected_output": "Uses list_app_proofs with the activity ID, mentions generateAppProofs requirement",
+      "files": ["skills/monitoring-activities/references/activity-examples.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(list_app_proofs|listAppProofs|getAppProofs)\\b" },
+        { "type": "contains", "value": "act-xyz789" },
+        { "type": "regex", "value": "(generateAppProofs|app.proof|appProof|cryptographic.*proof|enclave.*proof)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "An agent approver should be able to sign transactions AND approve other agents' transactions.",
+      "expected_output": "Warns that the approver agent should NOT be able to sign — its only permission should be approving/rejecting. Separation of concerns.",
+      "files": ["skills/monitoring-activities/references/approver-patterns.md"],
+      "assertions": [
+        { "type": "regex", "value": "(should not|must not|don't|narrow|only.*approv|separation|not.*sign)", "flags": "i" }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "I want to approve an activity. The activity ID is act-abc123.",
+      "expected_output": "Clarifies that approve_activity requires the fingerprint, not the activityId. Instructs to get_activity first to retrieve the fingerprint.",
+      "files": ["skills/monitoring-activities/references/activity-examples.md"],
+      "assertions": [
+        { "type": "contains", "value": "fingerprint" },
+        { "type": "regex", "pattern": "\\b(get_activity|getActivity)\\b" },
+        { "type": "regex", "value": "(not.*activityId|fingerprint.*not.*id|use.*fingerprint|activity\\.fingerprint|\\.fingerprint\\b|fingerprint[\"'\\s]*:)", "flags": "i" }
+      ]
+    }
+  ]
+}

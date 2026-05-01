@@ -16,37 +16,21 @@
 import { readFileSync } from "fs";
 import { describe, it, expect } from "vitest";
 import * as ts from "typescript";
-import { findSkillFiles, findReferenceFiles, relativePath, SKILLS_ROOT } from "./helpers.js";
+import {
+  findSkillFiles,
+  findReferenceFiles,
+  relativePath,
+  SKILLS_ROOT,
+  extractTypeScriptBlocks,
+} from "./helpers.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-interface CodeBlock {
-  code: string;
-  /** 1-based index within the file, for readable test names */
-  index: number;
-  /** First non-empty line of the snippet, truncated, for test names */
-  preview: string;
-}
-
-function extractTypeScriptBlocks(markdown: string): CodeBlock[] {
-  const blocks: CodeBlock[] = [];
-  const regex = /```(?:typescript|ts)\n([\s\S]*?)```/g;
-  let match: RegExpExecArray | null;
-  let index = 1;
-
-  while ((match = regex.exec(markdown)) !== null) {
-    const code = match[1];
-    const firstLine = code
-      .split("\n")
-      .find((l) => l.trim().length > 0)
-      ?.trim()
-      .slice(0, 60) ?? "(empty)";
-    blocks.push({ code, index: index++, preview: firstLine });
-  }
-
-  return blocks;
+/** Returns true if the markdown contains at least one fenced code block of any language. */
+function hasAnyCodeBlock(markdown: string): boolean {
+  return /```(?:\w*)\n[\s\S]*?```/.test(markdown);
 }
 
 function getSyntaxErrors(code: string): string[] {
@@ -102,11 +86,14 @@ for (const filePath of [...skillFiles, ...referenceFiles]) {
   const blocks = extractTypeScriptBlocks(content);
 
   describe(name, () => {
+    it("has at least one code block", () => {
+      expect(
+        hasAnyCodeBlock(content),
+        "Every skill/reference file should include at least one code example",
+      ).toBe(true);
+    });
+
     if (blocks.length === 0) {
-      it("has at least one TypeScript code block", () => {
-        // Every skill should demonstrate usage with code
-        expect(blocks.length).toBeGreaterThan(0);
-      });
       return;
     }
 

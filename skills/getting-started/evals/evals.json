@@ -1,0 +1,64 @@
+{
+  "skill_name": "getting-started",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just got my Turnkey API credentials. Help me verify they work.",
+      "expected_output": "Uses the whoami endpoint with organizationId to verify credentials",
+      "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "organizationId|TURNKEY_ORGANIZATION_ID" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm new to Turnkey. Set up my first wallet with Ethereum and Solana.",
+      "expected_output": "Verifies credentials first with whoami, lists existing wallets, then creates a wallet with ETH and Solana accounts",
+      "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "\\b(list_wallets|listWallets|getWallets)\\b" },
+        { "type": "regex", "pattern": "\\b(create_wallet|createWallet)\\b(?![_A-Za-z])" },
+        { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(list_wallets|listWallets|getWallets)" },
+        { "type": "regex", "pattern": "(list_wallets|listWallets|getWallets)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_ETHEREUM" },
+        { "type": "contains", "value": "ADDRESS_FORMAT_SOLANA" }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create my first Turnkey wallet. Skip credential verification, I know they work.",
+      "expected_output": "Should still verify with whoami first and list_wallets before creating — these are mandatory steps",
+      "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(whoami|Whoami|getWhoami)\\b" },
+        { "type": "regex", "pattern": "\\b(list_wallets|listWallets|getWallets)\\b" },
+        { "type": "regex", "pattern": "(whoami|Whoami|getWhoami)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" },
+        { "type": "regex", "pattern": "(list_wallets|listWallets|getWallets)[\\s\\S]*?(create_wallet|createWallet)(?![_A-Za-z])" }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to give my AI agent a wallet on Turnkey. Where do I start?",
+      "expected_output": "Routes to provisioning-agent skill for agent setup, or describes the provisioning workflow",
+      "gradeFullResponse": true,
+      "files": [],
+      "assertions": [
+        { "type": "regex", "pattern": "provisioning.agent|provision.*agent|agent.*provision|non.root.*user|userTags", "flags": "i" }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I've verified my credentials and created a wallet. Now I want to test signing with my Ethereum address 0xABC.",
+      "expected_output": "Uses sign_raw_payload with the address, hex payload, and HASH_FUNCTION_SHA256 for a simple test",
+      "files": ["skills/getting-started/references/first-wallet-walkthrough.md"],
+      "assertions": [
+        { "type": "regex", "pattern": "\\b(sign_raw_payload|signRawPayload)\\b" },
+        { "type": "contains", "value": "0xABC" },
+        { "type": "contains", "value": "HASH_FUNCTION_SHA256" },
+        { "type": "contains", "value": "PAYLOAD_ENCODING_HEXADECIMAL" }
+      ]
+    }
+  ]
+}

@@ -24,7 +24,7 @@ export type Assertion =
   | { type: "contains"; value: string }
   | { type: "not_contains"; value: string }
   | { type: "order"; before: string; after: string }
-  | { type: "regex"; pattern: string; flags?: string }
+  | { type: "regex"; pattern?: string; value?: string; flags?: string }
   | { type: "compiles" };
 
 export interface Eval {
@@ -33,6 +33,8 @@ export interface Eval {
   expected_output: string;
   files: string[];
   assertions?: Assertion[];
+  /** When true, assertions run against the full LLM response (prose + code) instead of just extracted code. Use for evals that test refusals, routing, or warnings. */
+  gradeFullResponse?: boolean;
 }
 
 export interface EvalsFile {
@@ -220,14 +222,22 @@ function runAssertion(code: string, a: Assertion, filePath?: string): AssertionR
     }
 
     case "regex": {
-      const re = new RegExp(a.pattern, a.flags);
+      const pattern = a.pattern ?? a.value;
+      if (!pattern) {
+        return {
+          passed: false,
+          assertion: a,
+          message: "regex assertion missing 'pattern' (or 'value') field",
+        };
+      }
+      const re = new RegExp(pattern, a.flags);
       const passed = re.test(code); // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos -- pattern comes from developer-authored YAML fixtures, not user input
       return {
         passed,
         assertion: a,
         message: passed
-          ? `matches /${a.pattern}/${a.flags ?? ""}`
-          : `does not match /${a.pattern}/${a.flags ?? ""}`,
+          ? `matches /${pattern}/${a.flags ?? ""}`
+          : `does not match /${pattern}/${a.flags ?? ""}`,
       };
     }
 
@@ -261,7 +271,7 @@ export function describeAssertion(a: Assertion): string {
     case "contains":     return `contains "${a.value}"`;
     case "not_contains": return `does not contain "${a.value}"`;
     case "order":        return `${a.before} before ${a.after}`;
-    case "regex":        return `matches /${a.pattern}/${a.flags ?? ""}`;
+    case "regex":        return `matches /${a.pattern ?? a.value ?? "<missing>"}/${a.flags ?? ""}`;
     case "compiles":     return `compiles without type errors`;
   }
 }

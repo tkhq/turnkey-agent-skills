@@ -68,7 +68,7 @@ function loadGenerateApiKeyPair(): GenerateApiKeyPair {
 
   const moduleExports: Record<string, unknown> = {};
   const requireFn = createRequire(import.meta.url);
-  const wrapper = new Function(
+  const wrapper = new Function( // nosemgrep: semgrep.turnkey-no-eval
     "exports",
     "require",
     "module",

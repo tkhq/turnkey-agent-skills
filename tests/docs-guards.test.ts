@@ -75,7 +75,7 @@ function checkEvalString(
   jsonPath: string,
 ): string | null {
   // Strict, unconditional length check — exempt from any allow-list.
-  if (FULL_LENGTH_UNCOMPRESSED_RE.test(value)) {
+  if (FULL_LENGTH_UNCOMPRESSED_RE.test(value)) { // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos
     return `${jsonPath}: contains a fully-spelled 130-hex-char uncompressed P-256 key (no exception applies). Use a 33-byte compressed value (02/03 prefix) instead.`;
   }
 
@@ -86,7 +86,7 @@ function checkEvalString(
     .slice(Math.max(0, shortMatch.index - 32), shortMatch.index)
     .toLowerCase();
   if (beforeWindow.includes("uncompressed")) return null;
-  if (/^(https?:\/\/|\/|\.\.?\/)/.test(value)) return null;
+  if (/^(https?:\/\/|\/|\.\.?\/)/.test(value)) return null; // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos
 
   return `${jsonPath}: contains "${value.slice(
     Math.max(0, shortMatch.index - 8),
@@ -215,12 +215,12 @@ function checkMarkdownFile(absPath: string): string[] {
 
     const lines = block.body.split("\n");
     lines.forEach((line, i) => {
-      if (/"publicKey"\s*:\s*"04/.test(line)) {
+      if (/"publicKey"\s*:\s*"04/.test(line)) { // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos
         violations.push(
           `block at line ${block.startLine + i}: \`"publicKey": "04..."\` — Turnkey requires 33-byte compressed keys (\`02\` or \`03\` prefix).`,
         );
       }
-      if (/^TURNKEY_API_PUBLIC_KEY=04/.test(line)) {
+      if (/^TURNKEY_API_PUBLIC_KEY=04/.test(line)) { // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos
         violations.push(
           `block at line ${block.startLine + i}: \`TURNKEY_API_PUBLIC_KEY=04...\` — Turnkey requires 33-byte compressed keys (\`02\` or \`03\` prefix).`,
         );

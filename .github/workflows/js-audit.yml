@@ -36,12 +36,7 @@ jobs:
 
       - name: Audit PR branch
         id: pr-audit
-        run: |
-          npm audit --omit=dev --audit-level=high --json > /tmp/pr-audit.json 2>&1 || true
-          jq -r '[.vulnerabilities // {} | to_entries[].value.via[]? | select(type == "object") | .url // empty] | sort | unique | .[]' \
-            /tmp/pr-audit.json > /tmp/pr-advisories.txt || true
-          echo "PR advisories:"
-          cat /tmp/pr-advisories.txt
+        run: bash .github/scripts/npm-audit.sh . /tmp/pr-advisories.txt
 
       - name: Checkout main branch
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -51,16 +46,14 @@ jobs:
           path: __main
 
       - name: Audit main branch
-        run: |
-          cd __main
-          npm audit --omit=dev --audit-level=high --json > /tmp/main-audit.json 2>&1 || true
-          jq -r '[.vulnerabilities // {} | to_entries[].value.via[]? | select(type == "object") | .url // empty] | sort | unique | .[]' \
-            /tmp/main-audit.json > /tmp/main-advisories.txt || true
-          echo "Main advisories:"
-          cat /tmp/main-advisories.txt
+        run: bash .github/scripts/npm-audit.sh __main /tmp/main-advisories.txt
 
       - name: Compare — fail only on NEW advisories
         run: |
+          if [ ! -f /tmp/pr-advisories.txt ] || [ ! -f /tmp/main-advisories.txt ]; then
+            echo "::error::Advisory files missing — a prior audit step likely failed"
+            exit 1
+          fi
           new_advisories=$(comm -23 /tmp/pr-advisories.txt /tmp/main-advisories.txt)
 
           if [ -z "$new_advisories" ]; then

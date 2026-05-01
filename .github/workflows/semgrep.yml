@@ -1,0 +1,44 @@
+name: semgrep
+
+# Cancel in-progress runs for the same PR/branch
+concurrency:
+  cancel-in-progress: true
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 10:00 UTC (matches mono's audit cadence)
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep/ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run Semgrep
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/src" \
+            semgrep/semgrep@sha256:3228fb694f4f82eea3eeb8bc8900c3e9629c0a8048b25375dcc1e292f946e518 \
+            semgrep scan \
+              --error \
+              --strict \
+              --metrics=off \
+              --config p/security-audit \
+              --config p/secrets \
+              --config p/owasp-top-ten \
+              --config p/javascript \
+              --config p/typescript \
+              --config p/nodejsscan \
+              --config p/github-actions \
+              --config .semgrep/

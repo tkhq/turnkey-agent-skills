@@ -1,5 +1,9 @@
 name: Dependency review
 
+# dependency-review-action requires Dependency Graph (see repo Settings → Security).
+# That is available for public repos; private repos typically need GitHub Advanced Security.
+# The review step is skipped on private repos unless you set repository variable ENABLE_DEPENDENCY_REVIEW=true
+# after enabling Dependency Graph — then PRs get the check without making the repo public.
 on:
   pull_request:
     branches: [main]
@@ -14,7 +18,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
+      # Skipped on private repos without Dependency Graph — job still succeeds so required checks pass.
       - name: Dependency review
+        if: github.event.repository.visibility != 'private' || vars.ENABLE_DEPENDENCY_REVIEW == 'true'
         uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
         with:
           fail-on-severity: high
+
+      - name: Dependency review skipped (private repo)
+        if: github.event.repository.visibility == 'private' && vars.ENABLE_DEPENDENCY_REVIEW != 'true'
+        run: |
+          echo "Skipping GitHub Dependency review: Dependency Graph is not available on this private repo."
+          echo "When the repo is public, this step is replaced automatically. Or enable Dependency Graph and set repo variable ENABLE_DEPENDENCY_REVIEW=true."

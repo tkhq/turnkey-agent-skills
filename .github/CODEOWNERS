@@ -1,0 +1,14 @@
+# Default owner for everything
+* @tkhq/engineering
+
+# Skill definitions
+/skills/ @tkhq/engineering
+
+# Examples
+/examples/ @tkhq/engineering
+
+# Tests
+/tests/ @tkhq/engineering
+
+# CI/CD workflows
+/workflows/ @tkhq/engineering

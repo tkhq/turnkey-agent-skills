@@ -1,5 +1,5 @@
 /**
- * Layer 4 — Eval grading tests
+ * Layer 5 — Eval grading tests
  *
  * For each eval in evals.json, looks for a generated solution at:
  *   evals-workspace/<skill_name>/eval-<id>/solution.ts
@@ -70,22 +70,28 @@ describe("eval grader", () => {
     for (const evalItem of evalsData.evals) {
       if (!evalItem.assertions?.length) continue;
 
-      const outputPath = join(
+      const dir = join(
         PROJECT_ROOT,
         "evals-workspace",
         evalsData.skill_name,
-        `eval-${evalItem.id}`,
-        "solution.ts"
+        `eval-${evalItem.id}`
       );
+      const outputPath = join(dir, "solution.ts");
+      const responsePath = join(dir, "response.txt");
 
       if (!existsSync(outputPath)) continue;
 
       const code = readFileSync(outputPath, "utf-8");
+      // For gradeFullResponse evals, grade the full saved response (prose + code).
+      const gradeTarget =
+        evalItem.gradeFullResponse && existsSync(responsePath)
+          ? readFileSync(responsePath, "utf-8")
+          : code;
 
       describe(`${evalsData.skill_name} / eval ${evalItem.id}`, () => {
         for (const assertion of evalItem.assertions!) {
           it(describeAssertion(assertion), () => {
-            const [result] = runAssertions(code, [assertion], outputPath);
+            const [result] = runAssertions(gradeTarget, [assertion], outputPath);
             expect(result.passed, result.message).toBe(true);
           });
         }

@@ -1,14 +1,14 @@
 # Default owner for everything
-* @tkhq/engineering
+* @tkhq/interfaces
 
 # Skill definitions
-/skills/ @tkhq/engineering
+/skills/ @tkhq/interfaces
 
 # Examples
-/examples/ @tkhq/engineering
+/examples/ @tkhq/interfaces
 
 # Tests
-/tests/ @tkhq/engineering
+/tests/ @tkhq/interfaces
 
 # CI/CD workflows
-/workflows/ @tkhq/engineering
+/workflows/ @tkhq/interfaces

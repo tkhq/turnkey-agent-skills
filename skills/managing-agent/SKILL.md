@@ -4,7 +4,6 @@ description: "Day-2 operations for a provisioned Turnkey agent: debug denied tra
 license: Apache-2.0
 compatibility: "Requires Turnkey root credentials (P-256 key pair). All recipes run with root/admin access."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "workflow agent management key-rotation revocation debugging policy-update"
 ---

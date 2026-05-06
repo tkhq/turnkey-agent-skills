@@ -4,7 +4,6 @@ description: "Signs and broadcasts blockchain transactions via Turnkey: EVM (Eth
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials. Tier 1 requires Node.js and chain-specific SDK packages. Tier 2 uses the Turnkey HTTP API directly. Tier 3 uses the Turnkey HTTP API with optional gas sponsorship."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "signing transactions ethereum evm solana bitcoin raw-payload sponsored gasless ethers viem"
 ---

@@ -4,7 +4,6 @@ description: "Manages Turnkey users, API keys, and user tags: create, update, an
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "users api-keys user-tags authentication identity key-rotation"
 ---

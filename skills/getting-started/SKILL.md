@@ -4,7 +4,6 @@ description: "Day-0 onboarding workflow for Turnkey: verify API credentials, cre
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair) from the Turnkey Dashboard (app.turnkey.com)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "workflow onboarding getting-started first-wallet"
 ---

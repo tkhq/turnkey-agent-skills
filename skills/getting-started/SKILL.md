@@ -27,7 +27,7 @@ You need three environment variables from the Turnkey Dashboard (app.turnkey.com
 >
 > - **Test organizations**: root credentials are generally acceptable for experimentation and development.
 > - **Production organizations**: **create a dedicated non-root user for your AI assistant** and use policies to limit it from performing destructive operations. Consider the user's use case:
->   - **AI assistant** (human prescribes each action): lower risk, but note that these skills prescribe human-in-the-loop checks which an AI may ignore. A scoped user is still recommended.
+>   - **AI assistant** (human prescribes each action): lower risk, but a scoped user is still recommended.
 >   - **Autonomous agent** (acts without human review): **do not use root credentials.** Without human oversight, an agent can misinterpret instructions and cause irreversible damage. Scoped credentials are essential.
 >
 > To create a scoped non-root user with policies, see `managing-users` and `managing-policies`. For the full agent-with-wallet workflow (wallet + user + signing policies), see `provisioning-agent`.

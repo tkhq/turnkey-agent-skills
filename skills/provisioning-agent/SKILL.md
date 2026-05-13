@@ -19,7 +19,7 @@ Give an AI agent a non-root user, a wallet, and the narrowest ALLOW policy it ne
 
 **Scope:** This skill covers initial agent provisioning only (Steps 1–5). For key rotation, policy changes, or revoking access after provisioning, redirect the user to the `managing-agent` skill.
 
-This workflow runs with **your root credentials**. The output is a set of **agent credentials** with constrained permissions. NEVER give root credentials to an autonomous agent.
+This workflow typically runs with **your root credentials** (or any credentials with permission to create wallets, users, and policies). The output is a set of **agent credentials** with constrained permissions. NEVER give root credentials to an autonomous agent.
 
 Base URL: `https://api.turnkey.com`
 

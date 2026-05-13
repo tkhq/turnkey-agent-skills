@@ -152,7 +152,7 @@ Save: `userId` = `usr-agent-003`. The `agent` tag enables policy targeting.
 
 **Present this policy to the human and get explicit confirmation.**
 
-"This policy allows any user with the 'agent' tag to sign chain-aware transactions using wallet `wlt-agent-9012`. It does not allow raw payload signing, and it does not restrict destination addresses or amounts. The agent cannot perform any other actions (default deny)."
+"This policy allows any user carrying the agent tag (`tag-agent-001`) to sign chain-aware transactions using wallet `wlt-agent-9012`. It does not allow raw payload signing, and it does not restrict destination addresses or amounts. The agent cannot perform any other actions (default deny)."
 
 ```
 POST /public/v1/submit/create_policy
@@ -162,7 +162,7 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "agent-can-sign",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
   "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == 'wlt-agent-9012'",
   "notes": "Allow agent to sign chain-aware transactions with its designated wallet; raw payload signing is excluded"
 }
@@ -219,7 +219,7 @@ POST /public/v1/query/list_policies
       "policyId": "pol-allow-sign-001",
       "policyName": "agent-can-sign",
       "effect": "EFFECT_ALLOW",
-      "consensus": "approvers.any(user, user.tags.contains('agent'))",
+      "consensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
       "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == 'wlt-agent-9012'"
     },
     {

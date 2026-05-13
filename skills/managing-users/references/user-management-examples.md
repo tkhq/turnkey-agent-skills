@@ -169,7 +169,7 @@ Agent users should be non-root with a tag for policy targeting. Do not include `
 }
 ```
 
-`userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. Same tag object, different addressable fields — see the "Tag IDs vs. tag names" callout in `SKILL.md`.
+`userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the **same ID**: `approvers.any(user, user.tags.contains('tag_agent456'))`. The `tagName` exists only as a human-readable label — it is not what `user.tags` holds at evaluation time. See the "Tag IDs vs. tag names" callout in `SKILL.md`.
 
 `userName` is the only required string field on a user. `userEmail` and `userPhoneNumber` (E.164 format, e.g. `+13214567890`) are both optional — pass them for human users if you want OTP recovery flows to work, omit them for agents that should never receive out-of-band contact. The four array fields (`apiKeys`, `authenticators`, `oauthProviders`, `userTags`) are required but can be empty.
 

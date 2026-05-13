@@ -240,7 +240,7 @@ POST /public/v1/submit/create_users
 }
 ```
 
-Save the `userId`. The tag is referenced by its **ID** here; policy conditions in Step 3 target it by its **name** (`approvers.any(user, user.tags.contains('agent'))`). Both surfaces address the same tag object — see the "Tag IDs vs. tag names" callout in the `managing-users` skill.
+Save the `userId`. Both `userTags` here and the policy conditions in Step 3 reference the tag by its **ID** (e.g. `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))`). The `tagName` is purely a label on the tag object — it is not what `user.tags` holds at evaluation time. See the "Tag IDs vs. tag names" callout in the `managing-users` skill.
 
 For an **observer agent** (read-only, no signing), create an `observer` tag the same way in Step 2a, then pass its ID as `"userTags": ["<OBSERVER_TAG_ID>"]` here. Observer agents need no ALLOW policies — default-deny gives them read-only access. See [references/agent-personas.md](references/agent-personas.md) for the complete observer template.
 
@@ -260,7 +260,7 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "agent-can-sign",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == '<WALLET_ID>'",
   "notes": "Allow agent to sign chain-aware transactions with its designated wallet; raw payload signing is excluded"
 }
@@ -276,7 +276,7 @@ If the human chose destination restrictions, add an address allowlist:
 {
   "policyName": "agent-eth-allowlist",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
 }
 ```

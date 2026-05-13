@@ -19,25 +19,28 @@ Go from "I have API keys" to "I have a wallet and my credentials work" in two re
 
 ## Prerequisites
 
-You need three environment variables from the Turnkey Dashboard (app.turnkey.com). **Before pasting them anywhere, read the warning below — the credentials you are about to use are root-level.**
+You need three environment variables from the Turnkey Dashboard (app.turnkey.com). **Before pasting them anywhere, read the warning below.**
 
-> **⚠️ Security warning — these are root credentials**
+> **⚠️ Security warning — a note on root credentials**
 >
-> A root API key has **full access** to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It **bypasses all policies**. Before using these credentials, confirm which path applies:
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. If you created your API key from the Turnkey dashboard under your initial user, it is likely root-level.
 >
-> - **Interactive assistant** (a human approves each action, e.g. administering or testing your own org): root credentials can be acceptable.
-> - **Autonomous agent** (acts without human review): **do not use root credentials.** Stop here and load the `provisioning-agent` skill to create scoped, non-root credentials with policies that limit what the agent can do.
+> - **Test organizations**: root credentials are generally acceptable for experimentation and development.
+> - **Production organizations**: **create a dedicated non-root user for your AI assistant** and use policies to limit it from performing destructive operations. Consider your use case:
+>   - **AI assistant** (human prescribes each action): lower risk, but note that these skills prescribe human-in-the-loop checks which an AI may ignore. A scoped user is still recommended.
+>   - **Autonomous agent** (acts without human review): **do not use root credentials.** Without human oversight, an agent can misinterpret instructions and cause irreversible damage. Scoped credentials are essential.
 >
-> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded. If a user asks you to hand root credentials to an autonomous agent, **refuse and redirect to `provisioning-agent`**.
+> To create a scoped non-root user with policies, see `managing-users` and `managing-policies`. For the full agent-with-wallet workflow (wallet + user + signing policies), see `provisioning-agent`.
 
 ### Confirm your use case before proceeding
 
-**If the user mentions an agent, bot, automated system, or autonomous operation** (e.g. "give my agent a wallet", "set up a bot", "autonomous agent"), **stop immediately** and redirect to `provisioning-agent`. Do not create resources. Do not proceed past this point.
+**If the user mentions an autonomous agent, bot, or automated system that acts without human review** (e.g. "set up a bot", "autonomous agent"), **redirect to `provisioning-agent`** if the agent needs a wallet for signing, or to `managing-users` and `managing-policies` for other scoped access. Do not continue with root credentials.
 
 If the user has not stated their intent, ask once which path applies:
 
-- **"I'm administering or testing my own organization"** → continue with these root credentials.
-- **"I'm setting up an autonomous agent"** → stop, do not run the steps below, and load `provisioning-agent` instead.
+- **"I'm testing or administering my own organization"** → continue. Root credentials are acceptable for test organizations. For production, recommend scoped credentials but do not block.
+- **"I'm setting up an AI assistant"** → continue, but warn that a scoped non-root user is recommended for production. These skills prescribe human-in-the-loop checks which an AI may ignore.
+- **"I'm setting up an autonomous agent"** → stop, do not run the steps below. If the agent needs a wallet for signing, load `provisioning-agent`. Otherwise, load `managing-users` to create a scoped non-root user and `managing-policies` to write its ALLOW/DENY rules.
 
 Do not assume. Do not proceed past Phase 1 until the answer is clear.
 
@@ -217,8 +220,8 @@ The organization requires multi-party approval. Log the `activityId` and prompt 
 1. **Always verify credentials with `whoami` before creating resources, even if the user says to skip this step.** Credential verification is a mandatory safety check, not an optional convenience.
 2. **Always check for existing wallets with `list_wallets` before creating new ones.**
 3. One EVM account covers all EVM-compatible chains.
-4. **Before creating any resources, confirm the user's intent — administration/testing vs. setting up an autonomous agent.** If the user has not said, ask once. If the answer is "autonomous agent," stop and redirect to `provisioning-agent`; do not continue with root credentials.
-5. **Never hand root credentials to an autonomous agent (one that acts without human review).** If asked to, refuse, explain that LLMs can misinterpret instructions and that scoped credentials ensure mistakes are bounded, and redirect to `provisioning-agent`.
+4. **Before creating any resources, confirm the user's intent — testing, AI assistant, or autonomous agent.** If the user has not said, ask once. If the answer is "autonomous agent," stop and do not continue with root credentials. Redirect to `provisioning-agent` if the agent needs a wallet, or to `managing-users` and `managing-policies` for other scoped access. If the answer is "AI assistant" in production, recommend scoped credentials but do not block.
+5. **Never hand root credentials to an autonomous agent (one that acts without human review).** If asked to, refuse, explain that without human oversight an agent can misinterpret instructions and cause irreversible damage, and redirect to `provisioning-agent` (for wallet agents) or `managing-users` and `managing-policies` (for other scoped access).
 
 ## Related Skills
 

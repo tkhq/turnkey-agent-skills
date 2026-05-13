@@ -28,14 +28,16 @@ TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
 
-> **⚠️ Security warning — these are root credentials**
+> **⚠️ Security warning — a note on root credentials**
 >
-> A root API key has full access to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It bypasses all policies. Before giving these credentials to an AI agent, consider your use case:
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. If you created your API key from the Turnkey dashboard under your initial user, it is likely root-level.
 >
-> - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
-> - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
+> - **Test organizations**: root credentials are generally acceptable for experimentation and development.
+> - **Production organizations**: **create a dedicated non-root user for your AI assistant** and use policies to limit it from performing destructive operations. Consider your use case:
+>   - **AI assistant** (human prescribes each action): lower risk, but note that these skills prescribe human-in-the-loop checks which an AI may ignore. A scoped user is still recommended.
+>   - **Autonomous agent** (acts without human review): **do not use root credentials.** Without human oversight, an agent can misinterpret instructions and cause irreversible damage. Scoped credentials are essential.
 >
-> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded.
+> To create a scoped non-root user with policies, see [`skills/managing-users/`](skills/managing-users/SKILL.md) and [`skills/managing-policies/`](skills/managing-policies/SKILL.md). For the full agent-with-wallet workflow (wallet + user + signing policies), see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
 
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
 

@@ -23,7 +23,7 @@ You need three environment variables from the Turnkey Dashboard (app.turnkey.com
 
 > **⚠️ Security warning — a note on root credentials**
 >
-> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. If you created your API key from the Turnkey dashboard under your initial user, it is likely root-level.
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies.
 >
 > - **Test organizations**: root credentials are generally acceptable for experimentation and development.
 > - **Production organizations**: **create a dedicated non-root user for your AI assistant** and use policies to limit it from performing destructive operations. Consider the user's use case:

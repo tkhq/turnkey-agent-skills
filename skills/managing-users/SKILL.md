@@ -312,6 +312,24 @@ POST /public/v1/query/list_user_tags
 }
 ```
 
+**Response:**
+
+```json
+{
+  "userTags": [
+    {
+      "tagId": "<TAG_ID>",
+      "tagName": "trader",
+      "tagType": "TAG_TYPE_USER",
+      "createdAt": { "seconds": "...", "nanos": "..." },
+      "updatedAt": { "seconds": "...", "nanos": "..." }
+    }
+  ]
+}
+```
+
+> **Field renaming on read.** Write surfaces use `userTagId`/`userTagName`, but `list_user_tags` returns each tag as `{ tagId, tagName, ... }` — the wire schema is shared with private-key tags, so it drops the `user` prefix. Read with `tag.tagId`; pass that same value as `userTagId` to write endpoints (`update_user_tag`, `create_users.userTags`, etc.).
+
 ### Create a user tag
 
 Creates a tag and attaches it to specified users in one call:

@@ -286,6 +286,24 @@ POST /public/v1/query/list_user_tags
 }
 ```
 
+**Response** — note the fields are `tagId`/`tagName`, not `userTagId`/`userTagName`. The `v1.Tag` schema is shared with private-key tags, so the wire response drops the `user` prefix even though write surfaces (`create_user_tag`, `update_user_tag`) use `userTagId`/`userTagName`:
+
+```json
+{
+  "userTags": [
+    {
+      "tagId": "tag_engineering123",
+      "tagName": "engineering",
+      "tagType": "TAG_TYPE_USER",
+      "createdAt": { "seconds": "...", "nanos": "..." },
+      "updatedAt": { "seconds": "...", "nanos": "..." }
+    }
+  ]
+}
+```
+
+Read with `tag.tagId`; pass that same value as `userTagId` to write endpoints.
+
 ### Delete tags
 
 Removes the tag association, not the users:

@@ -102,7 +102,7 @@ describe("managing-users emergency revocation guidance", () => {
       expect.arrayContaining([
         expect.objectContaining({ type: "regex", pattern: expect.stringContaining("get_user") }),
         expect.objectContaining({ type: "regex", pattern: expect.stringContaining("delete_users") }),
-        expect.objectContaining({ type: "not_contains", value: "delete_api_keys" }),
+        expect.objectContaining({ type: "not_regex", pattern: expect.stringContaining("delete_api_keys") }),
       ]),
     );
   });
@@ -320,6 +320,7 @@ const VALID_ASSERTION_TYPES = [
   "not_contains",
   "order",
   "regex",
+  "not_regex",
   "compiles",
 ] as const;
 

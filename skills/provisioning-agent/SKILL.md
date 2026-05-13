@@ -31,6 +31,7 @@ Base URL: `https://api.turnkey.com`
 4. **Never output root credentials.** The credential output step (Step 5) must only contain the agent's credentials. Label them clearly.
 5. **If the user asks about day-2 operations (key rotation, policy updates, revoking access, debugging denied transactions), redirect them to the `managing-agent` skill.** Do not handle post-provisioning operations inline.
 6. **The agent's private key must be captured and persisted at generation time, with an explicit destination chosen by the human.** Never generate a key pair without asking where the private half should go (secrets manager, `.env` with `chmod 600`, or — only as a last resort for one-shot manual flows — the terminal). Never write the private key to a path inside a git-tracked directory. Never store it alongside your root credentials. If the human is bringing their own key pair, confirm they already have the private key stored safely before you register the public key.
+7. **Never read the agent's credential file after writing it.** When appending to the file in Step 5, use a blind append — do not read the file contents first.
 
 ## Prerequisites
 

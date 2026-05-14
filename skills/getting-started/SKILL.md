@@ -21,9 +21,9 @@ Go from "I have API keys" to "I have a wallet and my credentials work" in two re
 
 You need three environment variables from the Turnkey Dashboard (app.turnkey.com). **Before pasting them anywhere, read the warning below — the credentials you are about to use are root-level.**
 
-> **⚠️ Security warning — these are root credentials**
+> **⚠️ Security warning — a note on root credentials**
 >
-> A root API key has **full access** to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It **bypasses all policies**. Before using these credentials, confirm which path applies:
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. Before using these credentials, confirm which path applies:
 >
 > - **Interactive assistant** (a human approves each action, e.g. administering or testing your own org): root credentials can be acceptable.
 > - **Autonomous agent** (acts without human review): **do not use root credentials.** Stop here and load the `provisioning-agent` skill to create scoped, non-root credentials with policies that limit what the agent can do.

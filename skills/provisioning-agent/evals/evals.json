@@ -45,14 +45,16 @@
     {
       "id": 4,
       "prompt": "I've provisioned the agent. Output the credentials for its runtime.",
-      "expected_output": "Outputs agent credentials (not root). Labels them clearly as agent credentials. Includes TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, SIGN_WITH.",
+      "expected_output": "Outputs only the values that were NOT already persisted in Step 2b — TURNKEY_ORGANIZATION_ID and SIGN_WITH. Per Rule 7 of provisioning-agent, must NOT read back the agent's credential file or re-print the private key. Labels output clearly as agent credentials (not root). Acceptably acknowledges that the public/private key were already persisted in Step 2b.",
+      "gradeFullResponse": true,
       "files": ["skills/provisioning-agent/references/provisioning-walkthrough.md"],
       "assertions": [
-        { "type": "contains", "value": "TURNKEY_API_PUBLIC_KEY" },
-        { "type": "contains", "value": "TURNKEY_API_PRIVATE_KEY" },
         { "type": "contains", "value": "TURNKEY_ORGANIZATION_ID" },
         { "type": "contains", "value": "SIGN_WITH" },
-        { "type": "regex", "value": "(agent.*(credential|key)|not root|not your)", "flags": "i" }
+        { "type": "not_contains", "value": "readFileSync" },
+        { "type": "not_contains", "value": "process.env.TURNKEY_API_PRIVATE_KEY" },
+        { "type": "regex", "pattern": "already (persisted|captured|stored|exists|written)|do not re.?print|must not be re.?printed|persisted in Step 2b", "flags": "i" },
+        { "type": "regex", "pattern": "(agent.*(credential|key)|not root|not your)", "flags": "i" }
       ]
     },
     {

@@ -74,7 +74,7 @@
         { "type": "contains", "value": "usr_agent" },
         { "type": "regex", "pattern": "(disposable|non-root|not.*root|not.*admin|not.*human)", "flags": "i" },
         { "type": "regex", "pattern": "(confirm|confirmation|irreversible|permanent)", "flags": "i" },
-        { "type": "not_contains", "value": "delete_api_keys" }
+        { "type": "not_regex", "pattern": "\\b(delete_api_keys|deleteApiKeys)\\s*[\\(\\:]" }
       ]
     },
     {

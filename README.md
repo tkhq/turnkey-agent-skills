@@ -28,9 +28,9 @@ TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
 
-> **⚠️ Security warning — these are root credentials**
+> **⚠️ Security warning — a note on root credentials**
 >
-> A root API key has full access to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It bypasses all policies. Before giving these credentials to an AI agent, consider your use case:
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. Before giving these credentials to an AI agent, consider your use case:
 >
 > - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
 > - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).

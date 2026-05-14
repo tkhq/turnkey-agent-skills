@@ -3,16 +3,19 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Create a policy that lets my agent (user tag 'agent') sign transactions with wallet wlt_abc123.",
-      "expected_output": "EFFECT_ALLOW with consensus targeting agent tag, condition scoped to activity.action == 'SIGN' AND wallet.id. Asks human for confirmation before creating.",
-      "files": ["skills/managing-policies/references/policy-api-examples.md"],
+      "prompt": "Create a policy that lets my agent (carries a user tag named 'agent') sign transactions with wallet wlt_abc123.",
+      "expected_output": "EFFECT_ALLOW with consensus targeting the agent's tag ID (e.g. via `user.tags.contains('<AGENT_TAG_ID>')` or asking the user for the tag's userTagId, since the policy DSL compares against tag IDs not names), condition scoped to activity.action == 'SIGN' AND wallet.id. Asks human for confirmation before creating.",
+      "files": [
+        "skills/managing-policies/references/policy-api-examples.md",
+        "skills/managing-users/SKILL.md"
+      ],
       "assertions": [
         { "type": "contains", "value": "EFFECT_ALLOW" },
-        { "type": "contains", "value": "agent" },
         { "type": "contains", "value": "wlt_abc123" },
         { "type": "contains", "value": "activity.action" },
         { "type": "contains", "value": "SIGN" },
-        { "type": "contains", "value": "wallet.id" }
+        { "type": "contains", "value": "wallet.id" },
+        { "type": "regex", "value": "(tag.?id|userTagId|not.*tag.?name|<AGENT_TAG_ID>|TAG_ID)", "flags": "i" }
       ]
     },
     {
@@ -92,36 +95,38 @@
     },
     {
       "id": 9,
-      "prompt": "My agent (tagged 'agent') needs to sign transactions above 1 ETH, but every such signing request must be approved by two users tagged 'admin'. Create the policy.",
-      "expected_output": "ALLOW whose consensus includes both the submitting agent clause (approvers.any on 'agent' tag) AND the admin threshold (filter + count >= 2 on 'admin' tag), condition includes wallet.id scope and eth.tx.value > 1 ETH. Explains the submitter-in-consensus rule: without the agent clause the request would be implicit-denied at submit time instead of entering CONSENSUS_NEEDED.",
+      "prompt": "My agent (carries the agent tag) needs to sign transactions above 1 ETH, but every such signing request must be approved by two users carrying the admin tag. Create the policy.",
+      "expected_output": "ALLOW whose consensus includes both the submitting agent clause (approvers.any on the agent tag ID) AND the admin threshold (filter + count >= 2 on the admin tag ID), condition includes wallet.id scope and eth.tx.value > 1 ETH. Uses tag ID placeholders (e.g. <AGENT_TAG_ID>, <ADMIN_TAG_ID>) or explicitly notes that the policy DSL compares against tag IDs, not tag names. Explains the submitter-in-consensus rule: without the agent clause the request would be implicit-denied at submit time instead of entering CONSENSUS_NEEDED.",
       "files": [
         "skills/managing-policies/SKILL.md",
-        "skills/managing-policies/references/policy-api-examples.md"
+        "skills/managing-policies/references/policy-api-examples.md",
+        "skills/managing-users/SKILL.md"
       ],
       "gradeFullResponse": true,
       "assertions": [
         { "type": "contains", "value": "EFFECT_ALLOW" },
         { "type": "contains", "value": "filter" },
-        { "type": "contains", "value": "admin" },
         { "type": "contains", "value": "count()" },
         { "type": "contains", "value": ">= 2" },
         { "type": "contains", "value": "wallet.id" },
-        { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"]agent['\"]\\)", "flags": "s" },
-        { "type": "regex", "value": "(submitter|implicit.deny|CONSENSUS_NEEDED|auto.vote)", "flags": "i" }
+        { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"][^'\"]*(TAG_ID|tag[_-][A-Za-z0-9]|[0-9a-f]{8}-)", "flags": "s" },
+        { "type": "regex", "value": "(submitter|implicit.deny|CONSENSUS_NEEDED|auto.vote)", "flags": "i" },
+        { "type": "regex", "value": "(tag.id|userTagId|not.*tag.?name|by ID|TAG_ID)", "flags": "i" }
       ]
     },
     {
       "id": 10,
       "prompt": "My agent submits a SIGN activity and the admin approves it via Turnkey. I want a policy that says: any SIGN activity from my agent must be approved by an admin. I drafted this: consensus = \"approvers.filter(user, user.tags.contains('admin')).count() >= 1\", condition = \"activity.action == 'SIGN'\". Is this correct?",
-      "expected_output": "Identifies the submitter-in-consensus bug: the agent's auto-vote contributes 0 to the admin count, so at submit time the consensus evaluates to false, the ALLOW doesn't fire, and the request is implicit-denied instead of entering CONSENSUS_NEEDED. Proposes the fix: add an `approvers.any(user, user.tags.contains('agent'))` clause combined with `&&` to the admin clause, and adds wallet.id scoping (Rule 2). Refuses to create the policy as drafted.",
+      "expected_output": "Identifies two bugs in the drafted policy: (1) the submitter-in-consensus bug — the agent's auto-vote contributes 0 to the admin count, so at submit time the consensus evaluates to false, the ALLOW doesn't fire, and the request is implicit-denied instead of entering CONSENSUS_NEEDED; (2) the tag-name-vs-ID bug — `user.tags.contains('admin')` compares against the literal string 'admin', but `user.tags` holds tag IDs (the `userTagId` returned by `create_user_tag`), not names, so this clause can never match at runtime even with an admin approver. Proposes the fix: replace 'admin' and 'agent' with their respective tag IDs (or placeholders like `<ADMIN_TAG_ID>` / `<AGENT_TAG_ID>`), add an `approvers.any(...)` clause for the submitter combined with `&&`, and add wallet.id scoping (Rule 2). Refuses to create the policy as drafted.",
       "files": [
         "skills/managing-policies/SKILL.md",
-        "skills/managing-policies/references/policy-language.md"
+        "skills/managing-policies/references/policy-language.md",
+        "skills/managing-users/SKILL.md"
       ],
       "gradeFullResponse": true,
       "assertions": [
         { "type": "regex", "value": "(submitter|auto.vote|implicit.deny|CONSENSUS_NEEDED)", "flags": "i" },
-        { "type": "regex", "value": "approvers\\.any\\(.*tags\\.contains\\(['\"]agent['\"]\\)", "flags": "s" },
+        { "type": "regex", "value": "(tag.?id|userTagId|not.*tag.?name|by ID|TAG_ID)", "flags": "i" },
         { "type": "contains", "value": "&&" },
         { "type": "regex", "value": "(wallet\\.id|scope|not.recommend|don.t|do not|fix|should)", "flags": "i" }
       ]

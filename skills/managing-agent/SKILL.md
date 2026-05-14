@@ -118,7 +118,7 @@ Example — add a new address to the allowlist:
   "policyId": "<POLICY_ID>",
   "policyName": "agent-eth-allowlist",
   "policyEffect": "EFFECT_ALLOW",
-  "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
+  "policyConsensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "policyCondition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
   "policyNotes": "Added 0xNewAddr3 to allowlist"
 }

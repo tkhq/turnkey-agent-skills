@@ -169,7 +169,7 @@ Agent users should be non-root with a tag for policy targeting. Do not include `
 }
 ```
 
-`userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. Same tag object, different addressable fields — see the "Tag IDs vs. tag names" callout in `SKILL.md`.
+`userTags` holds the tag's **ID** (`tag_agent456`). Policy expressions target the **same ID**: `approvers.any(user, user.tags.contains('tag_agent456'))`. The `tagName` exists only as a human-readable label — it is not what `user.tags` holds at evaluation time. See the "Tag IDs vs. tag names" callout in `SKILL.md`.
 
 `userName` is the only required string field on a user. `userEmail` and `userPhoneNumber` (E.164 format, e.g. `+13214567890`) are both optional — pass them for human users if you want OTP recovery flows to work, omit them for agents that should never receive out-of-band contact. The four array fields (`apiKeys`, `authenticators`, `oauthProviders`, `userTags`) are required but can be empty.
 
@@ -285,6 +285,24 @@ POST /public/v1/query/list_user_tags
   "organizationId": "<ORG_ID>"
 }
 ```
+
+**Response** — note the fields are `tagId`/`tagName`, not `userTagId`/`userTagName`. The `v1.Tag` schema is shared with private-key tags, so the wire response drops the `user` prefix even though write surfaces (`create_user_tag`, `update_user_tag`) use `userTagId`/`userTagName`:
+
+```json
+{
+  "userTags": [
+    {
+      "tagId": "tag_engineering123",
+      "tagName": "engineering",
+      "tagType": "TAG_TYPE_USER",
+      "createdAt": { "seconds": "...", "nanos": "..." },
+      "updatedAt": { "seconds": "...", "nanos": "..." }
+    }
+  ]
+}
+```
+
+Read with `tag.tagId`; pass that same value as `userTagId` to write endpoints.
 
 ### Delete tags
 

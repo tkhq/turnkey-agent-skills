@@ -73,15 +73,17 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_admin123')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 500000000000000000",
   "notes": "Large ETH transfers require an admin to co-approve the agent's submission"
 }
 ```
 
-When the agent submits a transfer above 0.5 ETH, its auto-vote satisfies the `agent` clause and the activity enters `CONSENSUS_NEEDED`. The admin reviews with Claude Code using their own credentials and approves (satisfying the `admin` clause) or rejects.
+This assumes the submitting agent carries the agent tag whose ID is `tag_agent789` (provisioned separately — see `provisioning-agent`). The placeholders here (`tag_agent789`, `tag_admin123`) are `userTagId` values, **not** human-readable tag names — the policy DSL compares against the IDs stored on a user, not the `tagName`. See the "Tag IDs vs. tag names" callout in `managing-users`.
 
-> **Why the `agent` clause?** Without it — i.e. a consensus of just `admin.count() >= 1` — the agent's auto-vote would contribute 0 to the admin count, consensus would evaluate to false at submit time, and the ALLOW would never fire. The request would be implicit-denied rather than entering `CONSENSUS_NEEDED`. See [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
+When the agent submits a transfer above 0.5 ETH, its auto-vote satisfies the agent-tag clause and the activity enters `CONSENSUS_NEEDED`. The admin reviews with Claude Code using their own credentials and approves (satisfying the admin-tag clause) or rejects.
+
+> **Why the agent-tag clause?** Without it — i.e. a consensus of just `tag_admin123` `count() >= 1` — the agent's auto-vote would contribute 0 to the admin count, consensus would evaluate to false at submit time, and the ALLOW would never fire. The request would be implicit-denied rather than entering `CONSENSUS_NEEDED`. See [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
 
 **When to use:** Teams that want human review without exposing root credentials.
 
@@ -115,18 +117,18 @@ A dedicated agent that programmatically approves or rejects other agents' activi
 {
   "policyName": "approver-can-vote",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('approver'))",
+  "consensus": "approvers.any(user, user.tags.contains('tag_approver456'))",
   "condition": "activity.type in ['ACTIVITY_TYPE_APPROVE_ACTIVITY', 'ACTIVITY_TYPE_REJECT_ACTIVITY']"
 }
 ```
 
-**Step 3:** Create a policy on the worker agent that requires the approver agent's consensus. The worker's submitting tag (`agent`) must appear in consensus alongside the approver requirement — otherwise the request is implicit-denied at submit time instead of entering `CONSENSUS_NEEDED` (see [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule)):
+**Step 3:** Create a policy on the worker agent that requires the approver agent's consensus. The worker's submitting tag ID (`tag_agent789` in this example) must appear in consensus alongside the approver requirement — otherwise the request is implicit-denied at submit time instead of entering `CONSENSUS_NEEDED` (see [`managing-policies` → The submitter-in-consensus rule](../../managing-policies/SKILL.md#the-submitter-in-consensus-rule)):
 
 ```json
 {
   "policyName": "worker-needs-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_approver456')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WORKER_WALLET_ID>'"
 }
 ```
@@ -176,7 +178,7 @@ Require both automated and human approval. The first clause represents the submi
 {
   "policyName": "high-value-dual-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_admin123')).count() >= 1 && approvers.filter(user, user.tags.contains('tag_approver456')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 1000000000000000000"
 }
 ```
@@ -193,7 +195,7 @@ Different thresholds for different amounts. In every tier the first consensus cl
 {
   "policyName": "low-value-approver-auto",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_approver456')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value <= 100000000000000000"
 }
 ```
@@ -204,7 +206,7 @@ Different thresholds for different amounts. In every tier the first consensus cl
 {
   "policyName": "medium-value-dual-approval",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_admin123')).count() >= 1 && approvers.filter(user, user.tags.contains('tag_approver456')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 100000000000000000 && eth.tx.value <= 1000000000000000000"
 }
 ```
@@ -215,7 +217,7 @@ Different thresholds for different amounts. In every tier the first consensus cl
 {
   "policyName": "high-value-two-admins",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 2",
+  "consensus": "approvers.any(user, user.tags.contains('tag_agent789')) && approvers.filter(user, user.tags.contains('tag_admin123')).count() >= 2",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 1000000000000000000"
 }
 ```

@@ -27,7 +27,7 @@ POST /public/v1/query/list_policies
       "policyId": "pol-allow-001",
       "policyName": "agent-can-sign",
       "effect": "EFFECT_ALLOW",
-      "consensus": "approvers.any(user, user.tags.contains('agent'))",
+      "consensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
       "condition": "activity.action == 'SIGN' && wallet.id == 'wlt_abc'"
     },
     {
@@ -40,7 +40,7 @@ POST /public/v1/query/list_policies
       "policyId": "pol-allow-002",
       "policyName": "agent-eth-allowlist",
       "effect": "EFFECT_ALLOW",
-      "consensus": "approvers.any(user, user.tags.contains('agent'))",
+      "consensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
       "condition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xAddr2']"
     }
   ]
@@ -76,7 +76,7 @@ Add `0xNewAddr3` to an existing ALLOW:
   "policyId": "pol-allow-002",
   "policyName": "agent-eth-allowlist",
   "policyEffect": "EFFECT_ALLOW",
-  "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
+  "policyConsensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
   "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
   "policyNotes": "Added 0xNewAddr3"
 }
@@ -93,7 +93,7 @@ Remove `0xAddr2`:
   "policyId": "pol-allow-002",
   "policyName": "agent-eth-allowlist",
   "policyEffect": "EFFECT_ALLOW",
-  "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
+  "policyConsensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
   "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to in ['0xAddr1', '0xNewAddr3']",
   "policyNotes": "Removed 0xAddr2"
 }
@@ -108,7 +108,7 @@ If the agent should only call `transfer()` on a specific contract, and you've al
   "policyId": "pol-allow-002",
   "policyName": "agent-usdc-transfer-only",
   "policyEffect": "EFFECT_ALLOW",
-  "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
+  "policyConsensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
   "policyCondition": "wallet.id == 'wlt_abc' && eth.tx.to == '0xUSDC_CONTRACT' && eth.tx.function_name == 'transfer'",
   "policyNotes": "Restrict to transfer() on USDC only"
 }
@@ -126,7 +126,7 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "agent-solana-sign",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('tag-agent-001'))",
   "condition": "wallet.id == 'wlt_abc' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')",
   "notes": "Allow agent to sign Solana System Program transactions"
 }

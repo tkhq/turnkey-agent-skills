@@ -28,7 +28,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
 {
   "policyName": "worker-agent-sign",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.type in ['ACTIVITY_TYPE_SIGN_TRANSACTION_V2', 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION', 'ACTIVITY_TYPE_SOL_SEND_TRANSACTION'] && wallet.id == '<WALLET_ID>'",
   "notes": "Base chain-aware signing permission — raw payload signing excluded"
 }
@@ -41,7 +41,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
 {
   "policyName": "worker-eth-allowlist",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>']"
 }
 ```
@@ -60,7 +60,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
 {
   "policyName": "worker-usdc-transfer-only",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>' && eth.tx.to == '<USDC_CONTRACT>' && eth.tx.function_name == 'transfer'"
 }
 ```
@@ -70,7 +70,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
 {
   "policyName": "worker-solana-system-only",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
@@ -103,7 +103,7 @@ This base policy intentionally excludes `sign_raw_payload` so the policy engine 
 }
 ```
 
-The tag's **name** (`'agent'`) is what the policy DSL matches — `user.tags.contains('agent')` in the consensus expressions above.
+The tag's **ID** (`<AGENT_TAG_ID>`) is what the policy DSL matches — `user.tags.contains('<AGENT_TAG_ID>')` in the consensus expressions above. The `tagName` you set when creating the tag (e.g. `"agent"`) is a label only; it is never compared against `user.tags` at evaluation time.
 
 ## Observer Agent
 
@@ -124,7 +124,7 @@ If the organization has broad shared ALLOW policies that would unintentionally g
 {
   "policyName": "observer-deny-signing",
   "effect": "EFFECT_DENY",
-  "consensus": "approvers.any(user, user.tags.contains('observer'))",
+  "consensus": "approvers.any(user, user.tags.contains('<OBSERVER_TAG_ID>'))",
   "condition": "activity.action == 'SIGN'",
   "notes": "Explicit observer block — only needed if org has shared ALLOWs"
 }

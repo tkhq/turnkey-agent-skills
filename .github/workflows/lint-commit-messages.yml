@@ -1,0 +1,40 @@
+name: Lint Commit Messages
+
+# Cancel any previous runs of this workflow for a given PR
+concurrency:
+  cancel-in-progress: true
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # commitlint reads the PR commit range; full history is required so
+          # base..head is resolvable.
+          fetch-depth: 0
+
+      # https://github.com/wagoid/commitlint-github-action
+      - name: Validate commit messages are conventional commits
+        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+        with:
+          configFile: .commitlintrc.json
+          # Follow first-parent so commits merged in from main aren't
+          # re-validated — we only want to check commits authored on this PR.
+          firstParent: true
+          failOnWarnings: true

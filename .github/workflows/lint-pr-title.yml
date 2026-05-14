@@ -28,7 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Types must match what release-please recognizes for changelog generation.
+          # Allowed Conventional Commit types. Aligns with the types release-please
+          # recognizes; bump behavior (feat/fix bump, others are no-ops) is configured
+          # in release-please-config.json, not here.
           types: |
             feat
             fix
@@ -41,6 +43,7 @@ jobs:
             perf
             style
             revert
+            deps
           requireScope: false
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |

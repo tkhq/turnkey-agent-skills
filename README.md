@@ -2,7 +2,8 @@
 
 A collection of AI agent skills for [Turnkey](https://turnkey.com) — the wallet infrastructure platform that manages cryptographic keys in hardware-backed secure enclaves.
 
-These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenClaw**, and **OpenAI** assistants.
+These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenAI**, and other third-party agent frameworks.
+Use of these Skills is subject to Turnkey's Terms of Service. See also: Shared Responsibility Model.
 
 ## What is Turnkey?
 
@@ -32,10 +33,10 @@ TURNKEY_ORGANIZATION_ID=<your-organization-id>
 >
 > The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. Before giving these credentials to an AI agent, consider your use case:
 >
-> - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
+> - **Interactive assistant** (human approves each action): root credentials may be acceptable for testing — evaluate the risk before using them in production.
 > - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
 >
-> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded.
+> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded. Turnkey policies are the technical enforcement mechanism.
 
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
 

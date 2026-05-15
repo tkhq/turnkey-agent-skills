@@ -3,7 +3,7 @@
 A collection of AI agent skills for [Turnkey](https://turnkey.com) — the wallet infrastructure platform that manages cryptographic keys in hardware-backed secure enclaves.
 
 These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenAI**, and other third-party agent frameworks.
-Use of these Skills is subject to Turnkey's Terms of Service. See also: Shared Responsibility Model.
+Use of these Skills is subject to Turnkey's Terms of Service. See also: [Shared Responsibility Model](https://docs.turnkey.com/security/shared-responsibility-model#turnkey-shared-responsibility-model).
 
 ## What is Turnkey?
 

@@ -152,12 +152,6 @@ for (const filePath of skillFiles) {
       it("description fits on one line (no newlines)", () => {
         expect(parsed.data.description).not.toContain("\n");
       });
-
-      it("has metadata.version field", () => {
-        expect(parsed.data).toHaveProperty("metadata");
-        expect(parsed.data.metadata).toHaveProperty("version");
-        expect(typeof parsed.data.metadata.version).toBe("string");
-      });
     });
 
     // -------------------------------------------------------------------------
@@ -259,12 +253,6 @@ describe("SKILL.md (root package manifest)", () => {
 
     it("description fits on one line (no newlines)", () => {
       expect(rootParsed.data.description).not.toContain("\n");
-    });
-
-    it("has metadata.version field", () => {
-      expect(rootParsed.data).toHaveProperty("metadata");
-      expect(rootParsed.data.metadata).toHaveProperty("version");
-      expect(typeof rootParsed.data.metadata.version).toBe("string");
     });
 
     it("has metadata.tags field (non-empty string)", () => {

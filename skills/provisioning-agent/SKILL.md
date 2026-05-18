@@ -4,7 +4,6 @@ description: "End-to-end workflow to give an AI agent a scoped Turnkey wallet: c
 license: Apache-2.0
 compatibility: "Requires Turnkey root credentials (P-256 key pair). The agent's P-256 key pair is either generated inline in Step 2b or supplied by you."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "workflow agent wallet provisioning onboarding policies scoped-access"
 ---

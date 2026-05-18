@@ -4,7 +4,6 @@ description: "Monitors, approves, and rejects Turnkey activities (the result typ
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "activity monitoring consensus approval audit app-proofs multi-sig"
 ---

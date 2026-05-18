@@ -103,7 +103,6 @@ Skills live directly under `skills/` in a flat layout — no category subdirecto
    license: Apache-2.0
    compatibility: "Runtime requirements and required env vars."
    metadata:
-     version: "1.0.0"
      author: turnkey
      tags: "space separated tags"
    ---

@@ -4,7 +4,6 @@ description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bi
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "wallet blockchain address-derivation hd-wallet ethereum solana bitcoin multi-chain"
 ---

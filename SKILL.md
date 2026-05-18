@@ -4,7 +4,6 @@ description: "Use when working with Turnkey wallet infrastructure — creating w
 license: Apache-2.0
 compatibility: "Requires TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "turnkey wallet signing blockchain ethereum solana bitcoin crypto policy agent"
 ---

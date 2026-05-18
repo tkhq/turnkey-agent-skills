@@ -164,7 +164,7 @@ npx tsx examples/bitcoin-signing.ts
 
 ## Versioning
 
-This repo is versioned as a single bundle using [Semantic Versioning](https://semver.org). The authoritative version lives in `.claude-plugin/plugin.json`; `package.json` mirrors it. See [`CHANGELOG.md`](CHANGELOG.md) for release history.
+This repo is versioned as a single bundle using [Semantic Versioning](https://semver.org). The authoritative version lives in `package.json`; release-please keeps `.claude-plugin/plugin.json` in sync via its `extra-files` configuration. See [`CHANGELOG.md`](CHANGELOG.md) for release history.
 
 **SemVer contract for this skill bundle:**
 
@@ -172,14 +172,14 @@ This repo is versioned as a single bundle using [Semantic Versioning](https://se
 - **Minor** — adding a new skill, adding a new optional reference, or non-breaking expansions to an existing skill's workflow.
 - **Patch** — wording, formatting, doc fixes, dependency bumps with no behavior change.
 
-**Pinning a release.** Each distribution channel resolves to a git tag, so you can pin to a specific version:
+**Pinning a release.** Each distribution channel resolves to a git tag, so you can pin to a specific version. Replace `<version>` with a tag from the [GitHub releases page](https://github.com/tkhq/turnkey-agent-skills/releases):
 
 ```bash
 # npx
-npx add-skill turnkey/turnkey-agent-skills@v1.0.0
+npx add-skill turnkey/turnkey-agent-skills@v<version>
 
 # Local clone
-git clone --branch v1.0.0 https://github.com/turnkey/turnkey-agent-skills.git
+git clone --branch v<version> https://github.com/turnkey/turnkey-agent-skills.git
 ```
 
 For Claude Code plugin and ClawHub installs, see each tool's docs for how to pin to a tag.

@@ -4,7 +4,6 @@ description: "Manages Turnkey policies for access control and transaction govern
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "policy access-control governance security allowlist deny consensus smart-contract"
 ---
@@ -98,20 +97,22 @@ condition: "wallet.id == 'wlt_123' || private_key.id == 'pk_456'"
 
 Consensus is evaluated against the current approver list at submit time. The submitter's auto-vote only counts toward clauses their user ID or tags satisfy. **If the consensus expression references only tags or IDs the submitter doesn't have, the ALLOW doesn't fire on submission and the request is implicit-denied — it never reaches `CONSENSUS_NEEDED`.**
 
-**This will break** (an agent-tagged user submits, consensus names only `admin`):
+**This will break** (an agent-tagged user submits, consensus names only the admin tag ID):
 ```
-consensus: "approvers.filter(user, user.tags.contains('admin')).count() >= 1"
+consensus: "approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1"
 condition: "activity.action == 'SIGN' && eth.tx.value > 500000000000000000"
 ```
 The agent's vote contributes 0 to the admin count. Consensus evaluates to false at submit time, no ALLOW matches, implicit deny — not `CONSENSUS_NEEDED`.
 
 **Fix:** Include a clause the submitter satisfies, combined with the approver requirement:
 ```
-consensus: "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1"
+consensus: "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1"
 ```
 The agent's auto-vote satisfies the first clause immediately, the second clause remains pending, so the engine correctly enters `CONSENSUS_NEEDED`. The admin then approves and the activity completes.
 
-**When this applies:** Any policy whose `condition` can be triggered by a user whose ID or tags aren't referenced by any clause in `consensus`. Single-submitter policies like `approvers.any(user, user.tags.contains('agent'))` on an agent-submitted activity are fine — the submitter satisfies the only clause. Multi-party policies where the submitter is also in the required set (e.g., `trader.count() >= 2` with a trader-tagged submitter) are fine for the same reason.
+`<AGENT_TAG_ID>` / `<ADMIN_TAG_ID>` are the `userTagId` values returned by `create_user_tag`, **not** the human-readable `tagName`. The policy DSL compares against IDs only — see the "Tag IDs vs. tag names" callout in `managing-users`.
+
+**When this applies:** Any policy whose `condition` can be triggered by a user whose ID or tags aren't referenced by any clause in `consensus`. Single-submitter policies like `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))` on an agent-submitted activity are fine — the submitter satisfies the only clause. Multi-party policies where the submitter is also in the required set (e.g., a trader-tag-id clause with `count() >= 2` and a trader-tagged submitter) are fine for the same reason.
 
 **Symptom to recognize:** An activity denied at submit time when you expected `CONSENSUS_NEEDED`. Call `get_policy_evaluations` — you'll see your ALLOW listed with `consensusMatched: false` because the submitter contributes to no clause.
 
@@ -283,7 +284,7 @@ Check units. `eth.tx.value` is in wei (1 ETH = `1000000000000000000`). `tron.tx.
 Use `get_policy_evaluations` to see which policy matched. Common causes: a DENY policy's condition is broader than intended, or the ALLOW policy's consensus doesn't match the agent's user ID or tag.
 
 **Activity denied at submit time when `CONSENSUS_NEEDED` was expected**
-The submitter isn't referenced by any clause in the consensus expression. See [The submitter-in-consensus rule](#the-submitter-in-consensus-rule) — add a clause the submitter satisfies (typically `approvers.any(user, user.tags.contains('agent'))`) to the consensus.
+The submitter isn't referenced by any clause in the consensus expression. See [The submitter-in-consensus rule](#the-submitter-in-consensus-rule) — add a clause the submitter satisfies (typically `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))`, using the submitter's `userTagId`) to the consensus.
 
 **Locked out (no users can act)**
 Only root quorum can fix this. Root users bypass all policies. Use root quorum to delete the problematic policy.

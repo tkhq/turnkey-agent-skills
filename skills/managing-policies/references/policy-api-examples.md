@@ -16,7 +16,7 @@ POST /public/v1/submit/create_policy
 {
   "policyName": "agent-sign-with-wallet",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.action == 'SIGN' && wallet.id == 'wlt_abc123'",
   "notes": "Allow agent to sign with its designated wallet"
 }
@@ -85,7 +85,7 @@ POST /public/v1/query/list_policies
       "policyId": "pol_...",
       "policyName": "agent-sign-with-wallet",
       "effect": "EFFECT_ALLOW",
-      "consensus": "approvers.any(user, user.tags.contains('agent'))",
+      "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
       "condition": "activity.action == 'SIGN' && wallet.id == 'wlt_abc123'",
       "notes": "Allow agent to sign with its designated wallet",
       "createdAt": { "seconds": "1700000000", "nanos": "0" },
@@ -107,7 +107,7 @@ POST /public/v1/submit/update_policy
   "policyName": "agent-eth-allowlist-updated",
   "policyEffect": "EFFECT_ALLOW",
   "policyCondition": "wallet.id == 'wlt_abc123' && eth.tx.to in ['0xAddr1', '0xAddr2', '0xNewAddr3']",
-  "policyConsensus": "approvers.any(user, user.tags.contains('agent'))",
+  "policyConsensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "policyNotes": "Added 0xNewAddr3 to allowlist"
 }
 ```
@@ -182,7 +182,7 @@ The DENY policy matched because the transfer exceeded 0.1 ETH. Fix: lower the tr
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['0xContractA', '0xContractB', '0xRecipient']"
 }
 ```
@@ -203,7 +203,7 @@ The DENY policy matched because the transfer exceeded 0.1 ETH. Fix: lower the tr
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && eth.tx.chain_id == 11155111"
 }
 ```
@@ -238,7 +238,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
@@ -268,7 +268,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && solana.tx.spl_transfers.all(t, t.token_mint == '<ALLOWED_MINT>')"
 }
 ```
@@ -291,7 +291,7 @@ Restricts EIP-7702 delegation to a specific contract on a specific chain. Withou
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && bitcoin.tx.outputs.all(o, o.address in ['<ALLOWED_1>', '<ALLOWED_2>', '<CHANGE_ADDR>'])"
 }
 ```
@@ -305,7 +305,7 @@ Include the change address in the allowlist or the transaction will be denied.
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].type == 'TransferContract'"
 }
 ```
@@ -326,7 +326,7 @@ Include the change address in the allowlist or the transaction will be denied.
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].contract_address == '<TRC20_CONTRACT>' && tron.tx.contract[0].data[0..8] == 'a9059cbb'"
 }
 ```
@@ -340,7 +340,7 @@ Include the change address in the allowlist or the transaction will be denied.
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.action == 'SIGN' && activity.params.type == 'TRANSACTION_TYPE_TEMPO' && wallet.id == '<WALLET_ID>'"
 }
 ```
@@ -350,7 +350,7 @@ Include the change address in the allowlist or the transaction will be denied.
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
 }
 ```
@@ -371,7 +371,7 @@ Tempo does not support ABI uploads. Inspect encoded arguments by slicing `input`
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls[0].to == '<TOKEN_CONTRACT>' && tempo.tx.calls[0].input[34..74] == '<RECIPIENT_NO_0x>'"
 }
 ```

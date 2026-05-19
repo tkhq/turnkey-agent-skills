@@ -4,7 +4,6 @@ description: "Monitors, approves, and rejects Turnkey activities (the result typ
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "activity monitoring consensus approval audit app-proofs multi-sig"
 ---
@@ -194,14 +193,16 @@ A non-root user tagged 'admin' reviews and approves activities. Requires a polic
 {
   "policyName": "large-transfer-requires-admin",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value > 500000000000000000"
 }
 ```
 
-When an agent signs a transfer above 0.5 ETH, its auto-vote satisfies the `agent` clause and the activity enters `CONSENSUS_NEEDED`. The admin then reviews and approves via Claude Code to satisfy the `admin` clause.
+When an agent signs a transfer above 0.5 ETH, its auto-vote satisfies the agent-tag clause and the activity enters `CONSENSUS_NEEDED`. The admin then reviews and approves via Claude Code to satisfy the admin-tag clause.
 
-> **Why both clauses?** An `admin.count() >= 1` consensus alone would implicit-deny at submit time because the agent's vote contributes 0 to the admin count — the ALLOW never fires and the activity never reaches `CONSENSUS_NEEDED`. See [`managing-policies` → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule). Requires the submitting agent to be tagged `agent` (see `managing-users`).
+`<AGENT_TAG_ID>` and `<ADMIN_TAG_ID>` are `userTagId` values returned by `create_user_tag` — the policy DSL compares against tag IDs, not the human-readable `tagName`. See the "Tag IDs vs. tag names" callout in `managing-users`.
+
+> **Why both clauses?** An `<ADMIN_TAG_ID>` `count() >= 1` consensus alone would implicit-deny at submit time because the agent's vote contributes 0 to the admin count — the ALLOW never fires and the activity never reaches `CONSENSUS_NEEDED`. See [`managing-policies` → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule). Requires the submitting agent to carry the agent tag (see `managing-users`).
 
 **Best for:** Teams that want human review without using root credentials.
 
@@ -211,7 +212,7 @@ A dedicated agent that programmatically approves or rejects other agents' activi
 
 **Setup:**
 1. Create an approver user with an 'approver' tag (see `managing-users`)
-2. Create a policy on the worker agent that includes **both the submitting worker and the approver** in consensus, e.g. `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('approver')).count() >= 1` (see [managing-policies → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule))
+2. Create a policy on the worker agent that includes **both the submitting worker and the approver** in consensus, e.g. `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<APPROVER_TAG_ID>')).count() >= 1` (placeholders are `userTagId` values, not tag names — see [managing-policies → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule))
 3. The approver agent needs a narrow ALLOW policy — it should only be able to approve/reject activities, not sign transactions or create resources
 
 **Approver agent ALLOW policy:**
@@ -220,7 +221,7 @@ A dedicated agent that programmatically approves or rejects other agents' activi
 {
   "policyName": "approver-can-approve",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('approver'))",
+  "consensus": "approvers.any(user, user.tags.contains('<APPROVER_TAG_ID>'))",
   "condition": "activity.type in ['ACTIVITY_TYPE_APPROVE_ACTIVITY', 'ACTIVITY_TYPE_REJECT_ACTIVITY']"
 }
 ```
@@ -245,7 +246,7 @@ You can require both human and agent approval. Include a clause for the submitti
 
 ```json
 {
-  "consensus": "approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1 && approvers.filter(user, user.tags.contains('approver')).count() >= 1"
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1 && approvers.filter(user, user.tags.contains('<APPROVER_TAG_ID>')).count() >= 1"
 }
 ```
 
@@ -262,7 +263,7 @@ You're using the `activityId` instead of the `fingerprint`. Get the activity det
 Not enough authorized users have approved. Check the policy's consensus expression to see who can approve and how many are needed. Approvals expire after 24 hours.
 
 **Activity denied at submit time when `CONSENSUS_NEEDED` was expected**
-The submitter isn't referenced by any clause in the ALLOW policy's consensus expression, so their auto-vote contributes nothing and the ALLOW never fires. Call `get_policy_evaluations` on the denied activity — you'll see the ALLOW with `consensusMatched: false`. Fix by adding a clause the submitter satisfies, e.g. `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1`. See [`managing-policies` → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
+The submitter isn't referenced by any clause in the ALLOW policy's consensus expression, so their auto-vote contributes nothing and the ALLOW never fires. Call `get_policy_evaluations` on the denied activity — you'll see the ALLOW with `consensusMatched: false`. Fix by adding a clause the submitter satisfies, e.g. `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1` (substitute the actual `userTagId` values). See [`managing-policies` → The submitter-in-consensus rule](../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
 
 **App proofs not available**
 The activity must have been created with `generateAppProofs: true`. Proofs are not retroactively generated.

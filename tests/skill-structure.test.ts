@@ -102,7 +102,7 @@ describe("managing-users emergency revocation guidance", () => {
       expect.arrayContaining([
         expect.objectContaining({ type: "regex", pattern: expect.stringContaining("get_user") }),
         expect.objectContaining({ type: "regex", pattern: expect.stringContaining("delete_users") }),
-        expect.objectContaining({ type: "not_contains", value: "delete_api_keys" }),
+        expect.objectContaining({ type: "not_regex", pattern: expect.stringContaining("delete_api_keys") }),
       ]),
     );
   });
@@ -151,12 +151,6 @@ for (const filePath of skillFiles) {
 
       it("description fits on one line (no newlines)", () => {
         expect(parsed.data.description).not.toContain("\n");
-      });
-
-      it("has metadata.version field", () => {
-        expect(parsed.data).toHaveProperty("metadata");
-        expect(parsed.data.metadata).toHaveProperty("version");
-        expect(typeof parsed.data.metadata.version).toBe("string");
       });
     });
 
@@ -261,12 +255,6 @@ describe("SKILL.md (root package manifest)", () => {
       expect(rootParsed.data.description).not.toContain("\n");
     });
 
-    it("has metadata.version field", () => {
-      expect(rootParsed.data).toHaveProperty("metadata");
-      expect(rootParsed.data.metadata).toHaveProperty("version");
-      expect(typeof rootParsed.data.metadata.version).toBe("string");
-    });
-
     it("has metadata.tags field (non-empty string)", () => {
       expect(rootParsed.data).toHaveProperty("metadata");
       expect(rootParsed.data.metadata).toHaveProperty("tags");
@@ -320,6 +308,7 @@ const VALID_ASSERTION_TYPES = [
   "not_contains",
   "order",
   "regex",
+  "not_regex",
   "compiles",
 ] as const;
 

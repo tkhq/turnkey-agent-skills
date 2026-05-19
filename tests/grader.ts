@@ -9,6 +9,7 @@
  *   not_contains — negative substring match
  *   order        — first match of `before` must precede first match of `after`
  *   regex        — full regex match with optional flags
+ *   not_regex    — negative regex match with optional flags
  *   compiles     — type-checks the code with the project's tsconfig
  */
 
@@ -25,6 +26,7 @@ export type Assertion =
   | { type: "not_contains"; value: string }
   | { type: "order"; before: string; after: string }
   | { type: "regex"; pattern?: string; value?: string; flags?: string }
+  | { type: "not_regex"; pattern?: string; value?: string; flags?: string }
   | { type: "compiles" };
 
 export interface Eval {
@@ -241,6 +243,26 @@ function runAssertion(code: string, a: Assertion, filePath?: string): AssertionR
       };
     }
 
+    case "not_regex": {
+      const pattern = a.pattern ?? a.value;
+      if (!pattern) {
+        return {
+          passed: false,
+          assertion: a,
+          message: "not_regex assertion missing 'pattern' (or 'value') field",
+        };
+      }
+      const re = new RegExp(pattern, a.flags);
+      const passed = !re.test(code);
+      return {
+        passed,
+        assertion: a,
+        message: passed
+          ? `does not match /${pattern}/${a.flags ?? ""}`
+          : `should not match /${pattern}/${a.flags ?? ""}`,
+      };
+    }
+
     case "compiles": {
       const result = checkCompiles(code, filePath);
       return {
@@ -272,6 +294,7 @@ export function describeAssertion(a: Assertion): string {
     case "not_contains": return `does not contain "${a.value}"`;
     case "order":        return `${a.before} before ${a.after}`;
     case "regex":        return `matches /${a.pattern ?? a.value ?? "<missing>"}/${a.flags ?? ""}`;
+    case "not_regex":    return `does not match /${a.pattern ?? a.value ?? "<missing>"}/${a.flags ?? ""}`;
     case "compiles":     return `compiles without type errors`;
   }
 }

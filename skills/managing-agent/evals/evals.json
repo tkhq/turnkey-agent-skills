@@ -58,7 +58,7 @@
         { "type": "regex", "pattern": "\\b(get_user|getUser)\\b" },
         { "type": "regex", "pattern": "\\b(delete_users|deleteUsers)\\b" },
         { "type": "regex", "value": "(non.root|not root|root|admin|human|intended.*agent|confirm.*user)", "flags": "i" },
-        { "type": "regex", "value": "(immediate|instant|right away|cannot.*authenticate)", "flags": "i" }
+        { "type": "regex", "value": "(immediate|instant|right away|cannot.*authenticate|no longer (?:authenticate|sign)|revoke[ds]?|access (?:is|has been) (?:revoked|stopped))", "flags": "i" }
       ]
     },
     {

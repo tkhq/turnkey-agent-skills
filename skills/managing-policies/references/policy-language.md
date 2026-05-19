@@ -3,8 +3,8 @@
 ## Example expressions
 
 ```
-# Consensus: any approver with a specific tag
-approvers.any(user, user.tags.contains('finance-approver'))
+# Consensus: any approver carrying a specific tag (compared by tag ID, not name)
+approvers.any(user, user.tags.contains('<FINANCE_APPROVER_TAG_ID>'))
 
 # Condition: allow signing only from a specific wallet, ETH value under 1 ETH
 activity.action == 'SIGN' && wallet.id == '<WALLET_ID>' && eth.tx.value < 1000000000000000000
@@ -51,16 +51,16 @@ Available in the `consensus` field:
 | `approvers` | list\<User> | Users that have approved the activity |
 | `credentials` | list\<Credential> | Credentials used to approve the activity |
 
-> **Submitter-in-consensus rule:** The submitter's auto-vote only counts toward clauses their user ID or tags satisfy. If every clause in `consensus` references tags/IDs the submitter doesn't have, the ALLOW doesn't fire at submit time and the request is implicit-denied instead of going to `CONSENSUS_NEEDED`. When you want an agent-submitted activity to require admin approval, combine clauses: `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('admin')).count() >= 1`. See the managing-policies `SKILL.md` for a full explanation.
+> **Submitter-in-consensus rule:** The submitter's auto-vote only counts toward clauses their user ID or tags satisfy. If every clause in `consensus` references tags/IDs the submitter doesn't have, the ALLOW doesn't fire at submit time and the request is implicit-denied instead of going to `CONSENSUS_NEEDED`. When you want an agent-submitted activity to require admin approval, combine clauses: `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<ADMIN_TAG_ID>')).count() >= 1`. Both `<AGENT_TAG_ID>` and `<ADMIN_TAG_ID>` are `userTagId` values (not `tagName`s) — see the managing-policies `SKILL.md` for a full explanation.
 
 ### User struct
 
-| Field | Type |
-|-------|------|
-| `id` | string |
-| `tags` | list\<string> |
-| `email` | string |
-| `alias` | string |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | string | user UUID |
+| `tags` | list\<string> | list of `userTagId` values assigned to the user. `tagName` is **not** stored here — compare against IDs. |
+| `email` | string | |
+| `alias` | string | |
 
 ### Credential struct
 

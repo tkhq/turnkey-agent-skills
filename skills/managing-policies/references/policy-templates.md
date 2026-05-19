@@ -10,7 +10,7 @@ Starting points for common policy patterns, plus mistakes to avoid. Always scope
 {
   "policyName": "agent-sign-with-wallet",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'"
 }
 ```
@@ -23,7 +23,7 @@ This is the minimum viable ALLOW for an agent. It scopes to signing only, with o
 {
   "policyName": "agent-sign-with-address",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.action == 'SIGN' && wallet_account.address == '<WALLET_ACCOUNT_ADDRESS>'"
 }
 ```
@@ -36,7 +36,7 @@ More granular than `wallet.id` — restricts signing to a single address within 
 {
   "policyName": "agent-eth-allowlist",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && eth.tx.to in ['<ADDR_1>', '<ADDR_2>', '<ADDR_3>']"
 }
 ```
@@ -72,12 +72,12 @@ This denies any ETH transfer above 0.1 ETH (100000000000000000 wei) regardless o
 {
   "policyName": "require-two-traders",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.filter(user, user.tags.contains('trader')).count() >= 2",
+  "consensus": "approvers.filter(user, user.tags.contains('<TRADER_TAG_ID>')).count() >= 2",
   "condition": "activity.action == 'SIGN' && wallet.id == '<WALLET_ID>'"
 }
 ```
 
-This assumes the submitting user is tagged `trader` — their auto-vote then contributes to the count (1 of 2), a second trader approves to reach the threshold, and the activity completes. **If a non-trader would submit this signing request**, the submitter's vote counts toward nothing, consensus stays at 0, and the ALLOW never fires at submit time. In that case add a submitter clause, e.g. `approvers.any(user, user.tags.contains('agent')) && approvers.filter(user, user.tags.contains('trader')).count() >= 2`. See the submitter-in-consensus rule in the main skill.
+This assumes the submitting user carries the trader tag — their auto-vote then contributes to the count (1 of 2), a second trader approves to reach the threshold, and the activity completes. `<TRADER_TAG_ID>` is the `userTagId` returned by `create_user_tag`, **not** the human-readable name. **If a non-trader would submit this signing request**, the submitter's vote counts toward nothing, consensus stays at 0, and the ALLOW never fires at submit time. In that case add a submitter clause, e.g. `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>')) && approvers.filter(user, user.tags.contains('<TRADER_TAG_ID>')).count() >= 2`. See the submitter-in-consensus rule in the main skill.
 
 ### Solana: restrict to a specific program
 
@@ -85,7 +85,7 @@ This assumes the submitting user is tagged `trader` — their auto-vote then con
 {
   "policyName": "agent-solana-system-program-only",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && solana.tx.program_keys.all(p, p == '11111111111111111111111111111111')"
 }
 ```
@@ -96,7 +96,7 @@ This assumes the submitting user is tagged `trader` — their auto-vote then con
 {
   "policyName": "agent-tron-transfer-cap",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tron.tx.contract[0].type == 'TransferContract' && tron.tx.contract[0].amount < 10000000"
 }
 ```
@@ -109,7 +109,7 @@ Amount is in SUN (1 TRX = 1,000,000 SUN). This cap is 10 TRX.
 {
   "policyName": "agent-tempo-approved-contract",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "wallet.id == '<WALLET_ID>' && tempo.tx.calls.all(call, call.to == '<APPROVED_CONTRACT>')"
 }
 ```
@@ -134,7 +134,7 @@ No `consensus` — applies universally. Prevents any user from creating users, m
 {
   "policyName": "agent-managed-eth-only",
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.type == 'ACTIVITY_TYPE_ETH_SEND_TRANSACTION' && wallet.id == '<WALLET_ID>'"
 }
 ```
@@ -160,7 +160,7 @@ Blocks raw payload signing while still permitting `SIGN_TRANSACTION_V2`, `ETH_SE
 ```json
 {
   "effect": "EFFECT_ALLOW",
-  "consensus": "approvers.any(user, user.tags.contains('agent'))",
+  "consensus": "approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))",
   "condition": "activity.action == 'SIGN'"
 }
 ```

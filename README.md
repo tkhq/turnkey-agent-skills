@@ -2,7 +2,8 @@
 
 A collection of AI agent skills for [Turnkey](https://turnkey.com) — the wallet infrastructure platform that manages cryptographic keys in hardware-backed secure enclaves.
 
-These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenClaw**, and **OpenAI** assistants.
+These skills enable AI agents to autonomously create wallets, derive addresses, sign transactions, and authenticate users across multiple blockchains. Compatible with **Claude Code**, **OpenAI**, and other third-party agent frameworks.
+Use of these Skills is subject to Turnkey's Terms of Service. See also: [Shared Responsibility Model](https://docs.turnkey.com/security/shared-responsibility-model#turnkey-shared-responsibility-model).
 
 ## What is Turnkey?
 
@@ -28,14 +29,14 @@ TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
 
-> **⚠️ Security warning — these are root credentials**
+> **⚠️ Security warning — a note on root credentials**
 >
-> A root API key has full access to your Turnkey organization: creating wallets, signing transactions, managing users and policies. It bypasses all policies. Before giving these credentials to an AI agent, consider your use case:
+> The credentials you provide here may belong to a root user or a scoped non-root user. Root users are members of your organization's root quorum — they can execute any action and bypass all policies. Before giving these credentials to an AI agent, consider your use case:
 >
-> - **Interactive assistant** (human approves each action): root credentials can be acceptable for organization administration and testing.
+> - **Interactive assistant** (human approves each action): root credentials may be acceptable for testing — evaluate the risk before using them in production.
 > - **Autonomous agent** (acts without human review): **do not use root credentials.** Create scoped credentials with policies that limit what the agent can do — see [`skills/provisioning-agent/`](skills/provisioning-agent/SKILL.md).
 >
-> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded.
+> LLMs can misinterpret instructions or execute unintended actions. Scoped credentials ensure mistakes are bounded. Turnkey policies are the technical enforcement mechanism.
 
 Get these from the [Turnkey console](https://app.turnkey.com) under **Settings → API Keys**. When you create an API key, you receive a P-256 public/private key pair. The organization ID is visible in the URL and settings page.
 
@@ -160,6 +161,30 @@ npx tsx examples/ethereum-viem.ts
 npx tsx examples/solana-signing.ts
 npx tsx examples/bitcoin-signing.ts
 ```
+
+## Versioning
+
+This repo is versioned as a single bundle using [Semantic Versioning](https://semver.org). The authoritative version lives in `package.json`; release-please keeps `.claude-plugin/plugin.json` in sync via its `extra-files` configuration. See [`CHANGELOG.md`](CHANGELOG.md) for release history.
+
+**SemVer contract for this skill bundle:**
+
+- **Major** — removing or renaming a skill, removing a documented workflow step, or changing required environment variables.
+- **Minor** — adding a new skill, adding a new optional reference, or non-breaking expansions to an existing skill's workflow.
+- **Patch** — wording, formatting, doc fixes, dependency bumps with no behavior change.
+
+**Pinning a release.** Each distribution channel resolves to a git tag, so you can pin to a specific version. Replace `<version>` with a tag from the [GitHub releases page](https://github.com/tkhq/turnkey-agent-skills/releases):
+
+```bash
+# npx
+npx add-skill turnkey/turnkey-agent-skills@v<version>
+
+# Local clone
+git clone --branch v<version> https://github.com/turnkey/turnkey-agent-skills.git
+```
+
+For Claude Code plugin and ClawHub installs, see each tool's docs for how to pin to a tag.
+
+Releases are automated via [release-please](https://github.com/googleapis/release-please) on merges to `main`. Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `feat!:` for breaking) so the bot can compute the next version.
 
 ## Contributing
 

@@ -103,7 +103,6 @@ Skills live directly under `skills/` in a flat layout — no category subdirecto
    license: Apache-2.0
    compatibility: "Runtime requirements and required env vars."
    metadata:
-     version: "1.0.0"
      author: turnkey
      tags: "space separated tags"
    ---
@@ -125,7 +124,34 @@ Skills live directly under `skills/` in a flat layout — no category subdirecto
 
 8. **Register the skill in the root [`SKILL.md`](SKILL.md)** under the appropriate section (Workflows or Primitives) so it's discoverable.
 
-## Project Structure
+## Commit Messages
+
+Every commit on a PR must follow [Conventional Commits](https://www.conventionalcommits.org/). This is enforced in CI; PRs cannot merge until the check passes.
+
+Format:
+
+```
+<type>(<optional-scope>): <subject>
+```
+
+- `<type>` must be one of: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`, `build`, `perf`, `style`, `revert`, `deps`.
+- `<subject>` must start with a lowercase letter and describe the change in the imperative (`add`, not `added`).
+- `<optional-scope>` is freeform; skill directory names are a natural fit (e.g. `managing-wallets`, `signing-transactions`).
+- Append `!` after the type/scope (e.g. `feat!:`) or include `BREAKING CHANGE:` in the body to mark a breaking change.
+
+Examples:
+
+```
+feat(managing-wallets): add multi-address derivation
+fix(signing-transactions): handle empty memo on Solana
+docs: clarify policy quorum semantics
+chore(deps): bump @turnkey/http to 4.2.0
+feat!: drop legacy SKILL.md metadata.version field
+```
+
+Release impact: only `feat` and `fix` (and breaking changes) trigger a version bump and changelog entry — `feat` minor, `fix` patch, breaking major. All other types land silently. See the README for the full release flow.
+
+
 
 ```
 turnkey-agent-skills/

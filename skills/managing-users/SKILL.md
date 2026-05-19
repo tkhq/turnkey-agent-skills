@@ -4,7 +4,6 @@ description: "Manages Turnkey users, API keys, and user tags: create, update, an
 license: Apache-2.0
 compatibility: "Requires Turnkey API credentials (P-256 key pair)."
 metadata:
-  version: "1.0.0"
   author: turnkey
   tags: "users api-keys user-tags authentication identity key-rotation"
 ---
@@ -147,7 +146,7 @@ Agent users should be non-root with a descriptive tag for policy targeting. Crea
 }
 ```
 
-With the tag assigned, you can target this user in policies by the tag's **name**: `approvers.any(user, user.tags.contains('agent'))`. The `userTags` field above uses the tag's **ID**; the policy DSL uses the tag's **name**. They address the same tag object via different fields — see [User tags](#user-tags).
+With the tag assigned, you can target this user in policies by the same tag ID: `approvers.any(user, user.tags.contains('<AGENT_TAG_ID>'))`. Both `userTags` (above) and `user.tags.contains(...)` use the tag's **ID**, not its `tagName` — see [User tags](#user-tags).
 
 ### Update user
 
@@ -286,14 +285,19 @@ See [references/api-key-examples.md](references/api-key-examples.md) for the com
 
 ## User tags
 
-Tags group users for policy targeting. Write policies like `approvers.filter(user, user.tags.contains('trader')).count() >= 2` to require two traders to approve an action.
+Tags group users for policy targeting. To require two traders to approve an action, write a policy whose consensus references the trader tag's **ID**: `approvers.filter(user, user.tags.contains('<TRADER_TAG_ID>')).count() >= 2`.
 
-> **Tag IDs vs. tag names — important.** A tag has two addressable surfaces on the same object:
+> **Tag IDs vs. tag names — both surfaces use IDs.** A tag has a human-readable `tagName` (for dashboards and humans) and a stable `tagId` (a UUID). **Every machine-facing surface uses the ID**, including the policy DSL:
 >
-> - **Wire-level APIs reference tags by ID.** `create_users.userTags`, `list_users` responses (`userTags`), and `update_user.userTagIds` all contain tag IDs (e.g. `tag_abc123`), not names.
-> - **The policy DSL matches tags by name.** Expressions like `user.tags.contains('trader')` compare against the human-readable `tagName`.
+> - **APIs:** `create_users.userTags`, `list_users` responses (`userTags`), and `update_user.userTagIds` all contain tag IDs.
+> - **Policy DSL:** `user.tags.contains('<TAG_ID>')` matches against the IDs stored on the user. The tag's `tagName` is **not** what `user.tags` holds at evaluation time — it's purely a label on the tag object. Passing a name to `contains()` parses fine but never matches at runtime, so the ALLOW silently fails to fire and the activity is implicit-denied.
 >
-> Typical flow: call `create_user_tag` with a `userTagName`, capture the returned `userTagId`, pass that ID into `create_users` / `update_user`, and write policy conditions against the original name.
+> Typical flow:
+> 1. `create_user_tag` with `userTagName: "trader"` → save the returned `userTagId` (e.g. `8f3c1b2e-4a7d-...`).
+> 2. Pass that **ID** into `create_users.userTags` / `update_user.userTagIds`.
+> 3. Reference the **same ID** in policy conditions: `user.tags.contains('8f3c1b2e-4a7d-...')`.
+>
+> Treat the `userTagId` as the canonical handle; the name exists only for human readability.
 
 ### List user tags
 
@@ -306,6 +310,24 @@ POST /public/v1/query/list_user_tags
   "organizationId": "<ORG_ID>"
 }
 ```
+
+**Response:**
+
+```json
+{
+  "userTags": [
+    {
+      "tagId": "<TAG_ID>",
+      "tagName": "trader",
+      "tagType": "TAG_TYPE_USER",
+      "createdAt": { "seconds": "...", "nanos": "..." },
+      "updatedAt": { "seconds": "...", "nanos": "..." }
+    }
+  ]
+}
+```
+
+> **Field renaming on read.** Write surfaces use `userTagId`/`userTagName`, but `list_user_tags` returns each tag as `{ tagId, tagName, ... }` — the wire schema is shared with private-key tags, so it drops the `user` prefix. Read with `tag.tagId`; pass that same value as `userTagId` to write endpoints (`update_user_tag`, `create_users.userTags`, etc.).
 
 ### Create a user tag
 

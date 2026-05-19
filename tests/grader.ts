@@ -253,7 +253,7 @@ function runAssertion(code: string, a: Assertion, filePath?: string): AssertionR
         };
       }
       const re = new RegExp(pattern, a.flags);
-      const passed = !re.test(code);
+      const passed = !re.test(code); // nosemgrep: ajinabraham.njsscan.dos.regex_dos.regex_dos -- pattern comes from developer-authored YAML fixtures, not user input
       return {
         passed,
         assertion: a,

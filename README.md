@@ -47,7 +47,7 @@ Each skill is a `SKILL.md` file — a structured prompt that teaches an AI agent
 Clone the repo and point your assistant at the folder. This works with any AI assistant that can read files (Cursor, Cline, Windsurf, Aider, ChatGPT with file upload, etc.):
 
 ```bash
-git clone https://github.com/turnkey/turnkey-agent-skills.git
+git clone https://github.com/tkhq/turnkey-agent-skills.git
 cd turnkey-agent-skills
 ```
 
@@ -126,14 +126,9 @@ This repo is versioned as a single bundle using [Semantic Versioning](https://se
 **Pinning a release.** Each distribution channel resolves to a git tag, so you can pin to a specific version. Replace `<version>` with a tag from the [GitHub releases page](https://github.com/tkhq/turnkey-agent-skills/releases):
 
 ```bash
-# npx
-npx add-skill turnkey/turnkey-agent-skills@v<version>
-
 # Local clone
-git clone --branch v<version> https://github.com/turnkey/turnkey-agent-skills.git
+git clone --branch v<version> https://github.com/tkhq/turnkey-agent-skills.git
 ```
-
-For Claude Code plugin and ClawHub installs, see each tool's docs for how to pin to a tag.
 
 Releases are automated via [release-please](https://github.com/googleapis/release-please) on merges to `main`. Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `feat!:` for breaking) so the bot can compute the next version.
 

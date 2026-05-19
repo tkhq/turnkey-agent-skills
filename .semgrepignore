@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+vendor/
+**/vendor/**
+
+# Build output
+dist/
+build/
+out/
+target/
+*.min.js
+*.bundle.js
+
+# Generated code
+**/generated/**
+**/*.gen.go
+**/*.pb.go
+**/*.pb.ts
+src/gen/**
+
+# Test fixtures and snapshots
+**/__fixtures__/**
+**/__snapshots__/**
+**/testdata/**
+**/*.snap
+
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+Cargo.lock
+go.sum
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Coverage
+coverage/
+.nyc_output/

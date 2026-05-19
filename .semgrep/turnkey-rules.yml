@@ -1,0 +1,123 @@
+rules:
+  # ---------------------------------------------------------------
+  # 1. Hardcoded API keys / secrets
+  # ---------------------------------------------------------------
+  - id: turnkey-no-hardcoded-api-key
+    pattern-either:
+      - pattern: |
+          $X = "tk-..."
+      - pattern: |
+          const $X = "tk-..."
+      - pattern: |
+          let $X = "tk-..."
+    message: >-
+      Possible hardcoded Turnkey API key. Load from environment / SOPS-encrypted
+      secrets, never commit the literal value.
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: turnkey-no-hardcoded-private-key
+    pattern-regex: '-----BEGIN (EC |RSA |OPENSSH |PGP |)PRIVATE KEY-----'
+    message: >-
+      A PEM-encoded private key appears to be hardcoded in source. Remove it
+      and load from a secrets manager (KMS, SOPS, HSM).
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - "**/*test*"
+        - "**/__fixtures__/**"
+        - "**/testdata/**"
+
+  # ---------------------------------------------------------------
+  # 2. Logging sensitive material
+  # ---------------------------------------------------------------
+  - id: turnkey-no-log-secret-fields
+    pattern-either:
+      - pattern: console.log(..., $OBJ.apiKey, ...)
+      - pattern: console.log(..., $OBJ.privateKey, ...)
+      - pattern: console.log(..., $OBJ.secret, ...)
+      - pattern: console.log(..., $OBJ.mnemonic, ...)
+      - pattern: console.log(..., $OBJ.seed, ...)
+      - pattern: console.error(..., $OBJ.apiKey, ...)
+      - pattern: console.error(..., $OBJ.privateKey, ...)
+    message: >-
+      Do not log fields named apiKey, privateKey, secret, mnemonic, or seed.
+      Redact before logging.
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  - id: turnkey-no-log-whole-request-body
+    pattern-either:
+      - pattern: console.log($REQ.body)
+      - pattern: console.log(..., $REQ.body, ...)
+    message: >-
+      Avoid logging entire request bodies — they may contain signing material
+      or PII. Log a redacted summary instead.
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # ---------------------------------------------------------------
+  # 3. Insecure crypto / RNG
+  # ---------------------------------------------------------------
+  - id: turnkey-no-math-random-for-crypto
+    pattern: Math.random()
+    message: >-
+      Math.random() is NOT cryptographically secure. Use crypto.randomBytes()
+      / crypto.getRandomValues() / @noble/hashes for any security-sensitive
+      randomness (nonces, IDs, tokens, keys).
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  - id: turnkey-no-weak-hash
+    pattern-either:
+      - pattern: crypto.createHash("md5")
+      - pattern: crypto.createHash("sha1")
+    message: >-
+      MD5 and SHA-1 are broken. Use SHA-256 or SHA-3.
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # ---------------------------------------------------------------
+  # 4. Non-constant-time comparison of secrets
+  # ---------------------------------------------------------------
+  - id: turnkey-use-timing-safe-equal
+    pattern-either:
+      - pattern: $A.signature === $B
+      - pattern: $A.hmac === $B
+      - pattern: $A.token === $B
+      - pattern: $B === $A.signature
+      - pattern: $B === $A.hmac
+      - pattern: $B === $A.token
+    message: >-
+      Use crypto.timingSafeEqual() to compare signatures, HMACs, or tokens.
+      `===` leaks timing information.
+    severity: WARNING
+    languages: [javascript, typescript]
+
+  # ---------------------------------------------------------------
+  # 5. Code-execution sinks
+  # ---------------------------------------------------------------
+  - id: turnkey-no-eval
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+    message: >-
+      eval() and `new Function()` enable code injection. Refactor to avoid
+      dynamic code evaluation.
+    severity: ERROR
+    languages: [javascript, typescript]
+
+  # ---------------------------------------------------------------
+  # 6. Disabling TLS verification
+  # ---------------------------------------------------------------
+  - id: turnkey-no-disable-tls-verify
+    pattern-either:
+      - pattern: |
+          $X.rejectUnauthorized = false
+      - pattern: |
+          { ..., rejectUnauthorized: false, ... }
+    message: >-
+      Do not disable TLS certificate verification.
+    severity: ERROR
+    languages: [javascript, typescript]

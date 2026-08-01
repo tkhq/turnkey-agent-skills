@@ -23,7 +23,8 @@ Use this skill when driving the `tvc` CLI: building or shipping a TVC deployment
 Turnkey Verifiable Cloud (TVC) runs your container inside a verifiable enclave. The `tvc` CLI is the interface for provisioning operators, creating apps, and shipping deployments. The full lifecycle from an empty directory to a live deployment is:
 
 ```
-operator create → app init → (edit) → app create → deploy init → (edit) → deploy create → deploy approve → app set-live-deploy → poll deploy get-status
+operator create → app init → (edit) → app create → deploy init → (edit) → deploy create → deploy approve → poll deploy get-status
+# (the first deployment auto-goes-live on approval; app set-live-deploy is only for switching to a new version)
 ```
 
 | What you want to do | Command(s) |
@@ -33,7 +34,7 @@ operator create → app init → (edit) → app create → deploy init → (edit
 | Scaffold + create an app | `tvc app init` → edit → `tvc app create` |
 | Scaffold + create a deployment | `tvc deploy init` → edit → `tvc deploy create` |
 | Approve a deployment's manifest | `tvc deploy approve` |
-| Make a deployment live | `tvc app set-live-deploy` |
+| Switch traffic to a new deployment | `tvc app set-live-deploy` (the first deployment auto-targets on approval) |
 | Check if a deployment is live | `tvc deploy get-status` (poll) |
 | Inspect an app / list apps | `tvc app status`, `tvc app list` |
 | Tail logs (debug-mode deploys) | `tvc deploy debug-logs` |
@@ -80,8 +81,8 @@ Summarized here; full commands and outputs in **[references/deploy-lifecycle.md]
 2. `tvc app init --output app.json` → edit the scaffolded `app.json` (fill the `<FILL_IN_*>` sentinels) → `tvc app create --config-file app.json --message-format json` → `app_created` (save `appId`)
 3. `tvc deploy init --output deploy.json` → edit `deploy.json` (pivot image, ports) → `tvc deploy create --config-file deploy.json --app-id <APP_ID> --message-format json` → `deployment_created` (save `deploymentId`)
 4. `tvc deploy approve --deploy-id <DEPLOY_ID> --operator-id <OPERATOR_ID> --dangerous-skip-interactive --message-format json` → `manifest_approval_posted`
-5. `tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json` → `live_deployment_set`
-6. Poll `tvc deploy get-status --deploy-id <DEPLOY_ID> --message-format json` until live (see the polling rule below)
+5. Poll `tvc deploy get-status --deploy-id <DEPLOY_ID> --message-format json` until it returns state, then read `isTargeted`. The **first** deployment of an app auto-targets once approval quorum is reached, so `isTargeted` is already `true` and no set-live call is needed.
+6. **Only if `isTargeted == false`** (switching traffic to a new deployment while an older one is live): `tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json`, then poll again. Live == `isTargeted == true` && `replicas.ready == replicas.desired` (see the polling rule below).
 
 Config-file shapes and the scaffold-then-edit pattern are in **[references/config-files.md](references/config-files.md)**.
 
@@ -97,7 +98,7 @@ Config-file shapes and the scaffold-then-edit pattern are in **[references/confi
 
 1. **Always pass `--message-format json`** for programmatic use. It gives you NDJSON and guarantees non-interactive behavior (no hangs).
 2. **`deploy approve` requires `--dangerous-skip-interactive` in JSON/non-interactive mode.** There is no machine-readable manifest review yet, so non-interactive approval is unavoidably blind. Only approve deployments you created and whose inputs (`appId`, image, digest) you control. Surface this to the human when it matters.
-3. **"Is it live?" is a manual poll.** There is no `--wait` or lifecycle-phase field. Poll `tvc deploy get-status`; a deployment is live when `isTargeted == true` and `replicas.ready == replicas.desired`. `replicas` is `null` when the deployment is not yet present in app status, treat that as "not ready yet," not an error. Back off between polls (e.g. 5s) with an overall timeout.
+3. **"Is it live?" is a manual poll, and set-live is conditional.** There is no `--wait` or lifecycle-phase field. After approve, poll `tvc deploy get-status`; a deployment is live when `isTargeted == true` and `replicas.ready == replicas.desired`. The **first** deployment of an app auto-targets on approval, so do not call `app set-live-deploy` for it, calling set-live on an already-targeted deployment fails with `api_error` (HTTP 400) "already set as the live deployment". Only call `set-live-deploy` when `isTargeted == false` (cutting traffic over to a new deployment). Right after approval, `get-status` may return `replicas: null` or even a 404 `not_found` ("app status not found"), both mean "not ready yet," not a real failure, keep polling. Back off between polls (e.g. 5s) with an overall timeout.
 4. **Destructive commands have no undo except where noted.** `tvc app delete` removes the app **and all its deployments**. `tvc deploy delete` can be reversed with `tvc deploy restore`; `app delete` cannot. Confirm the exact `--app-id` / `--deploy-id` before running, and require explicit human confirmation for deletes.
 5. **Branch on `code`, never on `message` text.** Error messages carry the full server chain and will change; the `code` is the stable contract.
 6. **Bound every streaming command.** `deploy debug-logs --poll` runs until killed. Always wrap with a timeout or use `--tail-lines` for a one-shot read.

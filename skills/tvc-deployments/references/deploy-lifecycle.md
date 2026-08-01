@@ -72,29 +72,30 @@ tvc deploy approve \
 - You can approve by manifest file instead of deploy id: `--manifest <PATH>` (mutually exclusive with `--deploy-id`).
 - `--dry-run` validates without posting; `--approval-out <PATH>` / `-o` writes the approval artifact.
 
-## 5. Set the deployment live
+## 5. Confirm live (set live only if switching versions)
 
-```bash
-tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json
-```
+The **first** deployment of an app auto-targets once approval quorum is reached, there is no separate "go live" step for it. So check status first; only call `set-live-deploy` when you are switching traffic to a new deployment while an older one is already live.
 
-Outcome `reason: live_deployment_set`, with `activityId` and `activityStatus` (e.g. `ACTIVITY_STATUS_COMPLETED`). This targets traffic at the deployment.
-
-## 6. Confirm it is live (manual poll)
-
-There is no `--wait`. Poll:
+Poll status (there is no `--wait`):
 
 ```bash
 tvc deploy get-status --deploy-id <DEPLOY_ID> --message-format json   # reason: deployment_runtime_status
 ```
 
-Liveness criteria:
-- `isTargeted == true` (this is the live/targeted deployment), and
-- `replicas.ready == replicas.desired`.
+Right after approval this may return `replicas: null`, or even a 404 `not_found` ("app status not found"), both mean "no state yet, not ready", keep polling. Once it returns state, read `isTargeted`:
 
-`replicas` is `null` when the deployment is not yet present in app status, treat that as "not ready yet," keep polling. A reasonable loop: poll every 5s, give up after a timeout (e.g. 5 min), and report the last status.
+- **`isTargeted == true`** → this deployment is receiving traffic. It is live once `replicas.ready == replicas.desired`. First deployments land here with no set-live call.
+- **`isTargeted == false`** → it is not receiving traffic (an older deployment is still live). Switch traffic to it:
 
-For the app-wide view use `tvc app status --app-id <APP_ID> --message-format json` (`reason: app_status`). Note `tvc deploy status --deploy-id <ID>` (`reason: deployment_status`) returns config-level info (manifest id, QOS version, debug-mode, marked-for-deletion) but **not** replica readiness, use `get-status` for liveness.
+  ```bash
+  tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json   # reason: live_deployment_set
+  ```
+
+  then poll `get-status` again until `isTargeted == true` && `replicas.ready == replicas.desired`.
+
+Do **not** call `set-live-deploy` on a deployment that is already targeted, it fails with `api_error` (HTTP 400) "already set as the live deployment". Gating on `isTargeted == false` avoids that.
+
+A reasonable loop: poll every 5s, give up after a timeout (e.g. 5 min), report the last status. For the app-wide view use `tvc app status --app-id <APP_ID> --message-format json` (`reason: app_status`); its `targetedDeploymentId` should equal your deployment id. Note `tvc deploy status --deploy-id <ID>` (`reason: deployment_status`) returns config-level info (manifest id, QOS version, debug-mode, marked-for-deletion) but **not** replica readiness, use `get-status` for liveness.
 
 ## Provisioning variant (local/self-hosted operator key)
 

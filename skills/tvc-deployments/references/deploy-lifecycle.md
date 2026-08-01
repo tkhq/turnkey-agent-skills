@@ -97,6 +97,22 @@ Do **not** call `set-live-deploy` on a deployment that is already targeted, it f
 
 A reasonable loop: poll every 5s, give up after a timeout (e.g. 5 min), report the last status. For the app-wide view use `tvc app status --app-id <APP_ID> --message-format json` (`reason: app_status`); its `targetedDeploymentId` should equal your deployment id. Note `tvc deploy status --deploy-id <ID>` (`reason: deployment_status`) returns config-level info (manifest id, QOS version, debug-mode, marked-for-deletion) but **not** replica readiness, use `get-status` for liveness.
 
+## 6. Verify the app is serving
+
+Once the deployment is live, the app is reachable at a fixed hostname derived from the app id:
+
+```
+https://app-<APP_ID>.turnkey.cloud
+```
+
+Substitute your `appId`. The CLI does **not** return this URL in any command output, it always follows this convention. If the app exposes an HTTP health endpoint, check it:
+
+```bash
+curl https://app-<APP_ID>.turnkey.cloud/health
+```
+
+The exact path and response are app-specific (a typical one returns `{"status":"ok"}`).
+
 ## Provisioning variant (local/self-hosted operator key)
 
 The hosted path above lets Turnkey hold the operator quorum key. For the self-provisioned variant, these commands are the building blocks (not needed for the minimal hosted happy path):

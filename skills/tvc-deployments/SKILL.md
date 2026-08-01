@@ -84,6 +84,8 @@ Summarized here; full commands and outputs in **[references/deploy-lifecycle.md]
 5. Poll `tvc deploy get-status --deploy-id <DEPLOY_ID> --message-format json` until it returns state, then read `isTargeted`. The **first** deployment of an app auto-targets once approval quorum is reached, so `isTargeted` is already `true` and no set-live call is needed.
 6. **Only if `isTargeted == false`** (switching traffic to a new deployment while an older one is live): `tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json`, then poll again. Live == `isTargeted == true` && `replicas.ready == replicas.desired` (see the polling rule below).
 
+Once live, the app is reachable at `https://app-<APP_ID>.turnkey.cloud` (substitute your `appId`). The CLI does not return this URL in any command output, it follows this fixed convention, use it to hit the app's health endpoint (e.g. `curl https://app-<APP_ID>.turnkey.cloud/health`; the exact path/response is app-specific).
+
 Config-file shapes and the scaffold-then-edit pattern are in **[references/config-files.md](references/config-files.md)**.
 
 ### Maintain an established project

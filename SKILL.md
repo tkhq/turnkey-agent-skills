@@ -33,6 +33,7 @@ Wallet infrastructure skills for [Turnkey](https://turnkey.com). Private keys li
 | Getting Started | `skills/getting-started/SKILL.md` | new to Turnkey, verifying credentials, creating first wallet |
 | Provisioning Agent | `skills/provisioning-agent/SKILL.md` | giving an agent a scoped wallet with constrained credentials |
 | Managing Agent | `skills/managing-agent/SKILL.md` | debugging denied transactions, changing agent policies, key rotation, revocation |
+| TVC Deployments | `skills/tvc-deployments/SKILL.md` | building, deploying, and maintaining Turnkey Verifiable Cloud apps via the `tvc` CLI |
 
 ## Environment Variables
 

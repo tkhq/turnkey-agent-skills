@@ -91,7 +91,8 @@ Config-file shapes and the scaffold-then-edit pattern are in **[references/confi
 ### Maintain an established project
 
 - **Find your app:** `tvc app list --message-format json` (optionally `-n <name>`, a substring match) → `apps_listed`. `tvc app status --app-id <APP_ID>` → `app_status` for the app-wide view.
-- **Inspect a deployment:** `tvc deploy get-status --deploy-id <ID>` for runtime readiness (`deployment_runtime_status`); `tvc deploy status --deploy-id <ID>` for config-level info like manifest id, QOS version, debug-mode, marked-for-deletion (`deployment_status`).
+- **Enumerate an app's deployments:** `tvc app status --app-id <APP_ID>` → `app_status`, whose `deployments[]` array gives `deploymentId` and `replicas{ready,desired}` for each, with `targetedDeploymentId` naming the live one. This is the only way to list deployments; ids are returned bare (the CLI strips the API's `deploy` prefix).
+- **Inspect a deployment:** `tvc deploy get-status --deploy-id <ID>` for one deployment's runtime readiness (`deployment_runtime_status`); `tvc deploy status --deploy-id <ID>` for config-level info like manifest id, QOS version, debug-mode, marked-for-deletion (`deployment_status`).
 - **Debug a deployment** (must be deployed in debug mode): `tvc deploy debug-logs --deploy-id <ID> --tail-lines 200 --message-format json`. Add `--poll` to stream; it never self-terminates, so always bound it with a timeout wrapper.
 - **Ship a new version:** create a new deployment (`deploy create`), approve it, then `app set-live-deploy` to cut traffic over. Use `deploy init --from-deployment <OLD_ID>` to base the new config on an existing deployment.
 - **Roll back / clean up:** `tvc deploy restore --deploy-id <ID>` undoes a `deploy delete`. `tvc deploy delete` and `tvc app delete` are destructive (see Rules).
@@ -109,7 +110,7 @@ Config-file shapes and the scaffold-then-edit pattern are in **[references/confi
 
 Do not assume these exist, they do not, and inventing them will fail:
 
-- **No `tvc deploy list`.** You cannot enumerate deployments; track `deploymentId` values yourself when you create them. The closest substitute is `app list`, whose per-app entry carries `liveDeploymentId` (null when nothing is live) alongside `id`, `name`, `quorumPublicKey`, `egressEnabled`, `debugModeDeploymentsEnabled`, and `publicDomain`. That recovers the *live* deployment id for an app you have lost track of, but not the non-live ones.
+- **No `tvc deploy list` subcommand**, but deployments *are* enumerable per app: `tvc app status --app-id <APP_ID>` returns a `deployments[]` array of `{deploymentId, replicas{ready,desired}, lastUpdated}` plus `targetedDeploymentId`. Use it to recover deployment ids you no longer have. Caveat: that array reflects runtime state, so a freshly created deployment that has not been approved yet may not appear in it. Still save `deploymentId` at create time. `app list` is the app-level view and carries only `liveDeploymentId`, which is by definition already approved.
 - **No `tvc operator list`** and **no `tvc whoami`.** Save `operatorId` at creation time.
 - **No `--wait` / phase flag.** Poll `deploy get-status` (Rule 3).
 - **No `--version` flag.** Use the `tvc version` subcommand instead.

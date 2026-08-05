@@ -99,19 +99,53 @@ A reasonable loop: poll every 5s, give up after a timeout (e.g. 5 min), report t
 
 ## 6. Verify the app is serving
 
-Once the deployment is live, the app is reachable at a fixed hostname derived from the app id:
-
-```
-https://app-<APP_ID>.turnkey.cloud
-```
-
-Substitute your `appId`. The CLI does **not** return this URL in any command output, it always follows this convention. If the app exposes an HTTP health endpoint, check it:
+Once the deployment is live, ask the CLI for the app's hostname instead of assuming it:
 
 ```bash
-curl https://app-<APP_ID>.turnkey.cloud/health
+tvc app list --message-format json
 ```
 
-The exact path and response are app-specific (a typical one returns `{"status":"ok"}`).
+`app list` has no `--app-id` filter (its only filter is `-n/--name`, a substring match), and `app status` does **not** return the domain, so select your app out of the list by `id`. Each entry in the `apps_listed` line carries a `publicDomain` field:
+
+```json
+{
+  "reason": "apps_listed",
+  "apps": [
+    {
+      "id": "<APP_ID>",
+      "name": "Little App",
+      "quorumPublicKey": "04cdff...",
+      "liveDeploymentId": "<DEPLOY_ID>",
+      "egressEnabled": false,
+      "debugModeDeploymentsEnabled": false,
+      "publicDomain": "app-<APP_ID>.turnkey.cloud"
+    }
+  ]
+}
+```
+
+**Read `publicDomain`; do not construct it.** The key is omitted from the JSON whenever its value is the empty string, and empty is the only "absent" signal the API has (the wire type is a non-optional string, so there is no null and no way to tell unset from empty). Treat a missing key as "no domain available right now" rather than an error.
+
+What empty *means* is not firmly established: the CLI documents it as "the app has no public domain configured," but it has not been confirmed whether it can also be empty transiently while a new app's domain is still being provisioned. If you get an empty value on an app you expect to have a domain, poll `app list` again before concluding it has none. As a last resort the hosted domain currently follows an `app-<APP_ID>.turnkey.cloud` convention, but prefer the returned value.
+
+If the app exposes an HTTP health endpoint, check it:
+
+```bash
+DOMAIN=$(tvc app list --message-format json \
+  | jq -r --arg id "<APP_ID>" '.apps[] | select(.id == $id) | .publicDomain // empty')
+curl "https://$DOMAIN/health"
+```
+
+**Do not assert on the response body.** TVC judges liveness by the HTTP status, so a `200` is what matters; the body is app-defined. Treat a non-200 as unhealthy and read the body only for human diagnosis.
+
+The probe is configured on the deployment:
+
+| Field | Values | Default | Also settable via |
+|---|---|---|---|
+| `healthCheckType` | `TVC_HEALTH_CHECK_TYPE_HTTP`, `TVC_HEALTH_CHECK_TYPE_GRPC` | `..._HTTP` | config file only, no flag or env var |
+| `healthCheckPort` | any `u16`, must be the port your app listens on | `3000` | `--health-check-port`, `TVC_HEALTH_CHECK_PORT` |
+
+There is no health-check *path* field, so `/health` is a platform convention rather than something you choose. A deployment whose `healthCheckPort` does not match the port the pivot actually binds will never pass its probe, which looks identical to an app that failed to start.
 
 ## Provisioning variant (local/self-hosted operator key)
 

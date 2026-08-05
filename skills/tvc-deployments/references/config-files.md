@@ -23,7 +23,7 @@ tvc deploy init --output deploy.json         # reason: deployment_config_created
 tvc deploy create --config-file deploy.json --app-id <APP_ID> --message-format json
 ```
 
-Every deploy field also has a CLI flag / env var; flags override the file. The knobs:
+Almost every deploy field also has a CLI flag / env var; flags override the file. The one exception is `healthCheckType`, which can only be set in the config file. The knobs:
 
 | Flag | Env | Meaning |
 |---|---|---|
@@ -34,6 +34,7 @@ Every deploy field also has a CLI flag / env var; flags override the file. The k
 | `--pivot-args` | `TVC_PIVOT_ARGS` | Args passed to the pivot (repeatable) |
 | `--qos-version` | `TVC_QOS_VERSION` | QOS version to run |
 | `--health-check-port` | `TVC_HEALTH_CHECK_PORT` | Port the health check probes |
+| *(none)* | *(none)* | `healthCheckType` is config-file only: `TVC_HEALTH_CHECK_TYPE_HTTP` (default) or `TVC_HEALTH_CHECK_TYPE_GRPC`. There is no flag and no env var, so it must be set in `deploy.json`. |
 | `--public-ingress-port` | `TVC_PUBLIC_INGRESS_PORT` | Public ingress port |
 | `--pivot-pull-secret` | `TVC_PIVOT_PULL_SECRET` | Pull secret for a private image |
 | `--dangerous-deploy-debug-mode` | `TVC_DANGEROUS_DEPLOY_DEBUG_MODE` | Debug-mode deploy (logs tailable; never for prod) |

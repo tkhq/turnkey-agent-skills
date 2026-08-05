@@ -8,13 +8,13 @@
       "files": ["skills/tvc-deployments/references/deploy-lifecycle.md"],
       "assertions": [
         { "type": "contains", "value": "--message-format json" },
-        { "type": "contains", "value": "deploy approve" },
+        { "type": "regex", "value": "deploy[\"'\\s,]+approve", "comment": "tolerates both shell form (deploy approve) and argv arrays (\"deploy\", \"approve\")" },
         { "type": "contains", "value": "--dangerous-skip-interactive" },
         { "type": "contains", "value": "set-live-deploy" },
         { "type": "regex", "value": "deploy get-status|get-status" },
         {
           "type": "not_regex",
-          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
+          "pattern": "^\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
           "flags": "m",
           "comment": "Must not INVOKE `tvc deploy list` (it does not exist). Matches only command position, so correctly saying 'there is no deploy list' still passes."
         }
@@ -31,7 +31,7 @@
         { "type": "regex", "value": "replicas" },
         {
           "type": "not_regex",
-          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s[^\\n]*--wait\\b",
+          "pattern": "^\\s*\\$?\\s*tvc\\s[^\\n]*--wait\\b",
           "flags": "m",
           "comment": "Must not USE a --wait flag on a tvc command (there is none). Correctly stating 'there is no --wait flag' still passes."
         }
@@ -43,12 +43,12 @@
       "expected_output": "Points at `tvc app status --app-id <APP_ID>`, whose `deployments[]` array enumerates the app's deployments, and uses `targetedDeploymentId` to identify the already-live one (which needs no approval). There is no `tvc deploy list` subcommand. Notes that deployment IDs should still be saved at create time, since the status array reflects runtime state and a freshly created, unapproved deployment may not appear in it.",
       "files": ["skills/tvc-deployments/SKILL.md"],
       "assertions": [
-        { "type": "contains", "value": "app status" },
+        { "type": "regex", "value": "app[\"'\\s,]+status", "comment": "tolerates both shell form and argv arrays" },
         { "type": "regex", "value": "deployments" },
         { "type": "regex", "value": "targetedDeploymentId", "comment": "must distinguish the already-live deployment, since a live one is by definition already approved" },
         {
           "type": "not_regex",
-          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
+          "pattern": "^\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
           "flags": "m",
           "comment": "Secondary guard: must not INVOKE the nonexistent command. Naming it to deny it exists is fine, which is why this matches command position rather than a substring."
         }
@@ -83,7 +83,7 @@
       "files": ["skills/tvc-deployments/references/deploy-lifecycle.md"],
       "assertions": [
         { "type": "regex", "value": "--from-deployment|deploy init" },
-        { "type": "contains", "value": "deploy create" },
+        { "type": "regex", "value": "deploy[\"'\\s,]+create", "comment": "tolerates both shell form and argv arrays" },
         { "type": "contains", "value": "set-live-deploy" }
       ]
     },

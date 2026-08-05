@@ -12,7 +12,12 @@
         { "type": "contains", "value": "--dangerous-skip-interactive" },
         { "type": "contains", "value": "set-live-deploy" },
         { "type": "regex", "value": "deploy get-status|get-status" },
-        { "type": "not_contains", "value": "deploy list" }
+        {
+          "type": "not_regex",
+          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
+          "flags": "m",
+          "comment": "Must not INVOKE `tvc deploy list` (it does not exist). Matches only command position, so correctly saying 'there is no deploy list' still passes."
+        }
       ]
     },
     {
@@ -24,17 +29,29 @@
         { "type": "contains", "value": "get-status" },
         { "type": "contains", "value": "isTargeted" },
         { "type": "regex", "value": "replicas" },
-        { "type": "not_contains", "value": "--wait" }
+        {
+          "type": "not_regex",
+          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s[^\\n]*--wait\\b",
+          "flags": "m",
+          "comment": "Must not USE a --wait flag on a tvc command (there is none). Correctly stating 'there is no --wait flag' still passes."
+        }
       ]
     },
     {
       "id": 3,
       "prompt": "List all my TVC deployments with the tvc CLI so I can pick one to approve.",
-      "expected_output": "Explains there is no `tvc deploy list` command; you must track deploymentId values yourself. Does not invent a list command.",
+      "expected_output": "Points at `tvc app status --app-id <APP_ID>`, whose `deployments[]` array enumerates the app's deployments, and uses `targetedDeploymentId` to identify the already-live one (which needs no approval). There is no `tvc deploy list` subcommand. Notes that deployment IDs should still be saved at create time, since the status array reflects runtime state and a freshly created, unapproved deployment may not appear in it.",
       "files": ["skills/tvc-deployments/SKILL.md"],
       "assertions": [
-        { "type": "not_contains", "value": "tvc deploy list" },
-        { "type": "regex", "value": "no .{0,20}deploy list|does not exist|track .{0,20}deploymentId|save" }
+        { "type": "contains", "value": "app status" },
+        { "type": "regex", "value": "deployments" },
+        { "type": "regex", "value": "targetedDeploymentId", "comment": "must distinguish the already-live deployment, since a live one is by definition already approved" },
+        {
+          "type": "not_regex",
+          "pattern": "(?:^|[\"'`])\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b",
+          "flags": "m",
+          "comment": "Secondary guard: must not INVOKE the nonexistent command. Naming it to deny it exists is fine, which is why this matches command position rather than a substring."
+        }
       ]
     },
     {

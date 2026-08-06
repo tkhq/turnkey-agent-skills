@@ -3,14 +3,15 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Using the tvc CLI, deploy my TVC app end to end from these config files and make it live. I'm scripting this, no prompts.",
-      "expected_output": "Runs the CLI in JSON/non-interactive mode with --message-format json, follows operator create -> app create -> deploy create -> deploy approve -> app set-live-deploy -> poll deploy get-status, and passes --dangerous-skip-interactive to approve",
+      "prompt": "I need to ship a TVC app end to end with the tvc CLI, from creating the app through to confirming it is serving traffic. This runs unattended in CI, so nothing can prompt for input.",
+      "expected_output": "Runs the CLI with --message-format json (which also puts it in non-interactive mode), follows operator create -> app create -> deploy create -> deploy approve -> poll deploy get-status, and passes --dangerous-skip-interactive to approve since non-interactive mode requires it. Treats set-live-deploy as conditional on isTargeted, because the first deployment auto-targets on approval.",
       "files": ["skills/tvc-deployments/references/deploy-lifecycle.md"],
       "assertions": [
         { "type": "contains", "value": "--message-format json" },
         { "type": "regex", "value": "deploy[\"'\\s,]+approve", "comment": "tolerates both shell form (deploy approve) and argv arrays (\"deploy\", \"approve\")" },
         { "type": "contains", "value": "--dangerous-skip-interactive" },
         { "type": "contains", "value": "set-live-deploy" },
+        { "type": "regex", "value": "isTargeted", "comment": "set-live-deploy must be conditional: the first deployment auto-targets on approval, and calling it on an already-targeted deployment fails with HTTP 400" },
         { "type": "regex", "value": "deploy get-status|get-status" },
         {
           "type": "not_regex",

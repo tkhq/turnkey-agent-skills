@@ -45,9 +45,34 @@ Seed a new deployment's config from an existing one:
 tvc deploy init --output deploy.json --from-deployment <OLD_DEPLOY_ID>
 ```
 
-## Computing the expected pivot digest
+## The two digests, which are different fields
 
-`--expected-pivot-digest` pins the pivot binary's integrity. Today there is no CLI helper to compute it (the audit tracks exposing `validate-container-image`), so it is derived out of band from the built image (e.g. `docker create` + `docker cp` the pivot path, then `sha256sum`). Get the `linux/amd64` image digest with `docker buildx imagetools inspect`. A wrong digest is only caught at deploy time, double-check it.
+A deployment pins **two** separate sha256 values. Conflating them yields a config that looks correct and fails at deploy time.
+
+| Field | Hashes | Obtained from |
+|---|---|---|
+| the `@sha256:` in `pivotContainerImageUrl` | the **container image manifest** | the registry, after you push |
+| `expectedPivotDigest` | the **pivot binary** inside that image | extract the binary at `pivotPath`, then sha256 it |
+
+The CLI computes neither for you, so both are derived out of band. A wrong `expectedPivotDigest` is only caught at deploy time; nothing local validates it.
+
+### What the image has to satisfy
+
+These are requirements, not a toolchain recommendation:
+
+- A **`linux/amd64` OCI image** (the enclave runtime requires that architecture), in a registry TVC can pull from.
+- **Referenced by digest, not by tag alone.** Tags are mutable, and pinning is the point of a verifiable deployment.
+- **One digest to pin.** If your build publishes a multi-arch index, you must select the `linux/amd64` child manifest rather than the index digest. Builders often have flags to suppress the index and attestation layers so there is exactly one.
+- If the registry is private, supply a pull secret (`pivotContainerEncryptedPullSecret` / `--pivot-pull-secret`); if it is public, remove that placeholder from the scaffold entirely.
+
+### Getting the values
+
+Any OCI-compatible tooling works. Common choices, none required:
+
+- **Image digest:** `docker buildx imagetools inspect`, `crane digest`, `skopeo inspect`, or a plain registry API request.
+- **Pivot binary:** extract the file at `pivotPath` out of the image, then hash it. `docker create` + `docker cp`, `podman create` + `podman cp`, or `crane export` piped through `tar` all work. Hash with `sha256sum` or `shasum -a 256`.
+
+Whatever you use, the binary you hash must be the one inside the image you are pinning. Hashing a local build artifact that was not the one published produces a mismatch that only surfaces when the enclave refuses to start.
 
 ## Local quorum key files (self-provisioned operator)
 

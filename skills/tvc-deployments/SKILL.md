@@ -77,6 +77,17 @@ Exit codes: `0` success, `1` runtime error, `2` usage error.
 
 Summarized here; full commands and outputs in **[references/deploy-lifecycle.md](references/deploy-lifecycle.md)**.
 
+**Before you run anything, confirm you have these four values.** None can be obtained from the `tvc` CLI or discovered with `--help`; they come from the container image you built and published:
+
+| Value | Source |
+|---|---|
+| `pivotContainerImageUrl` | a `linux/amd64` OCI image in a registry TVC can pull, referenced **by digest** |
+| `pivotPath` | the path of the pivot binary *inside* that image |
+| `expectedPivotDigest` | sha256 of that pivot binary, **not** the image digest, they are different fields |
+| `pivotArgs` | the app's own argument contract (often none) |
+
+If any are missing, **ask for them before step 1**. Everything from `operator create` onward creates real resources, so discovering the gap at step 3 leaves an app and operator already provisioned. Never guess a digest: a plausible wrong value passes every local check and only fails once the enclave refuses to start. See **[references/config-files.md](references/config-files.md)** for how each is derived and what the image must satisfy.
+
 1. `tvc operator create --message-format json` → `operator_created` (save `operatorId`)
 2. `tvc app init --output app.json` → edit the scaffolded `app.json` (fill the `<FILL_IN_*>` sentinels) → `tvc app create --config-file app.json --message-format json` → `app_created` (save `appId`)
 3. `tvc deploy init --output deploy.json` → edit `deploy.json` (pivot image, ports) → `tvc deploy create --config-file deploy.json --app-id <APP_ID> --message-format json` → `deployment_created` (save `deploymentId`)

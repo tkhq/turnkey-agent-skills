@@ -26,6 +26,7 @@
       "prompt": "How do I check whether my TVC deployment is live and serving traffic from the CLI?",
       "expected_output": "Polls tvc deploy get-status and checks isTargeted true and replicas.ready == replicas.desired; notes there is no --wait flag",
       "files": ["skills/tvc-deployments/SKILL.md"],
+      "gradeFullResponse": true,
       "assertions": [
         { "type": "contains", "value": "get-status" },
         { "type": "contains", "value": "isTargeted" },
@@ -43,6 +44,7 @@
       "prompt": "List all my TVC deployments with the tvc CLI so I can pick one to approve.",
       "expected_output": "Points at `tvc app status --app-id <APP_ID>`, whose `deployments[]` array enumerates the app's deployments, and uses `targetedDeploymentId` to identify the already-live one (which needs no approval). There is no `tvc deploy list` subcommand. Notes that deployment IDs should still be saved at create time, since the status array reflects runtime state and a freshly created, unapproved deployment may not appear in it.",
       "files": ["skills/tvc-deployments/SKILL.md"],
+      "gradeFullResponse": true,
       "assertions": [
         { "type": "regex", "value": "app[\"'\\s,]+status", "comment": "tolerates both shell form and argv arrays" },
         { "type": "regex", "value": "deployments" },
@@ -72,6 +74,7 @@
       "prompt": "My tvc command failed with {\"reason\":\"command_error\",\"code\":\"unauthorized\",\"httpStatus\":401,\"message\":\"...\"}. What should I do?",
       "expected_output": "Identifies it as an auth/permission failure, points at verifying TVC_ORG_ID/TVC_API_KEY_* or the login profile and key permissions; branches on code not message",
       "files": ["skills/tvc-deployments/references/error-reference.md"],
+      "gradeFullResponse": true,
       "assertions": [
         { "type": "regex", "value": "unauthorized|401|credential|permission" },
         { "type": "regex", "value": "TVC_ORG_ID|TVC_API_KEY|login" }

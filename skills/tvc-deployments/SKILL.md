@@ -2,21 +2,21 @@
 name: tvc-deployments
 description: "Build, deploy, and maintain Turnkey Verifiable Cloud (TVC) apps with the `tvc` CLI: create apps and deployments, approve manifests, set the live deployment, check runtime status, tail debug logs, and consume the NDJSON output contract. Drives the CLI (not the HTTP API); use for scripting and agent-driven TVC workflows."
 license: Apache-2.0
-compatibility: "Requires the `tvc` CLI (Turnkey rust-sdk) on PATH and TVC API credentials, supplied via TVC_* environment variables or a prior `tvc login`. This skill drives the CLI, not the Turnkey HTTP API."
+compatibility: "Requires the `tvc` CLI on PATH (install: `cargo install tvc`) and TVC API credentials, supplied via TVC_* environment variables or a prior `tvc login`. This skill drives the CLI, not the Turnkey HTTP API."
 metadata:
   author: turnkey
-  tags: "tvc verifiable-cloud cli deploy deployment enclave operator manifest quorum ndjson rust-sdk"
+  tags: "tvc verifiable-cloud cli deploy deployment enclave operator manifest quorum ndjson"
 ---
 
 # TVC Deployments
 
 > **This skill drives the `tvc` CLI, not the HTTP API.** Unlike the other Turnkey skills (which call `POST /public/v1/...` with `TURNKEY_API_*` credentials), everything here runs `tvc <command> --message-format json` and reads NDJSON from stdout. Auth uses `TVC_*` env vars, a different set. Do not mix the two.
 >
-> **Skill vs AGENTS.md:** the `tvc-template` and `rust-sdk` repos ship an `AGENTS.md` that lands in context automatically and covers the from-scratch QuickStart of a template project. This skill is for the complementary cases: driving the CLI programmatically, editing/maintaining an already-established TVC project, and carrying TVC knowledge into any repo (install once, invoke anywhere). Prefer the repo's `AGENTS.md` for first-time template setup.
+> **Scope:** this skill covers driving the CLI programmatically, editing/maintaining an already-established TVC project, and carrying TVC knowledge into any repo (install once, invoke anywhere). First-time human onboarding (org setup, `tvc login`, dashboard key registration) is owned by the [TVC quickstart](https://docs.turnkey.com/features/verifiable-cloud/quickstart).
 
 ## When to use
 
-Use this skill when driving the `tvc` CLI: building or shipping a TVC deployment, editing/maintaining an established TVC project, cutting traffic to a new version, checking runtime status, or scripting any of the above in CI or an agent loop. For a first-time, from-scratch template walkthrough, prefer the repo's `AGENTS.md` (it auto-loads without invocation). For Turnkey wallet/signing/policy work over the HTTP API, use the other Turnkey skills instead, this one is CLI-only.
+Use this skill when driving the `tvc` CLI: building or shipping a TVC deployment, editing/maintaining an established TVC project, cutting traffic to a new version, checking runtime status, or scripting any of the above in CI or an agent loop. For first-time human onboarding (org setup, `tvc login`), point the user at the [TVC quickstart](https://docs.turnkey.com/features/verifiable-cloud/quickstart). For Turnkey wallet/signing/policy work over the HTTP API, use the other Turnkey skills instead, this one is CLI-only.
 
 ## Overview
 
@@ -59,6 +59,8 @@ Resolution order:
 3. **Partial** (some but not all three) → the CLI errors and names the missing variable. Set all three or none.
 
 For interactive/local setup, `tvc login --org <alias> --api-base-url <url>` persists a profile to disk. Env vars always win over disk config when all three are present.
+
+Credentials cannot be created non-interactively: `tvc login`'s key generation needs a human (TTY prompts plus manual dashboard registration). If neither env vars nor a profile are provisioned, stop and ask the user, do not retry `tvc login`.
 
 ## Output contract (read this before parsing anything)
 
@@ -145,5 +147,5 @@ Full per-code recovery is in **[references/error-reference.md](references/error-
 
 ## Related Skills
 
-- **AGENTS.md** in the tvc-template and rust-sdk repos — from-scratch QuickStart for a template project (auto-loaded, no invocation needed). Start there for first-time setup; use this skill for CLI-driven, maintenance, and cross-repo work.
+- [TVC quickstart](https://docs.turnkey.com/features/verifiable-cloud/quickstart) — first-time human onboarding (org setup, `tvc login`, first app). Use this skill for CLI-driven, maintenance, and cross-repo work.
 - `getting-started` — Turnkey HTTP API onboarding (separate `TURNKEY_API_*` credential model; not TVC).

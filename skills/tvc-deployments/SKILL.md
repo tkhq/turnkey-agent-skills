@@ -142,6 +142,7 @@ Errors classify into a `code`. Common ones and first move:
 - **`approval_required`** — the manifest needs more approvals before it can proceed. Collect additional operator approvals.
 - **`network_error`** — connect/timeout/DNS; the request never reached the server. Check `TVC_API_BASE_URL` and connectivity, then retry.
 - **`api_error`** — other non-2xx from the API; read the `message` (it now carries the server's error body).
+- **`client_version_too_old`** — the backend refuses `tvc` releases below its minimum version. Upgrade the binary (`cargo install tvc`); do not retry or touch the config.
 
 Full per-code recovery is in **[references/error-reference.md](references/error-reference.md)**.
 

@@ -24,13 +24,14 @@ Exit codes: `0` success, `1` runtime error, `2` usage error.
 | `approval_required` | The activity needs more approvals (consensus) before it can proceed. | Collect additional operator approvals via `deploy approve`, then continue. |
 | `network_error` | Connect / timeout / DNS; the request never reached the server. | Check `TVC_API_BASE_URL` and connectivity. Safe to retry with backoff. |
 | `api_error` | Any other non-2xx HTTP status, or a failed/unexpected activity. | Read `message` for the server's explanation. Not automatically retryable. |
+| `client_version_too_old` | The backend rejected this `tvc` release as older than the minimum it supports (HTTP 400 with `turnkeyErrorCode: TVC_CLIENT_VERSION_TOO_OLD`). | Not a config problem and never retryable: upgrade the binary (`cargo install tvc`) and rerun. The server's remediation text is in `message`. |
 | `command_error` | Fallback for anything not classified above. | Read `message`. |
 | `invalid_input` | Defined in the taxonomy but **not currently emitted** by the classifier. | You will not see this today; do not branch on it expecting semantic-validation failures. |
 
 ## Handling patterns
 
 - **Retryable:** `network_error` (backoff + retry). `api_error` may be transient (5xx) or permanent (4xx-ish), inspect before retrying.
-- **Not retryable without a change:** `usage_error`, `missing_required_input`, `unauthorized`, `not_found`, `invalid_input`.
+- **Not retryable without a change:** `usage_error`, `missing_required_input`, `unauthorized`, `not_found`, `invalid_input`, `client_version_too_old` (the change is upgrading the binary).
 - **Needs a human/side action:** `approval_required` (get more approvals).
 - **Never loop blindly on the same command.** If a retry would send the identical request, only retry `network_error`.
 

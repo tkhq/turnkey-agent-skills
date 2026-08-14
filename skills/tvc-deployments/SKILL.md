@@ -91,7 +91,7 @@ If any are missing, **ask for them before step 1**. Everything from `operator cr
 1. `tvc operator create --message-format json` → `operator_created` (save `operatorId`)
 2. `tvc app init --output app.json` → edit the scaffolded `app.json` (fill the `<FILL_IN_*>` sentinels) → `tvc app create --config-file app.json --message-format json` → `app_created` (save `appId`)
 3. `tvc deploy init --output deploy.json` → edit `deploy.json` (pivot image, ports) → `tvc deploy create --config-file deploy.json --app-id <APP_ID> --message-format json` → `deployment_created` (save `deploymentId`)
-4. `tvc deploy approve --deploy-id <DEPLOY_ID> --operator-id <OPERATOR_ID> --dangerous-skip-interactive --message-format json` → `manifest_approval_posted`
+4. `tvc deploy approve --deploy-id <DEPLOY_ID> --operator-id <OPERATOR_ID> --dangerous-skip-interactive --message-format json` → `manifest_approval_posted`. Its `quorumReached` field is a nullable boolean — tri-state: `true` = quorum met, `false` = more approvals needed, `null`/absent = unknown (not a failure; proceed to polling). A repeat approval by the same operator returns `manifest_approval_already_posted`, which is safe to treat as success.
 5. Poll `tvc deploy get-status --deploy-id <DEPLOY_ID> --message-format json` until it returns state, then read `isTargeted`. The **first** deployment of an app auto-targets once approval quorum is reached, so `isTargeted` is already `true` and no set-live call is needed.
 6. **Only if `isTargeted == false`** (switching traffic to a new deployment while an older one is live): `tvc app set-live-deploy --deploy-id <DEPLOY_ID> --message-format json`, then poll again. Live == `isTargeted == true` && `replicas.ready == replicas.desired` (see the polling rule below).
 

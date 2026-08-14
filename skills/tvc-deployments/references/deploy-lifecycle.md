@@ -66,8 +66,11 @@ tvc deploy approve \
   --message-format json
 ```
 
-- Success: `reason: manifest_approval_posted`.
-- If quorum is now met, you may also see `manifest_approval_quorum_reached`.
+- Success: `reason: manifest_approval_posted`. Read its `quorumReached` field, which is a **nullable boolean, so treat it as tri-state**:
+  - `true` — approval quorum is met; move on to polling `get-status`.
+  - `false` — the deployment still needs more operator approvals before it can proceed; collect them via further `deploy approve` calls.
+  - `null` / absent — quorum state is **unknown**, not "not reached": the CLI could not run its post-approval check (e.g. you approved via `--manifest` with no `--deploy-id`). Do not re-approve; proceed to polling `get-status`.
+- Re-approving with an operator that has already approved returns `reason: manifest_approval_already_posted` (carrying `operatorId` and `approvalId`). Nothing was posted; it is safe to treat as success.
 - If more approvals are still needed, a follow-up call classifies as `code: approval_required`, collect the remaining operator approvals.
 - You can approve by manifest file instead of deploy id: `--manifest <PATH>` (mutually exclusive with `--deploy-id`).
 - `--dry-run` validates without posting; `--approval-out <PATH>` / `-o` writes the approval artifact.
@@ -161,4 +164,4 @@ The hosted path above lets Turnkey hold the operator quorum key. For the self-pr
 
 ## Quick reference: outcome reasons you will see
 
-`operator_created`, `app_config_created`, `app_created`, `deployment_config_created`, `deployment_created`, `manifest_approval_posted` / `manifest_approval_generated` / `manifest_approval_dry_run` / `manifest_approval_quorum_reached`, `live_deployment_set`, `deployment_runtime_status`, `deployment_status`, `app_status`, `apps_listed`, `debug_logs_fetched` (+ streamed `debug_log_line`), `deployment_deleted`, `deployment_restored`, `app_deleted`, `version`.
+`operator_created`, `app_config_created`, `app_created`, `deployment_config_created`, `deployment_created`, `manifest_approval_posted` (carries nullable `quorumReached`) / `manifest_approval_generated` / `manifest_approval_dry_run` / `manifest_approval_already_posted`, `live_deployment_set`, `deployment_runtime_status`, `deployment_status`, `app_status`, `apps_listed`, `debug_logs_fetched` (+ streamed `debug_log_line`), `deployment_deleted`, `deployment_restored`, `app_deleted`, `version`.

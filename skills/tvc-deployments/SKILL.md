@@ -67,7 +67,7 @@ Add `--message-format json` to **every** command in scripts and agents:
 - Stdout becomes **NDJSON**: exactly one JSON object per line. Parse line by line.
 - **JSON mode forces non-interactive.** Any command that would otherwise prompt for a missing value instead emits an error line (`reason: missing_required_input`) rather than hanging.
 - Each success line carries a `reason` naming the outcome (e.g. `app_created`, `deployment_created`, `manifest_approval_posted`, `live_deployment_set`, `deployment_runtime_status`). One command → one terminal outcome line (except streaming commands like `deploy debug-logs`, which emit `debug_log_line` events).
-- Errors are a single line: `{ "reason": "command-error", "code": "<code>", "httpStatus"?: <n>, "message": "<full chain>" }`. Branch on `code`, not on `message` text. See **[references/error-reference.md](references/error-reference.md)** for the full taxonomy and recovery per code.
+- Errors are a single line: `{ "reason": "command_error", "code": "<code>", "httpStatus"?: <n>, "message": "<full chain>" }`. Branch on `code`, not on `message` text. See **[references/error-reference.md](references/error-reference.md)** for the full taxonomy and recovery per code.
 
 Exit codes: `0` success, `1` runtime error, `2` usage error.
 

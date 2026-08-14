@@ -69,7 +69,7 @@
     },
     {
       "id": 5,
-      "prompt": "My tvc command failed with {\"reason\":\"command-error\",\"code\":\"unauthorized\",\"httpStatus\":401,\"message\":\"...\"}. What should I do?",
+      "prompt": "My tvc command failed with {\"reason\":\"command_error\",\"code\":\"unauthorized\",\"httpStatus\":401,\"message\":\"...\"}. What should I do?",
       "expected_output": "Identifies it as an auth/permission failure, points at verifying TVC_ORG_ID/TVC_API_KEY_* or the login profile and key permissions; branches on code not message",
       "files": ["skills/tvc-deployments/references/error-reference.md"],
       "assertions": [

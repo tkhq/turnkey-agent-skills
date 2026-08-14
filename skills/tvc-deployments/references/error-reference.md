@@ -3,10 +3,10 @@
 Every runtime error in JSON mode is a single NDJSON line:
 
 ```json
-{ "reason": "command-error", "code": "<code>", "httpStatus": 404, "message": "<full error chain>" }
+{ "reason": "command_error", "code": "<code>", "httpStatus": 404, "message": "<full error chain>" }
 ```
 
-- `reason` is `command-error` for all runtime errors (and `missing-required-input` for that one special case). It identifies the *shape*; it is not the classification.
+- `reason` is `command_error` for all runtime errors (and `missing_required_input` for that one special case). It identifies the *shape*; it is not the classification. Reasons are snake_case, like every other outcome reason.
 - `code` is the stable classification, **branch on this**, never on `message` text.
 - `httpStatus` is present only when the failure came from an HTTP response.
 - `message` is the full error chain including the server's response body (not just the top layer). Show it to humans; do not parse it programmatically.
@@ -17,7 +17,7 @@ Exit codes: `0` success, `1` runtime error, `2` usage error.
 
 | `code` | Trigger | Recovery |
 |---|---|---|
-| `missing_required_input` | A required value was absent in non-interactive mode. `reason` is `missing-required-input`. | The message names the missing flag. Supply it or its `TVC_*` env var. |
+| `missing_required_input` | A required value was absent in non-interactive mode. `reason` is `missing_required_input`. | The message names the missing flag. Supply it or its `TVC_*` env var. |
 | `usage_error` | Bad flags/args or unknown subcommand (clap parse failure). Exit code 2. | Fix the command. Re-check subcommand and flag names against the skill; do not invent flags. |
 | `unauthorized` | HTTP 401/403 from the API. | Verify `TVC_ORG_ID` / `TVC_API_KEY_PUBLIC` / `TVC_API_KEY_PRIVATE` (or your `tvc login` profile), and that the key is permitted for the action. |
 | `not_found` | HTTP 404, or an OK response with an empty resource. | Confirm the `--app-id` / `--deploy-id`. Remember there is no `deploy list` to discover IDs; you must have saved them. |

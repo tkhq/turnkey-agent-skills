@@ -65,7 +65,7 @@ For interactive/local setup, `tvc login --org <alias> --api-base-url <url>` pers
 Add `--message-format json` to **every** command in scripts and agents:
 
 - Stdout becomes **NDJSON**: exactly one JSON object per line. Parse line by line.
-- **JSON mode forces non-interactive.** Any command that would otherwise prompt for a missing value instead emits an error line (`reason: missing_required_input`) rather than hanging.
+- **JSON mode forces non-interactive.** A command that would otherwise prompt for a missing value instead fails fast with an error line (`missing_required_input` or `usage_error`) rather than hanging. Provide every required value up front.
 - Each success line carries a `reason` naming the outcome (e.g. `app_created`, `deployment_created`, `manifest_approval_posted`, `live_deployment_set`, `deployment_runtime_status`). One command → one terminal outcome line (except streaming commands like `deploy debug-logs`, which emit `debug_log_line` events).
 - Errors are a single line: `{ "reason": "command_error", "code": "<code>", "httpStatus"?: <n>, "message": "<full chain>" }`. Branch on `code`, not on `message` text. See **[references/error-reference.md](references/error-reference.md)** for the full taxonomy and recovery per code.
 

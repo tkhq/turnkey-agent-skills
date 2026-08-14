@@ -21,13 +21,15 @@ These skills let you operate Turnkey through conversation instead of code. Point
 
 ## Environment Variables
 
-All skills require these three variables:
+All HTTP API skills require these three variables:
 
 ```env
 TURNKEY_API_PUBLIC_KEY=<your-api-public-key>
 TURNKEY_API_PRIVATE_KEY=<your-api-private-key>
 TURNKEY_ORGANIZATION_ID=<your-organization-id>
 ```
+
+The one exception is [`tvc-deployments`](skills/tvc-deployments/SKILL.md), which drives the `tvc` CLI rather than the HTTP API and authenticates with a separate `TVC_*` variable set (`TVC_ORG_ID`, `TVC_API_KEY_PUBLIC`, `TVC_API_KEY_PRIVATE`) — see that skill's Authentication section. Do not mix the two credential sets.
 
 > **⚠️ Security warning — a note on root credentials**
 >
@@ -80,6 +82,7 @@ Guided multi-step procedures — start here for onboarding or agent setup.
 | Getting Started | `skills/getting-started/` | Day-0 onboarding: verify credentials, create your first wallet |
 | Provisioning Agent | `skills/provisioning-agent/` | Create a scoped agent with constrained credentials and policies |
 | Managing Agent | `skills/managing-agent/` | Debug denied transactions, rotate keys, update agent policies |
+| TVC Deployments | `skills/tvc-deployments/` | Build, deploy, and maintain Turnkey Verifiable Cloud apps via the `tvc` CLI |
 
 ### Primitives
 

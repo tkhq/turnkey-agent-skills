@@ -13,7 +13,7 @@ tvc app create --config-file app.json --message-format json
 ```
 
 - `--config-file` / `-c` is required for `app create` (env `TVC_APP_CONFIG`).
-- `--output` / `-o` is required for `app init` (env `TVC_APP_CONFIG_OUT`).
+- `--output` / `-o` is optional for `app init` (env `TVC_APP_CONFIG_OUT`); it defaults to `app.json`. Pass it explicitly in scripts so the path is deterministic.
 
 ## Deploy config
 
@@ -77,11 +77,11 @@ Whatever you use, the binary you hash must be the one inside the image you are p
 ## Local quorum key files (self-provisioned operator)
 
 ```bash
-tvc keys init-local-quorum-key -o quorum_key.json       # required: -o / TVC_QUORUM_KEY_CONFIG_OUT
+tvc keys init-local-quorum-key -o quorum_key.json       # -o / TVC_QUORUM_KEY_CONFIG_OUT, defaults to quorum_key.json
 # edit quorum_key.json
 tvc keys generate-local-quorum-key \
   --config-file quorum_key.json \
-  --quorum-key-metadata-out quorum_key_metadata.json    # both required
+  --quorum-key-metadata-out quorum_key_metadata.json    # -c required; metadata-out defaults to quorum_key_metadata.json
 ```
 
 `quorum_key_metadata.json` and any re-encrypted share files contain sensitive shares. Keep them out of source control and out of the working tree you might commit. Prefer writing them to a path outside the repo.

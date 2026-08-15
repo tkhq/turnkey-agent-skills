@@ -52,7 +52,7 @@ tvc deploy create --config-file deploy.json --app-id <APP_ID> --message-format j
 
 - Everything in the config file can also be passed as a flag / env var: `--qos-version`, `--pivot-image-url`, `--expected-pivot-digest`, `--pivot-path`, `--pivot-args`, `--health-check-port`, `--public-ingress-port`, `--app-id`. Flags override the file.
 - `tvc deploy init --from-deployment <OLD_DEPLOY_ID>` seeds `deploy.json` from an existing deployment (use when shipping a new version).
-- `--dangerous-deploy-debug-mode` produces a debug-mode deployment whose logs you can tail with `deploy debug-logs`. Never use debug mode for production.
+- `--dangerous-deploy-debug-mode` produces a debug-mode deployment whose logs you can tail with `deploy debug-logs`. It only works if the **app** was created with `--dangerous-enable-debug-mode-deployments` — an app-level opt-in that is decided at `app create`, can never be changed afterward, and permanently marks the app's quorum key as insecure (debug deployments emit zeroed attestation PCRs, so remote attestation cannot succeed). Never use debug mode for production.
 
 ## 4. Approve the manifest
 

@@ -4,6 +4,8 @@
 
 Always treat the scaffolded file as the source of truth for the current schema, fields evolve, and the CLI's scaffold is authoritative for the version you have installed.
 
+Scaffold-then-edit is a hard rule for `deploy.json`, not a preference: the parser has **no field defaults**. Eight of its eleven fields are required at parse time — `appId`, `qosVersion`, `pivotContainerImageUrl`, `pivotPath`, `expectedPivotDigest`, `healthCheckType`, `healthCheckPort`, `publicIngressPort` — and a hand-written file missing any of them fails with `command_error` ("missing field `...`"). Only `pivotArgs` (defaults `[]`), `dangerousDeployDebugMode` (defaults `false`), and `pivotContainerEncryptedPullSecret` (defaults absent) may be omitted. The 3000/HTTP defaults you see in scaffolded files live in `deploy init` and the flag-only path, not in the file parser.
+
 ## App config
 
 ```bash

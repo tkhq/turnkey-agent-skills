@@ -1,0 +1,159 @@
+{
+  "generatedAt": "2026-09-02T13:15:54.516Z",
+  "provider": "claude",
+  "entries": [
+    {
+      "skill": "tvc-deployments",
+      "evalId": 1,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "contains \"--message-format json\"",
+          "passed": true
+        },
+        {
+          "description": "matches /deploy[\"'\\s,]+approve/",
+          "passed": true
+        },
+        {
+          "description": "contains \"--dangerous-skip-interactive\"",
+          "passed": true
+        },
+        {
+          "description": "contains \"set-live-deploy\"",
+          "passed": true
+        },
+        {
+          "description": "matches /isTargeted/",
+          "passed": true
+        },
+        {
+          "description": "matches /deploy get-status|get-status/",
+          "passed": true
+        },
+        {
+          "description": "does not match /^\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b/m",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 2,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "contains \"get-status\"",
+          "passed": true
+        },
+        {
+          "description": "contains \"isTargeted\"",
+          "passed": true
+        },
+        {
+          "description": "matches /replicas/",
+          "passed": true
+        },
+        {
+          "description": "does not match /^\\s*\\$?\\s*tvc\\s[^\\n]*--wait\\b/m",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 3,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "matches /app[\"'\\s,]+status/",
+          "passed": true
+        },
+        {
+          "description": "matches /deployments/",
+          "passed": true
+        },
+        {
+          "description": "matches /targetedDeploymentId/",
+          "passed": true
+        },
+        {
+          "description": "does not match /^\\s*\\$?\\s*tvc\\s+deploy\\s+list\\b/m",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 4,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "contains \"TVC_ORG_ID\"",
+          "passed": true
+        },
+        {
+          "description": "contains \"TVC_API_KEY_PUBLIC\"",
+          "passed": true
+        },
+        {
+          "description": "contains \"TVC_API_KEY_PRIVATE\"",
+          "passed": true
+        },
+        {
+          "description": "does not contain \"TURNKEY_API_PUBLIC_KEY\"",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 5,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "matches /unauthorized|401|credential|permission/",
+          "passed": true
+        },
+        {
+          "description": "matches /TVC_ORG_ID|TVC_API_KEY|login/",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 6,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "matches /--from-deployment|deploy init/",
+          "passed": true
+        },
+        {
+          "description": "matches /deploy[\"'\\s,]+create/",
+          "passed": true
+        },
+        {
+          "description": "contains \"set-live-deploy\"",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "skill": "tvc-deployments",
+      "evalId": 7,
+      "mode": "with_skill",
+      "assertions": [
+        {
+          "description": "contains \"debug-logs\"",
+          "passed": true
+        },
+        {
+          "description": "matches /--tail-lines|--poll|timeout|bound/",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

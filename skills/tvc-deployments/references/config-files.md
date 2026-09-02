@@ -17,6 +17,15 @@ tvc app create --config-file app.json --message-format json
 - `--config-file` / `-c` is required for `app create` (env `TVC_APP_CONFIG`).
 - `--output` / `-o` is optional for `app init` (env `TVC_APP_CONFIG_OUT`); it defaults to `app.json`. Pass it explicitly in scripts so the path is deterministic.
 
+### Wiring the operator into `app.json`
+
+The scaffold prefills `manifestSetParams.newOperators[0].publicKey` with your profile's saved default operator when the profile resolves exactly one; otherwise it drops a `<FILL_IN_OPERATOR_PUBLIC_KEY>` sentinel. Branch on which you got:
+
+- **Prefilled with a real key:** the profile already has a usable operator. Keep the scaffolded key and do **not** run `tvc operator create` — a freshly created operator's key would not be the one in the scaffold, so the app's manifest set would not contain it and it could never approve this app's deployments.
+- **`<FILL_IN_OPERATOR_PUBLIC_KEY>` sentinel:** run `tvc operator create --message-format json` and paste the returned `compositePublicKey` (the `encryptPublicKey` and `signPublicKey` concatenated, emitted as one field) into `newOperators[0].publicKey`.
+
+Either way, the identities allowed to approve this app's deployments are the `manifestSetOperatorIds` returned by `app create` — save those and pass one of them to `deploy approve --operator-id`. The `operatorId` printed by `operator create` is only valid for approval if that operator's public key actually made it into the manifest set. Note that on the prefilled path the approver id is unknowable before `app create` returns: the scaffold shows only a public key, and no command lists operators — so if asked for the operator id up front, answer that it arrives with `app create`.
+
 ## Deploy config
 
 ```bash
@@ -76,7 +85,17 @@ Any OCI-compatible tooling works. Common choices, none required:
 
 Whatever you use, the binary you hash must be the one inside the image you are pinning. Hashing a local build artifact that was not the one published produces a mismatch that only surfaces when the enclave refuses to start.
 
-## Local quorum key files (self-provisioned operator)
+## Quorum keys: Turnkey-hosted by default, local files only when self-provisioning
+
+**Prefer the Turnkey-hosted path.** It is the default, it runs no `tvc keys` commands, and it writes no key material to disk:
+
+- `tvc app init` scaffolds `app.json` with `quorumPublicKey` already prefilled — leave it as scaffolded.
+- The scaffold writes `"shareSetParams": null` and `"shareSetId": null` — keep both as scaffolded (do not delete the keys or fill them in). A null/absent share set selects Turnkey's default hosted share set at `app create` time.
+- The approver identity is the operator wired into `manifestSetParams` — see "Wiring the operator into `app.json`" above.
+
+Keep those scaffold defaults unless the app requires a quorum key you generate and hold yourself. Only then use the local flow below.
+
+### Alternative: local quorum key files (self-provisioned operator)
 
 ```bash
 tvc keys init-local-quorum-key -o quorum_key.json       # -o / TVC_QUORUM_KEY_CONFIG_OUT, defaults to quorum_key.json

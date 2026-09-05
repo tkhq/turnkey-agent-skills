@@ -2,7 +2,7 @@
 name: turnkey-agent-skills
 description: "Use when working with Turnkey wallet infrastructure — creating wallets, signing blockchain transactions, managing users and policies, provisioning agents, or monitoring activities. Supports Ethereum/EVM, Solana, Bitcoin, and 10+ other chains. Keys stay in hardware-backed secure enclaves."
 license: Apache-2.0
-compatibility: "Requires TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID env vars."
+compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "turnkey wallet signing blockchain ethereum solana bitcoin crypto policy agent"
@@ -10,153 +10,80 @@ metadata:
 
 # Turnkey Skills
 
-Wallet infrastructure skills for [Turnkey](https://turnkey.com). Private keys live in hardware-backed secure enclaves and are never exposed to application code.
+Use `tk` for credentials, signed requests, and the core agent lifecycle. Skills own workflow decisions, resource scope, and existing user authorization; the CLI owns key handling, request stamping, and submission.
+
+## CLI readiness
+
+This conversion targets the **local, unreleased unified CLI** built from the Rust SDK repository. No published minimum version is claimed. The older experimental `tk` binary and released `tvc`/`turnkey` binaries do not provide this surface. Before executing a workflow, check `tk --help` plus its required subcommand help. A matching version string alone is insufficient during development.
+
+Build the integrated rust-sdk checkout with `cargo build -p tvc --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
+
+Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
 ## Skills
 
-**Workflows** are guided multi-step procedures (start here if you're new or doing first-time setup). **Primitives** are individual operations (use these for ongoing work and one-off tasks).
+| Skill | Use |
+|---|---|
+| [Getting started](skills/getting-started/SKILL.md) | Verify identity and create a first wallet |
+| [Provisioning agent](skills/provisioning-agent/SKILL.md) | Create a non-root agent with scoped access |
+| [Managing agent](skills/managing-agent/SKILL.md) | Diagnose denial, update access, rotate/revoke credentials |
+| [Managing users](skills/managing-users/SKILL.md) | Users, tags, and registered API keys |
+| [Managing policies](skills/managing-policies/SKILL.md) | Policy CRUD, consensus, and evaluations |
+| [Managing wallets](skills/managing-wallets/SKILL.md) | Wallets and derived accounts |
+| [Monitoring activities](skills/monitoring-activities/SKILL.md) | Inspect, approve/reject, and resume pending work |
+| [Signing transactions](skills/signing-transactions/SKILL.md) | Serialized signing plus explicitly retained chain SDK workflows |
 
-### Primitives
+## Authentication and key generation
 
-| Skill | Path | Use when… |
-|-------|------|-----------|
-| Signing Transactions | `skills/signing-transactions/SKILL.md` | signing, broadcasting, gasless/sponsored transactions on any chain |
-| Managing Wallets | `skills/managing-wallets/SKILL.md` | creating wallets, deriving addresses, adding chains, import/export |
-| Managing Users | `skills/managing-users/SKILL.md` | creating users, API key rotation, user tags |
-| Managing Policies | `skills/managing-policies/SKILL.md` | access control, spending limits, allowlists, multi-sig, policy debugging |
-| Monitoring Activities | `skills/monitoring-activities/SKILL.md` | activity status, consensus approvals, automated agent approver, audit |
+Use existing saved profiles or complete environment credentials. Never place private keys in command arguments or echo credential files.
 
-### Workflows
-
-| Skill | Path | Use when… |
-|-------|------|-----------|
-| Getting Started | `skills/getting-started/SKILL.md` | new to Turnkey, verifying credentials, creating first wallet |
-| Provisioning Agent | `skills/provisioning-agent/SKILL.md` | giving an agent a scoped wallet with constrained credentials |
-| Managing Agent | `skills/managing-agent/SKILL.md` | debugging denied transactions, changing agent policies, key rotation, revocation |
-
-## Environment Variables
-
-```env
-TURNKEY_API_PUBLIC_KEY=    # API key — public component (hex)
-TURNKEY_API_PRIVATE_KEY=   # API key — private component (P-256 hex)
-TURNKEY_ORGANIZATION_ID=   # Organization UUID
-SIGN_WITH=                 # Address or public key to sign with (signing skills only)
+```sh
+tk --profile admin auth status
+tk --profile admin whoami
+tk profile list
 ```
 
-Get credentials from the [Turnkey Dashboard](https://app.turnkey.com) under **Settings → API Keys**.
+For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), login verifies identity before saving/selecting a new named profile:
+
+```sh
+tk --profile admin --organization-id "$ORG_ID" login --api-key-file "$ADMIN_KEY_FILE"
+```
+
+Generate replacement/agent credentials locally into an explicit, private destination outside the repository:
+
+```sh
+tk --message-format json api-key generate --output "$AGENT_KEY_FILE" > generated-key.json
+```
+
+The generation result contains public information and the output path; the secret lives only in the key file. Register only the public key with `tk user create` or `tk api-key register`. Do not recreate SDK stamping or inline cryptographic key-generation scripts. If a secrets manager is the requested destination, arrange a supported secure handoff explicitly; the current generate command writes a local file.
+
+For unattended use, the full `TURNKEY_ORGANIZATION_ID`, `TURNKEY_API_PUBLIC_KEY`, and `TURNKEY_API_PRIVATE_KEY` bundle is supported; `TURNKEY_API_BASE_URL` is optional. Explicit `--profile NAME` selects that saved identity instead of an environment bundle. Partial/conflicting bundles must be corrected rather than mixing credential halves. `auth logout` clears selection without revoking remote credentials; `profile delete` removes the local profile entry, not the API key.
 
 ## Calling the API
 
-All Turnkey API requests must be cryptographically signed ("stamped") with your P-256 API key. The `@turnkey/sdk-server` package handles stamping automatically and is the recommended way to call the API.
+Use dedicated commands with exactly one of `--input-json JSON` or `--input-file PATH`; `--input-file -` reads stdin. Inputs are the generated operation's **parameters object**, not an activity envelope. Use files for policy expressions and structured batches. UUIDs and unsupported fields are checked locally; policy authorization remains server-evaluated.
 
-### Setup
-
-```
-npm install @turnkey/sdk-server
-```
-
-```typescript
-import { Turnkey } from "@turnkey/sdk-server";
-
-const turnkey = new Turnkey({
-  apiBaseUrl: "https://api.turnkey.com",
-  apiPublicKey: process.env.TURNKEY_API_PUBLIC_KEY!,
-  apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY!,
-  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID!,
-});
-const client = turnkey.apiClient();
+```sh
+tk --profile admin --message-format json policy create --input-file policy.json
+tk --profile admin --message-format json user create --input-file users.json
+tk --profile agent --message-format json sign payload --input-file payload.json
 ```
 
-### Mapping endpoints to SDK methods
+`tk request --path /public/v1/... --body-file request.json` is the escape hatch. Unlike dedicated commands, its body is the **complete request**: query organization ID or versioned submit envelope. `--body` accepts literal bytes and `--stamp-only` signs without submission. Copy neither stale activity versions nor SDK setup from reference documents. There is no automatic envelope generation for arbitrary requests.
 
-Skills describe operations using HTTP endpoints (e.g., `POST /public/v1/query/list_wallets`). The SDK exposes these as typed TypeScript methods in `camelCase`:
+## Machine results and pending work
 
-- `snake_case` endpoint → `camelCase` method: `create_wallet` → `client.createWallet(...)`
-- Most query endpoints rename `list_` to `get`: `list_wallets` → `client.getWallets()`. A few retain `list` (e.g., `list_user_tags` → `client.listUserTags()`, `list_private_key_tags` → `client.listPrivateKeyTags()`) — rely on the SDK's TypeScript types for the exact method name when in doubt.
-- Rely on the SDK's TypeScript types for exact method names and parameters
+Use `--message-format json`; consume complete JSON records and check `schemaVersion: 1`. Successful records use `reason: "command_result"`; failures use `reason: "command_error"` and a nonzero exit. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
 
-For example, when a skill shows:
+**Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file.
 
-```
-POST /public/v1/query/list_wallets
-```
-```json
-{
-  "organizationId": "<ORG_ID>"
-}
+```sh
+tk --profile admin --message-format json activity get "$ACTIVITY_ID"
+tk --profile admin --message-format json activity wait "$ACTIVITY_ID" --timeout 60
 ```
 
-The equivalent SDK call is:
+No submit command has an automatic `--wait` flag. Waiting resumes by activity ID; it never repeats resource creation. After an uncertain submission/transport failure, inspect activity history and reconcile the intended operation before retrying. Do not change timestamps to force a duplicate as a recovery strategy.
 
-```typescript
-const wallets = await client.getWallets();
-```
+## Reference boundaries
 
-### Direct HTTP
-
-If you cannot use the SDK, every request must include an `X-Stamp` header containing a base64url-encoded signature over the POST body. See [Turnkey docs on stamps](https://docs.turnkey.com/developer-reference/api-overview/stamps) for the stamping protocol.
-
-### Request body convention
-
-JSON bodies shown in skills and reference files are the **`parameters` object** — the exact shape SDK methods accept (e.g., `client.createWallet({walletName, accounts, mnemonicLength})`). When making raw HTTP calls, the wrapping differs by endpoint prefix:
-
-- **`POST /public/v1/query/*`** (read-only, e.g. `whoami`, `list_wallets`): send the body as shown. No envelope.
-- **`POST /public/v1/submit/*`** (mutations, e.g. `create_wallet`, `sign_raw_payload`): wrap in the activity envelope:
-
-```json
-{
-  "type": "ACTIVITY_TYPE_CREATE_WALLET",
-  "timestampMs": "1700000000000",
-  "organizationId": "<ORG_ID>",
-  "parameters": { /* body shown in the skill goes here */ }
-}
-```
-
-The activity `type` follows the endpoint path: `create_wallet` → `ACTIVITY_TYPE_CREATE_WALLET`, `sign_raw_payload` → `ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2`, `create_users` → `ACTIVITY_TYPE_CREATE_USERS_V3`, etc. Canonical list in the [Turnkey API reference](https://docs.turnkey.com/api-reference/activities/create-wallet). `timestampMs` must be a stringified millisecond Unix timestamp and must change between otherwise-identical retries (Turnkey uses the body hash as an idempotency fingerprint).
-
-The SDK constructs this envelope for you — this is why `client.createWallet({...})` takes only the `parameters` fields.
-
-## Generating API key pairs
-
-Agent provisioning and key rotation require generating a P-256 key pair locally. The private key never leaves the machine — only the public key is registered with Turnkey.
-
-The helper below is the **derivation step only**: it returns the key pair as hex strings. The caller decides where the private half goes — persisting it is a separate, deliberate step (see "Destination for the private key" below). Do not paste the raw snippet into an ad-hoc console and walk away; that is how private keys end up in shell history.
-
-```typescript
-import crypto from "crypto";
-
-export function generateApiKeyPair(): { publicKeyHex: string; privateKeyHex: string } {
-  const keyPair = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
-  const pubJwk = keyPair.publicKey.export({ format: "jwk" }) as { x: string; y: string };
-  const privJwk = keyPair.privateKey.export({ format: "jwk" }) as { d: string };
-
-  // SEC1-compressed P-256 public key: 33 bytes total.
-  // Prefix is 0x02 when Y is even, 0x03 when Y is odd. X is the 32-byte
-  // big-endian X coordinate. Pad to 32 bytes so a leading-zero coordinate
-  // doesn't produce a short hex string (the stamper requires exactly 33 bytes).
-  const xHex = Buffer.from(pubJwk.x, "base64url").toString("hex").padStart(64, "0");
-  const yBuf = Buffer.from(Buffer.from(pubJwk.y, "base64url").toString("hex").padStart(64, "0"), "hex");
-  const prefix = (yBuf[yBuf.length - 1] & 1) === 0 ? "02" : "03";
-  const publicKeyHex = prefix + xHex;
-  const privateKeyHex = Buffer.from(privJwk.d, "base64url").toString("hex").padStart(64, "0");
-
-  return { publicKeyHex, privateKeyHex };
-}
-```
-
-Use `publicKeyHex` as the `publicKey` field when calling `create_api_keys` or `create_users`. It is a 33-byte SEC1-compressed P-256 public key (66 hex chars, prefixed with `02` or `03`) — Turnkey rejects the uncompressed (`04` + X + Y, 65-byte) form when verifying stamped requests. `privateKeyHex` becomes the agent's `TURNKEY_API_PRIVATE_KEY` (32-byte big-endian scalar, 64 hex chars).
-
-### Destination for the private key
-
-Pick exactly one, in this order of preference:
-
-1. **Secrets manager (recommended for production).** Pipe `privateKeyHex` straight into AWS Secrets Manager, HashiCorp Vault, 1Password, etc. Example: `aws secretsmanager put-secret-value --secret-id agent/turnkey --secret-string "$privateKeyHex"`. The agent runtime reads it from there; it never touches disk in cleartext.
-2. **`.env` file with `chmod 600`.** Acceptable for local development and hand-off to a single machine. Write to a path **outside any git-tracked directory**. The end-to-end pattern — including the git-root guard, `chmod 600`, and wire-up to the `create_users` call — is documented in `provisioning-agent` Step 2b, Option A. Reuse that script rather than reinventing it.
-3. **Terminal print (last resort, manual flows only).** Only when you cannot write to disk or a secrets manager (e.g., ephemeral shell). Treat the terminal session as compromised afterward: private key will be in shell history, scrollback, and any active screen share. Copy into a secrets manager and close the terminal.
-
-Whichever destination you pick: never log `privateKeyHex` to application logs, never commit it, never store it alongside your root credentials, and never transmit it to Turnkey.
-
-### Where this helper is used
-
-- **Agent provisioning** (`provisioning-agent` Step 2b, Option A): wraps this helper with a file-write + git-tracking guard. Use that wrapper directly.
-- **Key rotation** (`managing-agent` → `references/key-rotation-examples.md` Step 1): generate a new pair, register the public key while the old key is still active, verify with the new key, then delete the old one. The new `privateKeyHex` replaces the old value in whichever destination the agent's runtime reads from.
+Retained API reference JSON is useful for fields and policy semantics, but is not a second execution path for the converted core skills. Use the CLI mappings; SDK setup, key-generation helpers, and old envelope instructions are superseded here. Import/export bundle cryptography and general chain construction/broadcast examples remain future work. Existing user authorization persists; do not re-ask solely because an old reference says to confirm every call.

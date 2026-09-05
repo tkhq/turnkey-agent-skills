@@ -1,5 +1,8 @@
 # Agent Persona Templates
 
+> **CLI migration:** This is retained API parameter/semantic reference material. Execute supported core operations through the commands in the parent SKILL.md and root CLI convention. SDK authentication, stamping, inline key-generation scripts, and old envelope/retry instructions below are superseded. Import/export crypto and unvalidated request bridges remain explicit gaps; this reference alone does not establish CLI completion. Existing user authorization takes precedence over blanket per-call confirmation wording in legacy examples.
+
+
 Use these templates after locking the decision gates with the human. These are starting points — tighten them based on the human's specific constraints.
 
 All personas assume the agent is a **non-root user** with default-deny permissions.

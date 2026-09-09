@@ -68,7 +68,7 @@ tk --profile agent --message-format json secret resume --state-file "$SECRET_STA
 
 Resume uses the saved operation and decryption material; it does not submit a replacement export. `activity wait` can inspect status but cannot decrypt the result by itself. If the state file is lost, do not claim that the old export can be decrypted from the activity ID alone. Never upload the state file to diagnose a failure.
 
-After successful recovery, report the destination and completion metadata. Do not read or print the recovered secret. Pass the file directly to the user's authorized consumer. Plaintext output retention belongs to that task; do not silently delete it or copy it elsewhere.
+After successful recovery, verify that the output file still exists using filesystem metadata only, then report the destination and completion metadata. A completed receipt can describe a prior write even if the file was later moved or removed; do not claim a missing file is available. Do not read or print the recovered secret. Pass the file directly to the user's authorized consumer. Plaintext output retention belongs to that task; do not silently delete it or copy it elsewhere.
 
 ### Scope access
 

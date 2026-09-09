@@ -11,6 +11,10 @@ while IFS= read -r command; do
     'user create'|'user update'|'user tag create'|'user tag update'|'policy create'|'policy create-batch'|'policy update'|'wallet create'|'wallet update'|'wallet account create'|'sign payload'|'sign transaction'|'api-key register')
       grep -F -- '--input-json' <<< "$help" >/dev/null
       grep -F -- '--input-file' <<< "$help" >/dev/null ;;
+    'secret list') grep -F -- '--limit' <<< "$help" >/dev/null; grep -F -- '--cursor' <<< "$help" >/dev/null ;;
+    'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--input-file' <<< "$help" >/dev/null; grep -F -- '--init-activity-id' <<< "$help" >/dev/null ;;
+    'secret export') grep -F -- '--output' <<< "$help" >/dev/null; grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
+    'secret resume') grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'activity wait') grep -F -- '--timeout' <<< "$help" >/dev/null ;;
@@ -54,5 +58,9 @@ activity wait
 activity approve
 activity reject
 request
+secret list
+secret import
+secret export
+secret resume
 COMMANDS
 printf '%s\n' 'Required local CLI commands are available. Live workflow behavior is not verified.'

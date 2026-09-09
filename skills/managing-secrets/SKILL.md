@@ -72,7 +72,21 @@ After successful recovery, report the destination and completion metadata. Do no
 
 ### Scope access
 
-Use a non-root identity for autonomous secret access; root quorum members bypass policy restrictions. Keep export access scoped to the requested secret and approved principals. Consult [managing policies](../managing-policies/SKILL.md) for policy submission, but verify Secrets-specific expression fields against supported API semantics before writing a condition. Wallet conditions do not scope secrets. Never compensate for an unverified expression with a blanket export ALLOW.
+Use a non-root identity for autonomous secret access; root quorum members bypass policy restrictions. For a metadata-scoped export policy, assign a nonsecret scope at import, such as `{"scope":"demo-agent"}` in the static-properties file. The following policy permits only the named agent to export secrets carrying that scope:
+
+```json
+{
+  "policyName": "Agent export for demo scope",
+  "effect": "EFFECT_ALLOW",
+  "condition": "activity.resource == 'SECRET' && activity.action == 'EXPORT' && secret.static_properties['scope'] == 'demo-agent'",
+  "consensus": "approvers.any(user, user.id == 'REPLACE_WITH_AGENT_USER_UUID')",
+  "notes": "Export only secrets imported with the approved demo-agent scope."
+}
+```
+
+Replace the principal and scope with the approved values, save the parameters to a file, and submit through `tk --profile admin --message-format json policy create --input-file policy.json`. This condition grants access to **every secret with that property**, including later imports. For access intended for one secret, use a unique approved scope and ensure it is not reused. Do not describe a shared tag as single-secret access.
+
+For additional human approval, require both the submitting agent and the intended human in consensus; see the submitter-in-consensus rule in [managing policies](../managing-policies/SKILL.md). A missing applicable ALLOW denies a non-root caller; matching DENY overrides ALLOW. Wallet conditions do not scope secrets. Never remove the metadata condition merely to make a denied export succeed.
 
 Validate allowed and denied access with synthetic values in an authorized test organization before relying on a new policy. Local command tests do not establish live policy behavior. Approval of an activity does not authorize unrelated exports or provider-token rotation.
 

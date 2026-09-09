@@ -12,7 +12,7 @@ while IFS= read -r command; do
       grep -F -- '--input-json' <<< "$help" >/dev/null
       grep -F -- '--input-file' <<< "$help" >/dev/null ;;
     'secret list') grep -F -- '--limit' <<< "$help" >/dev/null; grep -F -- '--cursor' <<< "$help" >/dev/null ;;
-    'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--input-file' <<< "$help" >/dev/null; grep -F -- '--init-activity-id' <<< "$help" >/dev/null ;;
+    'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--input-file' <<< "$help" >/dev/null; grep -F -- '--init-activity-id' <<< "$help" >/dev/null; grep -F -- '--static-properties-file' <<< "$help" >/dev/null ;;
     'secret export') grep -F -- '--output' <<< "$help" >/dev/null; grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'secret resume') grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;

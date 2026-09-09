@@ -26,7 +26,7 @@ tk --profile admin --message-format json whoami
 tk --profile admin --message-format json secret list --limit 50
 ```
 
-Listing returns metadata at `.data.items` and pagination at `.data.nextCursor`, not secret values. Follow supported pagination with `--cursor`; do not assume the first page is complete or that names are unique. Use the returned secret UUID for export and verify the selected organization.
+Listing returns metadata at `.data.items` and pagination at `.data.nextCursor`, not secret values. Follow supported pagination with `--cursor`; do not assume the first page is complete. Names are unique within an organization, so retain the organization context when identifying a secret. Use the returned secret UUID for export and verify the selected organization.
 
 ### Import from a protected source
 
@@ -35,6 +35,8 @@ Choose an existing file outside the repository whose contents the agent must not
 ```sh
 tk --profile admin --message-format json secret import --name service-token --input-file "$SECRET_INPUT_FILE"
 ```
+
+Optional `--static-properties-file PATH` accepts a JSON object with string keys and string values. These properties are policy-visible metadata, not encrypted secret contents; never put tokens, passwords, or other secret values in them.
 
 To receive bytes from an already authorized producer, pass `--input-file -` and connect the producer's stdout directly to the CLI's stdin. Do not construct an `echo` command containing the secret. Import preserves file bytes; avoid introducing a newline or text encoding conversion. The CLI encrypts the content for the enclave before submitting it.
 

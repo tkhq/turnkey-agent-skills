@@ -16,7 +16,7 @@ describe("skill CLI compatibility check", () => {
     const legacy = join(directory, "legacy-tk");
     writeFileSync(legacy, `#!/usr/bin/env bash
 if [[ "$1" == secret ]]; then exit 2; fi
-printf '%s\\n' '--message-format --input-json --input-file --api-key-file --output --timeout --wallet-id --user-id --body-file'
+printf '%s\\n' '<NAME> --message-format --input-json --input-file --api-key-file --output --timeout --wallet-id --user-id --body-file'
 `, { mode: 0o700 });
     const result = spawnSync("bash", ["scripts/check-cli.sh", legacy], { encoding: "utf8" });
     expect(result.status).not.toBe(0);

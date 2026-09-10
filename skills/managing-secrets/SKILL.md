@@ -11,7 +11,7 @@ metadata:
 
 ## Rules
 
-Use the root [CLI convention](../../SKILL.md) and verify `tk secret --help` before starting. Secrets require the newer CLI Secrets surface; a build supporting wallets alone is insufficient. Import endpoint availability depends on the deployed API and organization. Report an unavailable endpoint as a capability gap; do not bypass it with a raw plaintext request.
+Use the root [CLI convention](../../SKILL.md) and verify `tk secret --help` before starting. Secrets require the [tkhq/tk Secrets stack (#26)](https://github.com/tkhq/tk/pull/26); build its matching checkout with `cargo build -p tk --bin tk` and run `scripts/check-cli.sh /absolute/path/to/tk`. A build supporting wallets alone is insufficient. Import endpoint availability depends on the deployed API and organization. Report an unavailable endpoint as a capability gap; do not bypass it with a raw plaintext request.
 
 Keep secret contents outside the agent transcript. Accept an existing file path or a producer that pipes directly into the CLI. Do not read the source with a file tool, paste it into chat, interpolate it into command arguments, enable shell tracing, or print decrypted output to verify success. The CLI owns encryption and decryption. Generic `tk request` and `--input-json` are not substitutes for this workflow.
 
@@ -40,7 +40,7 @@ Optional `--static-properties-file PATH` accepts a JSON object with string keys 
 
 To receive bytes from an already authorized producer, pass `--input-file -` and connect the producer's stdout directly to the CLI's stdin. Do not construct an `echo` command containing the secret. Import preserves file bytes; avoid introducing a newline or text encoding conversion. The CLI encrypts the content for the enclave before submitting it.
 
-If initialization requires approval, retain its activity ID and the input file. After the initializer completes, reuse it without submitting another initializer:
+If initialization requires approval, the command exits zero with `.status: "pending"`, `.activity.id`, and `.data.nextStep`. Retain its activity ID and the input file. After the initializer completes, reuse it without submitting another initializer:
 
 ```sh
 tk --profile admin --message-format json secret import --name service-token --input-file "$SECRET_INPUT_FILE" --init-activity-id "$INIT_ACTIVITY_ID"
@@ -59,6 +59,10 @@ tk --profile agent --message-format json secret export "$SECRET_ID" --output "$S
 ```
 
 The output is written to an explicit protected file, never stdout. Existing output files are not overwritten. Keep the state file through pending approval, timeout, or an uncertain response. An exit status or activity receipt alone does not prove plaintext was recovered.
+
+Capture the JSON error record even when the command exits nonzero. `wait_timeout` and `submission_unknown` carry recovery context under `.details`, including `.details.stateFile`, `.details.fingerprint`, and `.details.activity` when observed. Reuse that state path; do not look for it under the success-only `.data` field or print the state contents. Failed/rejected activities use `api_error`; local input checks use `invalid_input`. A submission HTTP 5xx also uses `api_error` while retaining recovery state: check `.details.stateFile` and `httpStatus`, preserve the state, and reconcile with `secret resume` rather than treating that code as proof that no activity exists. Returned paths may be canonical absolute paths.
+
+The current port removes state after a submission HTTP 4xx rejection. If that happens, preserve the error metadata and reconcile the outcome before considering a new export; do not automatically resubmit or claim the missing state can decrypt the old activity.
 
 Inspect the activity and, when authorized, approve with the intended approver profile using the [activity workflow](../monitoring-activities/SKILL.md). Resume using the same identity, organization, and API endpoint as the original export:
 

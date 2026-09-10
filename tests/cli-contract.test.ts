@@ -1,6 +1,7 @@
 /** Execute the documented tk contract against loopback fixtures, never a live org. */
+import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, existsSync, realpathSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -13,7 +14,7 @@ const org = "11111111-1111-4111-8111-111111111111";
 
 describe.skipIf(!binary)("tk repository command contract", () => {
   it("logs in by name and preserves success, pending, and error recovery records", async () => {
-    const directory = mkdtempSync(join(tmpdir(), "tk-contract-"));
+    const directory = realpathSync(mkdtempSync(join(tmpdir(), "tk-contract-")));
     const requests: string[] = [];
     const activity = { id: "fixture-activity", status: "ACTIVITY_STATUS_CONSENSUS_NEEDED" };
     const server = createServer((req, res) => {
@@ -24,6 +25,18 @@ describe.skipIf(!binary)("tk repository command contract", () => {
         res.end(JSON.stringify({ organizationId: org, organizationName: "fixture", userId: "fixture-user", username: "fixture" }));
       } else if (req.url === "/public/v1/submit/create_wallet") {
         res.end(JSON.stringify({ activity }));
+      } else if (req.url === "/public/v1/submit/init_import_secrets") {
+        const chunks: Buffer[] = [];
+        req.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+        req.on("end", () => res.end(JSON.stringify({ activity: {
+          ...activity, organizationId: org, type: "ACTIVITY_TYPE_INIT_IMPORT_SECRETS",
+          fingerprint: `sha256:${createHash("sha256").update(Buffer.concat(chunks)).digest("hex")}`,
+        } })));
+      } else if (req.url === "/public/v1/submit/export_secrets") {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ message: "synthetic unknown submission" }));
+      } else if (req.url === "/public/v1/query/list_activities") {
+        res.end(JSON.stringify({ activities: [] }));
       } else if (req.url === "/public/v1/query/get_activity") {
         res.end(JSON.stringify({ activity }));
       } else {
@@ -71,6 +84,23 @@ describe.skipIf(!binary)("tk repository command contract", () => {
       const usage = await run(["login", "--api-key-file", key], 2);
       expect(usage).toMatchObject({ reason: "command_error", code: "usage_error" });
       expect(requests.filter((path) => path === "/public/v1/submit/create_wallet")).toHaveLength(1);
+      const source = join(directory, "synthetic.bin");
+      writeFileSync(source, "synthetic fixture", { mode: 0o600 });
+      const init = await run(["--profile", "fixture", "secret", "import", "--name", "fixture", "--input-file", source]);
+      expect(init).toMatchObject({ status: "pending", activity, data: { phase: "init-import" } });
+      expect(init.data.nextStep).toContain("--init-activity-id");
+      const state = join(directory, "export.state");
+      const output = join(directory, "recovered.bin");
+      const unknown = await run(["--profile", "fixture", "secret", "export", org, "--state-file", state, "--output", output, "--timeout", "1"], 1);
+      expect(unknown).toMatchObject({ reason: "command_error", code: "api_error", httpStatus: 500, details: { stateFile: state } });
+      expect(existsSync(state)).toBe(true);
+      expect(existsSync(output)).toBe(false);
+      const resumed = await run(["--profile", "fixture", "secret", "resume", "--state-file", state, "--timeout", "1"], 1);
+      expect(resumed).toMatchObject({ code: "submission_unknown", details: { stateFile: state } });
+      expect(existsSync(state)).toBe(true);
+      expect(existsSync(output)).toBe(false);
+      expect(requests.filter((path) => path === "/public/v1/submit/export_secrets")).toHaveLength(1);
+
     } finally {
       await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
       rmSync(directory, { recursive: true, force: true });

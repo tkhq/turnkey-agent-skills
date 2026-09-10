@@ -30,7 +30,7 @@ tk --profile approver --message-format json activity reject "$ACTIVITY_ID"
 
 The CLI accepts the **activity ID** for approve/reject and resolves the fingerprint itself. Raw API references use fingerprints; do not pass those in place of the CLI ID. Review the original intent and parameters under the already-authorized workflow before approving/rejecting. Rejection is permanent; unclear targets require clarification, while an explicit existing authorization need not be repeated.
 
-List accepts `--limit` and `--cursor` (the API after cursor), not `--all`, status filters, or type filters. Filter returned records locally or use a complete supported query body with `tk request` when necessary. Continue pages explicitly. Wait is bounded and resumes an existing activity; timeout is not permission to repeat the original mutation.
+List accepts `--limit` and `--cursor` (the API after cursor), not `--all`, status filters, or type filters. Filter returned records locally or use a complete supported query body with `tk request` when necessary. Continue pages explicitly. Wait is bounded and resumes an existing activity; timeout returns a nonzero exit with `code: "wait_timeout"` and the last observed identity at `.details.activity`. Save the error record and resume by that ID; timeout is not permission to repeat the original mutation.
 
 Keep automated approver permissions narrow and separate from worker signing authority where the workflow requires independent review. Consensus must include the submitter and required reviewers; see [policy consensus guidance](../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
 

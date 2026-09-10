@@ -11,7 +11,7 @@ while IFS= read -r command; do
     'user create'|'user update'|'user tag create'|'user tag update'|'policy create'|'policy create-batch'|'policy update'|'wallet create'|'wallet update'|'wallet account create'|'sign payload'|'sign transaction'|'api-key register')
       grep -F -- '--input-json' <<< "$help" >/dev/null
       grep -F -- '--input-file' <<< "$help" >/dev/null ;;
-    'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
+    'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null; grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'activity wait') grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'wallet account list') grep -F -- '--wallet-id' <<< "$help" >/dev/null ;;
@@ -22,7 +22,10 @@ done <<'COMMANDS'
 auth status
 auth whoami
 login
-profile import
+profile list
+profile show
+profile use
+profile delete
 api-key generate
 api-key register
 api-key delete

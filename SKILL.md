@@ -14,9 +14,9 @@ Use `tk` for credentials, signed requests, and the core agent lifecycle. Skills 
 
 ## CLI readiness
 
-This conversion targets the **local, unreleased unified CLI** built from the Rust SDK repository. No published minimum version is claimed. The older experimental `tk` binary and released `tvc`/`turnkey` binaries do not provide this surface. Before executing a workflow, check `tk --help` plus its required subcommand help. A matching version string alone is insufficient during development.
+This conversion targets the **unreleased unified CLI** in [tkhq/tk](https://github.com/tkhq/tk), with the output and core command surface from [#24](https://github.com/tkhq/tk/pull/24) and [#25](https://github.com/tkhq/tk/pull/25). No published minimum version is claimed. The older experimental `tk` binary and released `tvc`/`turnkey` binaries do not provide this surface. Before executing a workflow, check `tk --help` plus its required subcommand help. A matching version string alone is insufficient during development.
 
-Build the integrated rust-sdk checkout with `cargo build -p tvc --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
+Build the matching `tk` checkout with `cargo build -p tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
 
 Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
@@ -46,8 +46,10 @@ tk profile list
 For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), login verifies identity before saving/selecting a new named profile:
 
 ```sh
-tk --profile admin --organization-id "$ORG_ID" login --api-key-file "$ADMIN_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" login admin --api-key-file "$ADMIN_KEY_FILE"
 ```
+
+Login takes a positional **new profile name**; `--profile` selects an existing identity for other commands. Profiles live in `~/.config/turnkey/tk.config.toml` (override with `--config` or `TK_CONFIG`). This surface has no `profile import` or automatic legacy `tk.toml` migration; register an existing credential file with `login NAME`.
 
 Generate replacement/agent credentials locally into an explicit, private destination outside the repository:
 
@@ -73,7 +75,9 @@ tk --profile agent --message-format json sign payload --input-file payload.json
 
 ## Machine results and pending work
 
-Use `--message-format json`; consume complete JSON records and check `schemaVersion: 1`. Successful records use `reason: "command_result"`; failures use `reason: "command_error"` and a nonzero exit. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
+Use `--message-format json`; it disables interactive prompts and emits newline-delimited JSON on stdout. Dispatch on `reason` first. Successful core API records use `reason: "command_result"` and `schemaVersion: 1`. Errors use `reason: "command_error"` or `"missing_required_input"`, a stable `code`, and a nonzero exit (1 for runtime failure, 2 for usage errors); error records have no `schemaVersion`. Preserve stdout even on failure. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
+
+Recovery errors can include `.details.activity` with the last observed activity ID/status. `wait_timeout` means the bounded wait expired; `submission_unknown` requires reconciliation before any retry. Do not expect the success record's `.activity` or `.data` fields on errors, and do not parse prose messages for activity IDs.
 
 **Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file.
 

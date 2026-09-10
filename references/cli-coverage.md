@@ -8,6 +8,7 @@ This targets the unreleased [tkhq/tk unified CLI stack](https://github.com/tkhq/
 | managing-users + user/key references | user list/get/create/update/delete, tag list/create/update/delete, api-key generate/register/list/delete | Root quorum management is separate; get-api-key-by-ID uses request if needed |
 | managing-policies + API/templates/language references | policy list/get/create/create-batch/update/delete/evaluations | Contract interface requests use complete envelopes; no local policy proof |
 | managing-wallets + wallet reference | wallet list/get/create/update and account list/create | Account get/deletion, import/export crypto, full pagination remain separate |
+| managing-secrets | secret list/import/export/resume; protected recipient state across approval | Requires Secrets-capable API; no delete/update/provider rotation; live policy acceptance remains separate |
 | monitoring-activities + activity/approver references | activity list/get/wait/approve/reject | App proof query bridge; proof verification is not retrieval |
 | provisioning-agent + walkthrough/personas | Compose wallet/user/tag/key/policy operations with explicit profiles | Persist partial IDs; verify with agent credentials |
 | managing-agent + diagnosis/update/rotation references | evaluations, policy updates, key rotation, user revocation, account creation | Preserve requested scope; no automatic recovery mutation |

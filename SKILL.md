@@ -1,11 +1,11 @@
 ---
 name: turnkey-agent-skills
-description: "Use when working with Turnkey wallet infrastructure — creating wallets, signing blockchain transactions, managing users and policies, provisioning agents, or monitoring activities. Supports Ethereum/EVM, Solana, Bitcoin, and 10+ other chains. Keys stay in hardware-backed secure enclaves."
+description: "Use when working with Turnkey wallet infrastructure — creating wallets, signing blockchain transactions, managing users, policies, and secrets, provisioning agents, or monitoring activities. Supports Ethereum/EVM, Solana, Bitcoin, and 10+ other chains. Keys stay in hardware-backed secure enclaves."
 license: Apache-2.0
 compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
-  tags: "turnkey wallet signing blockchain ethereum solana bitcoin crypto policy agent"
+  tags: "turnkey wallet signing blockchain ethereum solana bitcoin crypto policy secrets agent"
 ---
 
 # Turnkey Skills
@@ -18,7 +18,7 @@ This conversion targets the **unreleased unified CLI** in [tkhq/tk](https://gith
 
 Build the matching `tk` checkout with `cargo build -p tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
 
-Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
+Eight core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, managing-agent, and managing-secrets. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
 ## Skills
 
@@ -30,6 +30,7 @@ Seven core entrypoints are CLI-backed: getting-started, managing-users, managing
 | [Managing users](skills/managing-users/SKILL.md) | Users, tags, and registered API keys |
 | [Managing policies](skills/managing-policies/SKILL.md) | Policy CRUD, consensus, and evaluations |
 | [Managing wallets](skills/managing-wallets/SKILL.md) | Wallets and derived accounts |
+| [Managing secrets](skills/managing-secrets/SKILL.md) | Import encrypted secrets, list metadata, and export to protected files |
 | [Monitoring activities](skills/monitoring-activities/SKILL.md) | Inspect, approve/reject, and resume pending work |
 | [Signing transactions](skills/signing-transactions/SKILL.md) | Serialized signing plus explicitly retained chain SDK workflows |
 
@@ -63,7 +64,7 @@ For unattended use, the full `TURNKEY_ORGANIZATION_ID`, `TURNKEY_API_PUBLIC_KEY`
 
 ## Calling the API
 
-Use dedicated commands with exactly one of `--input-json JSON` or `--input-file PATH`; `--input-file -` reads stdin. Inputs are the generated operation's **parameters object**, not an activity envelope. Use files for policy expressions and structured batches. UUIDs and unsupported fields are checked locally; policy authorization remains server-evaluated.
+For resource parameter commands, use exactly one of `--input-json JSON` or `--input-file PATH`; `--input-file -` reads stdin. Inputs are the generated operation's **parameters object**, not an activity envelope. Use files for policy expressions and structured batches. UUIDs and unsupported fields are checked locally; policy authorization remains server-evaluated.
 
 ```sh
 tk --profile admin --message-format json policy create --input-file policy.json
@@ -90,4 +91,4 @@ No submit command has an automatic `--wait` flag. Waiting resumes by activity ID
 
 ## Reference boundaries
 
-Retained API reference JSON is useful for fields and policy semantics, but is not a second execution path for the converted core skills. Use the CLI mappings; SDK setup, key-generation helpers, and old envelope instructions are superseded here. Import/export bundle cryptography and general chain construction/broadcast examples remain future work. Existing user authorization persists; do not re-ask solely because an old reference says to confirm every call.
+Retained API reference JSON is useful for fields and policy semantics, but is not a second execution path for the converted core skills. Use the CLI mappings; SDK setup, key-generation helpers, and old envelope instructions are superseded here. Wallet/private-key import/export bundle cryptography and general chain construction/broadcast examples remain future work. Secrets use the dedicated managing-secrets workflow; never send plaintext through generic request bodies or parameter JSON. Existing user authorization persists; do not re-ask solely because an old reference says to confirm every call.

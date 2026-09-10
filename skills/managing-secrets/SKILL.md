@@ -1,0 +1,111 @@
+---
+name: managing-secrets
+description: "Manage Turnkey Secrets through the tk CLI: list metadata, encrypt file or stdin imports, export to protected files, and recover pending approvals without exposing plaintext to the agent."
+license: Apache-2.0
+metadata:
+  author: turnkey
+  tags: "turnkey secrets encrypted-import export consensus"
+---
+
+# Managing Secrets
+
+## Rules
+
+Use the root [CLI convention](../../SKILL.md) and verify `tk secret --help` before starting. Secrets require the [tkhq/tk Secrets stack (#26)](https://github.com/tkhq/tk/pull/26); build its matching checkout with `cargo build -p tk --bin tk` and run `scripts/check-cli.sh /absolute/path/to/tk`. A build supporting wallets alone is insufficient. Import endpoint availability depends on the deployed API and organization. Report an unavailable endpoint as a capability gap; do not bypass it with a raw plaintext request.
+
+Keep secret contents outside the agent transcript. Accept an existing file path or a producer that pipes directly into the CLI. Do not read the source with a file tool, paste it into chat, interpolate it into command arguments, enable shell tracing, or print decrypted output to verify success. The CLI owns encryption and decryption. Generic `tk request` and `--input-json` are not substitutes for this workflow.
+
+Use an explicit profile for every remote command. Before export, establish the intended secret ID, recipient destination, and existing user authorization. Authorization to list metadata is not authorization to export plaintext. Preserve authorization already given for that exact operation; do not ask again solely because this skill was loaded.
+
+## Instructions
+
+### List and identify
+
+```sh
+tk --profile admin --message-format json whoami
+tk --profile admin --message-format json secret list --limit 50
+```
+
+Listing returns metadata at `.data.items` and pagination at `.data.nextCursor`, not secret values. Follow supported pagination with `--cursor`; do not assume the first page is complete. Names are unique within an organization, so retain the organization context when identifying a secret. Use the returned secret UUID for export and verify the selected organization.
+
+### Import from a protected source
+
+Choose an existing file outside the repository whose contents the agent must not inspect:
+
+```sh
+tk --profile admin --message-format json secret import --name service-token --input-file "$SECRET_INPUT_FILE"
+```
+
+Optional `--static-properties-file PATH` accepts a JSON object with string keys and string values. These properties are policy-visible metadata, not encrypted secret contents; never put tokens, passwords, or other secret values in them.
+
+To receive bytes from an already authorized producer, pass `--input-file -` and connect the producer's stdout directly to the CLI's stdin. Do not construct an `echo` command containing the secret. Import preserves file bytes; avoid introducing a newline or text encoding conversion. The CLI encrypts the content for the enclave before submitting it.
+
+If initialization requires approval, the command exits zero with `.status: "pending"`, `.activity.id`, and `.data.nextStep`. Retain its activity ID and the input file. After the initializer completes, reuse it without submitting another initializer:
+
+```sh
+tk --profile admin --message-format json secret import --name service-token --input-file "$SECRET_INPUT_FILE" --init-activity-id "$INIT_ACTIVITY_ID"
+```
+
+Use the same identity and organization. This recovery flag is for the initialization activity, not a final import activity. For a pending final import, use `activity get` or `activity wait` instead of repeating the command.
+
+Record activity IDs and inspect status before claiming completion. A completed import returns `.data.secretIds`; an initialization receipt is not the imported secret. If a submission is uncertain, reconcile activity history before any retry; repeating import can create another secret. Retain the input securely until completion is established, then follow the user's source-retention preference.
+
+### Export and resume
+
+Choose new output and state-file paths in a private directory outside the repository. The state file contains the recipient decryption material while pending; treat it as a credential, not a review artifact or log attachment.
+
+```sh
+tk --profile agent --message-format json secret export "$SECRET_ID" --output "$SECRET_OUTPUT_FILE" --state-file "$SECRET_STATE_FILE" --timeout 60
+```
+
+The output is written to an explicit protected file, never stdout. Existing output files are not overwritten. Keep the state file through pending approval, timeout, or an uncertain response. An exit status or activity receipt alone does not prove plaintext was recovered.
+
+Capture the JSON error record even when the command exits nonzero. `wait_timeout` and `submission_unknown` carry recovery context under `.details`, including `.details.stateFile`, `.details.fingerprint`, and `.details.activity` when observed. Reuse that state path; do not look for it under the success-only `.data` field or print the state contents. Failed/rejected activities use `api_error`; local input checks use `invalid_input`. A submission HTTP 5xx also uses `api_error` while retaining recovery state: check `.details.stateFile` and `httpStatus`, preserve the state, and reconcile with `secret resume` rather than treating that code as proof that no activity exists. Returned paths may be canonical absolute paths.
+
+The current port removes state after a submission HTTP 4xx rejection. If that happens, preserve the error metadata and reconcile the outcome before considering a new export; do not automatically resubmit or claim the missing state can decrypt the old activity.
+
+Inspect the activity and, when authorized, approve with the intended approver profile using the [activity workflow](../monitoring-activities/SKILL.md). Resume using the same identity, organization, and API endpoint as the original export:
+
+```sh
+tk --profile agent --message-format json secret resume --state-file "$SECRET_STATE_FILE" --timeout 60
+```
+
+Resume uses the saved operation and decryption material; it does not submit a replacement export. `activity wait` can inspect status but cannot decrypt the result by itself. If the state file is lost, do not claim that the old export can be decrypted from the activity ID alone. Never upload the state file to diagnose a failure.
+
+After successful recovery, verify that the output file still exists using filesystem metadata only, then report the destination and completion metadata. A completed receipt can describe a prior write even if the file was later moved or removed; do not claim a missing file is available. Do not read or print the recovered secret. Pass the file directly to the user's authorized consumer. Plaintext output retention belongs to that task; do not silently delete it or copy it elsewhere.
+
+### Scope access
+
+Use a non-root identity for autonomous secret access; root quorum members bypass policy restrictions. For a metadata-scoped export policy, assign a nonsecret scope at import, such as `{"scope":"demo-agent"}` in the static-properties file. The following policy permits only the named agent to export secrets carrying that scope:
+
+```json
+{
+  "policyName": "Agent export for demo scope",
+  "effect": "EFFECT_ALLOW",
+  "condition": "activity.resource == 'SECRET' && activity.action == 'EXPORT' && secret.static_properties['scope'] == 'demo-agent'",
+  "consensus": "approvers.any(user, user.id == 'REPLACE_WITH_AGENT_USER_UUID')",
+  "notes": "Export only secrets imported with the approved demo-agent scope."
+}
+```
+
+Replace the principal and scope with the approved values, save the parameters to a file, and submit through `tk --profile admin --message-format json policy create --input-file policy.json`. This condition grants access to **every secret with that property**, including later imports. For access intended for one secret, use a unique approved scope and ensure it is not reused. Do not describe a shared tag as single-secret access.
+
+For additional human approval, require both the submitting agent and the intended human in consensus; see the submitter-in-consensus rule in [managing policies](../managing-policies/SKILL.md). A missing applicable ALLOW denies a non-root caller; matching DENY overrides ALLOW. Wallet conditions do not scope secrets. Never remove the metadata condition merely to make a denied export succeed.
+
+Validate allowed and denied access with synthetic values in an authorized test organization before relying on a new policy. Local command tests do not establish live policy behavior. Approval of an activity does not authorize unrelated exports or provider-token rotation.
+
+## Troubleshooting
+
+- Pending or timed out export: retain state, inspect the activity, and resume the original export after required approval.
+- Unknown submission: use saved state to reconcile; do not change timestamps or start a new export to force a result.
+- Profile mismatch: restore the original identity and endpoint, rather than editing the state file.
+- Existing output or unsafe destination: preserve both files; choose a supported recovery path without overwriting user data.
+- Denied operation: inspect activity/policy evaluations with the appropriate identity; do not switch to root to bypass the requested scope.
+
+This skill covers list/import/export and export recovery. Secret update/delete, automatic provider-token rotation, environment injection, and wallet/private-key import/export are separate capabilities; do not invent corresponding commands.
+
+## Related Skills
+
+- [Managing policies](../managing-policies/SKILL.md): scoped access and consensus.
+- [Managing users](../managing-users/SKILL.md): non-root identities and credentials.
+- [Monitoring activities](../monitoring-activities/SKILL.md): inspect and approve the existing activity.

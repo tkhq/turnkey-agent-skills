@@ -15,7 +15,7 @@ while IFS= read -r command; do
     'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--input-file' <<< "$help" >/dev/null; grep -F -- '--init-activity-id' <<< "$help" >/dev/null; grep -F -- '--static-properties-file' <<< "$help" >/dev/null ;;
     'secret export') grep -F -- '--output' <<< "$help" >/dev/null; grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'secret resume') grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
-    'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
+    'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null; grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'activity wait') grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'wallet account list') grep -F -- '--wallet-id' <<< "$help" >/dev/null ;;
@@ -26,7 +26,10 @@ done <<'COMMANDS'
 auth status
 auth whoami
 login
-profile import
+profile list
+profile show
+profile use
+profile delete
 api-key generate
 api-key register
 api-key delete

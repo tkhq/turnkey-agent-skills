@@ -23,7 +23,7 @@ Provision a non-root identity, wallet, and scoped policy using the local unified
 5. Login with the **agent key**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
 
 ```sh
-tk --profile agent --organization-id "$ORG_ID" login --api-key-file "$AGENT_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" login agent --api-key-file "$AGENT_KEY_FILE"
 tk --profile agent --message-format json whoami
 tk --profile agent --message-format json sign transaction --input-file allowed-transaction.json
 tk --profile agent --message-format json sign transaction --input-file denied-transaction.json

@@ -1,6 +1,6 @@
 # CLI conversion coverage and examples
 
-This is a local, unreleased integration contract. Verify capabilities with `scripts/check-cli.sh /absolute/path/to/tk` before executing a skill. No package version is a release gate yet.
+This targets the unreleased [tkhq/tk unified CLI stack](https://github.com/tkhq/tk/pull/25), built with `cargo build -p tk --bin tk`. Verify capabilities with `scripts/check-cli.sh /absolute/path/to/tk` before executing a skill. No package version is a release gate yet.
 
 | Maintained source | CLI-backed operation | Remaining boundary |
 |---|---|---|
@@ -59,6 +59,6 @@ For smart-contract interface upload/list/delete, use the current request types a
 
 ## Response handling
 
-Capture stdout in a result file and inspect the final JSON record. For wallet creation, completed results expose `.data.activity.result.createWalletResult.walletId`; user creation exposes `.data.activity.result.createUsersResult.userIds`. Pending records have no required result IDs. Retain `.activity.id`, wait separately, then inspect the completed result. Handle nonzero exits without discarding their JSON error record; reconcile `submission_unknown` before any repeat mutation.
+Capture stdout in a result file and inspect the final JSON record. For wallet creation, completed results expose `.data.activity.result.createWalletResult.walletId`; user creation exposes `.data.activity.result.createUsersResult.userIds`. Pending records have no required result IDs. Retain `.activity.id`, wait separately, then inspect the completed result. Handle nonzero exits without discarding their JSON error record; use `.details.activity` on errors and reconcile `submission_unknown` before any repeat mutation. Errors carry `code` rather than the success-only `schemaVersion`/`data` contract.
 
 The CLI's own mock tests validate transport, input shapes, and statuses. This skill artifact's optional binary checks verify command availability and offline key generation. Neither establishes live permissions, funded-chain behavior, managed-send access, or full end-to-end agent lifecycle success.

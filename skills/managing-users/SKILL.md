@@ -45,7 +45,7 @@ tk --profile admin --message-format json api-key register --input-file public-ke
 `public-keys.json` contains `userId` and `apiKeys`; use only the generated public key. Wait for registration completion, then verify the replacement with a new profile before revocation:
 
 ```sh
-tk --profile agent-next --organization-id "$ORG_ID" login --api-key-file "$NEW_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" login agent-next --api-key-file "$NEW_KEY_FILE"
 tk --profile agent-next --message-format json whoami
 tk --profile admin --message-format json api-key delete --user-id "$USER_ID" "$OLD_KEY_ID"
 ```

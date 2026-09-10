@@ -1,5 +1,8 @@
 # Raw Payload Signing Examples
 
+> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk sign payload` / `tk sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
+
+
 Use `sign_raw_payload` to sign arbitrary bytes with a Turnkey-stored key. This is the universal fallback for chains without a dedicated `TRANSACTION_TYPE_*` (Cosmos, Aptos, Sui, TON, Tron, etc.) and for custom signing schemes.
 
 You are responsible for serialization, hashing (or choosing the right hash function), and broadcasting. Turnkey just signs.

@@ -1,5 +1,8 @@
 # Key Rotation Examples
 
+> **CLI migration:** This is retained API parameter/semantic reference material. Execute supported core operations through the commands in the parent SKILL.md and root CLI convention. SDK authentication, stamping, inline key-generation scripts, and old envelope/retry instructions below are superseded. Import/export crypto and unvalidated request bridges remain explicit gaps; this reference alone does not establish CLI completion. Existing user authorization takes precedence over blanket per-call confirmation wording in legacy examples.
+
+
 Complete request/response for the 4-step API key rotation workflow.
 
 **Base URL:** `https://api.turnkey.com`
@@ -11,7 +14,7 @@ Complete request/response for the 4-step API key rotation workflow.
 You need:
 - The agent's `userId` (from `list_users` or saved during provisioning)
 - The old API key ID (from `get_api_keys`)
-- A newly generated P-256 key pair (local) — use the `generateApiKeyPair` helper from the root [`SKILL.md`](../../../SKILL.md) "Generating API key pairs" section, and pick a destination for the new private key before running it (see that section's "Destination for the private key" subsection). The new private key will replace the old value in the agent's runtime environment in Step 5.
+- Generate a replacement using `tk api-key generate --output "$NEW_KEY_FILE"`. Read only its public metadata into registration parameters; use the new named profile to verify identity before revoking the old key. See the parent skill for the CLI sequence.
 
 ## Step 1: List current API keys
 

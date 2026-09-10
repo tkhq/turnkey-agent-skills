@@ -1,5 +1,8 @@
 # Policy Templates and Anti-Patterns
 
+> **CLI migration:** This is retained API parameter/semantic reference material. Execute supported core operations through the commands in the parent SKILL.md and root CLI convention. SDK authentication, stamping, inline key-generation scripts, and old envelope/retry instructions below are superseded. Import/export crypto and unvalidated request bridges remain explicit gaps; this reference alone does not establish CLI completion. Existing user authorization takes precedence over blanket per-call confirmation wording in legacy examples.
+
+
 Starting points for common policy patterns, plus mistakes to avoid. Always scope to the specific user/wallet and tighten further based on the use case.
 
 ## Good ALLOW policy templates

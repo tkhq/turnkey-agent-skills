@@ -35,7 +35,7 @@ Properties are immutable. To change a secret's level, import a new secret and de
 
 Wallets follow the same idea later: tag or name wallets by trust level and write signing policies against `wallet.id` sets, not one address at a time.
 
-## The five policies
+## The six policies
 
 Substitute the three tag ids. Each command is one `tk policy create`; the JSON form for `--input-json` follows for readers who prefer it.
 
@@ -79,7 +79,17 @@ tk --profile admin --message-format json policy create --name provisioners-nothi
   --condition "activity.type != 'ACTIVITY_TYPE_CREATE_API_KEYS_V2'"
 ```
 
-The same five as parameters objects:
+### 6. provisioners-no-self-keys (deny, one per provisioner)
+
+```sh
+tk --profile admin --message-format json policy create --name provisioners-no-self-keys --effect deny \
+  --consensus "approvers.any(user, user.tags.contains('PROVISIONER_TAG'))" \
+  --condition "activity.type == 'ACTIVITY_TYPE_CREATE_API_KEYS_V2' && activity.params.user_id == 'PROVISIONER_USER_UUID'"
+```
+
+This is the one id-based policy. Without it, a provisioner proposing a key on *itself* is not denied but goes pending under policy 4, waiting for a human who might approve by habit. The target user's tags are not policy-visible, so the only hard stop names the provisioner's own user id. Create one per provisioner user. Verified live on 2026-09-16: without it the self-mint went pending; with it, HTTP 403.
+
+The same policies as parameters objects (policy 6 omitted because it carries a user id):
 
 ```json
 [
@@ -123,9 +133,11 @@ The same five as parameters objects:
 
 Everything not listed is implicitly denied for non-root users.
 
+In the acceptance test below, the provisioner self-mint must return `unauthorized` (403). If it returns `pending` instead, policy 6 is missing.
+
 ## Why the two DENY policies exist
 
-Turnkey's policy engine default-allows a user creating or deleting **their own** API keys and authenticators when no policy decides. Without policy 3, an agent holding a seven-day key could register itself a permanent one. Without policy 5, the provisioner could do the same for itself, and could delete other users' keys. Policies 3 and 5 close both holes; do not remove them to make a denied activity succeed.
+Turnkey's policy engine default-allows a user creating or deleting **their own** API keys and authenticators when no policy decides. Without policy 3, an agent holding a seven-day key could register itself a permanent one. Without policies 5 and 6, the provisioner could delete other users' keys and propose keys on itself. Policies 3, 5, and 6 close these holes; do not remove them to make a denied activity succeed.
 
 ## What policies cannot see
 

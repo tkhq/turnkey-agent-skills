@@ -14,7 +14,7 @@ A session agent holds only expiring API keys. A separate provisioner identity re
 
 ## Rules
 
-The agent and the provisioner never share a container or credential store. Only the agent's public key crosses between them; private keys are generated where they are used and never move. Every mint is approved by a `human-approver`; the provisioner alone cannot complete one. The agent user keeps one never-expiring anchor key whose private half was discarded, because Turnkey requires one long-lived credential per user. Do not weaken policies 3 to 5 to make a denied activity pass.
+The agent and the provisioner never share a container or credential store. Only the agent's public key crosses between them; private keys are generated where they are used and never move. Every mint is approved by a `human-approver`; the provisioner alone cannot complete one. The agent user keeps one never-expiring anchor key whose private half was discarded, because Turnkey requires one long-lived credential per user. Do not weaken policies 3 to 6 to make a denied activity pass.
 
 ## Instructions
 
@@ -35,7 +35,7 @@ The agent and the provisioner never share a container or credential store. Only 
 
    Its one long-lived key stays on the provisioner host. Log in there with `tk --message-format json login --profile-name provisioner`.
 
-3. **Apply policies 4 and 5** from the reference: `provisioners-mint-agent-keys` and `provisioners-nothing-else`. Explain them before submitting; record the ids.
+3. **Apply policies 4, 5, and 6** from the reference: `provisioners-mint-agent-keys`, `provisioners-nothing-else`, and `provisioners-no-self-keys` with this provisioner's user id. Explain them before submitting; record the ids.
 
 4. **Run the mint loop once, end to end.**
 
@@ -62,7 +62,7 @@ The agent and the provisioner never share a container or credential store. Only 
 
 5. **Set up renewal.** The agent host runs `tk --message-format json session status --profile-name agent --warn-before 48h` on a schedule. Exit 1 with `code: session_expiring` means: run `session request`, ship the public key, and wait for `activate` to succeed. A key left unapproved past expiry breaks the agent's exports until a mint is approved; that is the accepted trade for having no long-lived key on the agent host.
 
-6. **Verify the boundaries** with the reference's acceptance test as the provisioner profile: registering a key on the provisioner itself and deleting any key must both be denied.
+6. **Verify the boundaries** with the reference's acceptance test as the provisioner profile: registering a key on the provisioner itself and deleting any key must both return `unauthorized`. A `pending` result on the self-registration means policy 6 is missing.
 
 7. **Hand off.** Report both profile locations, the provisioner user id, policy ids, and the current key's `expiresAt`. Never report private material.
 

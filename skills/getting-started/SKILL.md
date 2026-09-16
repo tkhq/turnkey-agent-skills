@@ -2,7 +2,7 @@
 name: getting-started
 description: "Day-0 onboarding workflow for Turnkey: verify API credentials, create your first wallet, and optionally test signing. Use for first-time setup; for agent provisioning, use provisioning-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "workflow onboarding getting-started first-wallet"
@@ -12,7 +12,7 @@ metadata:
 
 ## Rules
 
-Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the local unreleased binary. Use `tk auth status` for local readiness and `tk whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
+Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the installed binary is tk 0.2.0 or later. Use `tk auth status` for local readiness and `tk whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
 
 ## Instructions
 

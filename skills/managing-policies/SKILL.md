@@ -2,7 +2,7 @@
 name: managing-policies
 description: "Manages Turnkey policies for access control and transaction governance: ALLOW/DENY policies, consensus expressions, allowlists, spending limits, multi-sig approval, smart contract ABIs, and policy evaluation debugging."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "policy access-control governance security allowlist deny consensus smart-contract"

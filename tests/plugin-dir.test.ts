@@ -21,6 +21,7 @@ const SKILL_NAMES = [
   "managing-wallets",
   "managing-users",
   "managing-policies",
+  "managing-secrets",
   "monitoring-activities",
   "getting-started",
   "provisioning-agent",

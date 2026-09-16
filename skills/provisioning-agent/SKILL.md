@@ -2,7 +2,7 @@
 name: provisioning-agent
 description: "End-to-end workflow to give an AI agent a scoped Turnkey wallet: creates a wallet, a non-root agent user, and a wallet-scoped ALLOW policy, then verifies signing and outputs agent credentials. For day-2 operations, use managing-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "workflow agent wallet provisioning onboarding policies scoped-access"
@@ -17,13 +17,13 @@ Provision a non-root identity, wallet, and scoped policy using the local unified
 ## Instructions
 
 1. Verify the admin identity with `tk --profile admin whoami`. List wallets before creating one, then reuse or create the intended wallet. Record its UUID and account addresses only after completion.
-2. Generate the agent key into an explicit private destination: `tk --message-format json api-key generate --output "$AGENT_KEY_FILE" > generated-key.json`. Register only its public key; no inline SDK/key-generation scripts.
+2. Create the agent profile locally: `tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent > agent-profile.json`. It generates the credential under `~/.config/turnkey/tk/api-keys/` and reports `.data.publicKey`; pass `--api-key-file` instead for a key generated with `tk api-key generate --output`. Register only the public key; no inline SDK/key-generation scripts.
 3. List/create the intended user tag with `tk user tag list/create`. Then `tk --profile admin --message-format json user create --input-file users.json`. Use CreateUsersIntentV4 fields, including `userTags` (tag UUIDs), and public API-key entries. Save the created user ID and key-registration result.
 4. Prepare a scoped policy file naming that user/tag and wallet. Explain its effect/condition/consensus and apply the already-authorized scope with `tk --profile admin --message-format json policy create --input-file policy.json`. List/get the policy after completion.
-5. Login with the **agent key**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
+5. Login with the **agent profile**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" login agent --api-key-file "$AGENT_KEY_FILE"
+tk --message-format json login --profile-name agent
 tk --profile agent --message-format json whoami
 tk --profile agent --message-format json sign transaction --input-file allowed-transaction.json
 tk --profile agent --message-format json sign transaction --input-file denied-transaction.json

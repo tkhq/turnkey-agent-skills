@@ -1,6 +1,6 @@
 /** Execute the documented tk contract against loopback fixtures, never a live org. */
 import { execFile } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, existsSync, realpathSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -12,8 +12,8 @@ const exec = promisify(execFile);
 const org = "11111111-1111-4111-8111-111111111111";
 
 describe.skipIf(!binary)("tk repository command contract", () => {
-  it("logs in by name and preserves success, pending, and error recovery records", async () => {
-    const directory = mkdtempSync(join(tmpdir(), "tk-contract-"));
+  it("creates and logs in a profile and preserves success, pending, and error records", async () => {
+    const directory = realpathSync(mkdtempSync(join(tmpdir(), "tk-contract-")));
     const requests: string[] = [];
     const activity = { id: "fixture-activity", status: "ACTIVITY_STATUS_CONSENSUS_NEEDED" };
     const server = createServer((req, res) => {
@@ -24,6 +24,8 @@ describe.skipIf(!binary)("tk repository command contract", () => {
         res.end(JSON.stringify({ organizationId: org, organizationName: "fixture", userId: "fixture-user", username: "fixture" }));
       } else if (req.url === "/public/v1/submit/create_wallet") {
         res.end(JSON.stringify({ activity }));
+      } else if (req.url === "/public/v1/query/list_activities") {
+        res.end(JSON.stringify({ activities: [] }));
       } else if (req.url === "/public/v1/query/get_activity") {
         res.end(JSON.stringify({ activity }));
       } else {
@@ -34,7 +36,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("missing loopback address");
-    const env = { ...process.env };
+    const env = { ...process.env, HOME: directory };
     for (const name of Object.keys(env)) {
       if (name.startsWith("TURNKEY_") || name.startsWith("TK_") || /^(HTTPS?|ALL)_PROXY$/i.test(name)) delete env[name];
     }
@@ -42,7 +44,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
       let stdout: string;
       let code = 0;
       try {
-        ({ stdout } = await exec(binary!, ["--config", join(directory, "registry.toml"), "--message-format", "json", ...args], { env }));
+        ({ stdout } = await exec(binary!, ["--message-format", "json", ...args], { env }));
       } catch (error) {
         const failed = error as { stdout: string; code: number };
         stdout = failed.stdout;
@@ -55,9 +57,17 @@ describe.skipIf(!binary)("tk repository command contract", () => {
     };
     try {
       const key = join(directory, "key.json");
-      await run(["api-key", "generate", "--output", key]);
-      const login = await run(["--organization-id", org, "--api-base-url", `http://127.0.0.1:${address.port}`, "login", "fixture", "--api-key-file", key]);
-      expect(login.reason).toBe("command_result");
+      const generated = await run(["api-key", "generate", "--output", key]);
+      expect(generated).toMatchObject({ reason: "command_result", command: "api-key.generate", status: "completed" });
+      const baseUrl = `http://127.0.0.1:${address.port}`;
+      const created = await run(["--organization-id", org, "--api-base-url", baseUrl, "profile", "create", "--profile-name", "fixture", "--api-key-file", key]);
+      expect(created).toMatchObject({ reason: "command_result", data: { profile: { organization_id: org } } });
+      expect(created.data.publicKey).toMatch(/^0[23][0-9a-f]{64}$/);
+      expect(created.data.nextStep).toContain("tk login --profile-name fixture");
+      expect(requests).toHaveLength(0);
+      const login = await run(["login", "--profile-name", "fixture"]);
+      expect(login).toMatchObject({ reason: "command_result", command: "auth.login", data: { profile: "fixture" } });
+      expect(login.data.identity.organizationId).toBe(org);
       const identity = await run(["--profile", "fixture", "whoami"]);
       expect(identity.data.organizationId).toBe(org);
       const pending = await run(["--profile", "fixture", "wallet", "create", "--input-json", JSON.stringify({ walletName: "fixture", accounts: [] })]);
@@ -68,9 +78,29 @@ describe.skipIf(!binary)("tk repository command contract", () => {
       const timeout = await run(["--profile", "fixture", "activity", "wait", activity.id, "--timeout", "1"], 1);
       expect(timeout).toMatchObject({ reason: "command_error", code: "wait_timeout", details: { activity } });
       expect(timeout).not.toHaveProperty("schemaVersion");
-      const usage = await run(["login", "--api-key-file", key], 2);
+      const usage = await run(["login", "fixture"], 2);
       expect(usage).toMatchObject({ reason: "command_error", code: "usage_error" });
+      const mismatch = await run(["--organization-id", "22222222-2222-4222-8222-222222222222", "login", "--profile-name", "fixture"], 1);
+      expect(mismatch).toMatchObject({ reason: "command_error", code: "invalid_input" });
+      expect(mismatch.message).toContain("profile set");
       expect(requests.filter((path) => path === "/public/v1/submit/create_wallet")).toHaveLength(1);
+      // Secrets refuse endpoints without a known enclave quorum key before any bytes leave the machine.
+      const source = join(directory, "synthetic.bin");
+      writeFileSync(source, "synthetic fixture", { mode: 0o600 });
+      const before = requests.length;
+      const imported = await run(["--profile", "fixture", "secret", "import", "fixture", "--from-file", source], 1);
+      expect(imported).toMatchObject({ reason: "command_error", code: "invalid_input" });
+      expect(imported.message).toContain("quorum key");
+      const output = join(directory, "recovered.bin");
+      const exported = await run(["--profile", "fixture", "secret", "export", "--id", org, "--out", output], 1);
+      expect(exported).toMatchObject({ reason: "command_error", code: "invalid_input" });
+      expect(exported.message).toContain("quorum key");
+      expect(existsSync(output)).toBe(false);
+      writeFileSync(output, "", { mode: 0o600 });
+      const refused = await run(["--profile", "fixture", "secret", "export", "--id", org, "--out", output], 1);
+      expect(refused).toMatchObject({ code: "invalid_input" });
+      expect(refused.message).toContain("refusing to overwrite");
+      expect(requests).toHaveLength(before);
     } finally {
       await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
       rmSync(directory, { recursive: true, force: true });

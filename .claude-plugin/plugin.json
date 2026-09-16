@@ -1,6 +1,6 @@
 {
   "name": "turnkey",
   "version": "1.0.0",
-  "description": "AI agent skills for Turnkey wallet infrastructure: wallets, signing, users, policies, and agent provisioning across 13+ blockchains.",
+  "description": "AI agent skills for Turnkey wallet infrastructure: wallets, signing, users, policies, secrets, and agent provisioning across 13+ blockchains.",
   "skills": "./skills/"
 }

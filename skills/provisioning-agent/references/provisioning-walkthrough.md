@@ -1,5 +1,8 @@
 # Provisioning Walkthrough
 
+> **CLI migration:** This is retained API parameter/semantic reference material. Execute supported core operations through the commands in the parent SKILL.md and root CLI convention. SDK authentication, stamping, inline key-generation scripts, and old envelope/retry instructions below are superseded. Import/export crypto and unvalidated request bridges remain explicit gaps; this reference alone does not establish CLI completion. Existing user authorization takes precedence over blanket per-call confirmation wording in legacy examples.
+
+
 Complete request/response JSON for provisioning an Ethereum agent in the parent org. Every API call shows the full request and response.
 
 **Base URL:** `https://api.turnkey.com`
@@ -103,7 +106,7 @@ POST /public/v1/submit/create_user_tag
 }
 ```
 
-Then obtain the agent's P-256 public key (either by running the Step 2b generation script from `provisioning-agent/SKILL.md`, which writes the private key to a destination you chose, or by supplying a pre-generated public key), register only the public key, and pass the tag ID:
+Obtain the agent's public key from `tk api-key generate --output PATH` or an explicitly supplied public key. Register only that public key and pass the tag UUID; the parent skill owns the CLI sequence.
 
 ```
 POST /public/v1/submit/create_users

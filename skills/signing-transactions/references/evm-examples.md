@@ -1,5 +1,8 @@
 # EVM Signing Examples
 
+> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk sign payload` / `tk sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
+
+
 ## Turnkey-managed (simplest)
 
 Use `eth_send_transaction` when you want Turnkey to handle transaction construction, signing, broadcasting, and monitoring. Set `sponsor: true` for gasless transactions where Turnkey pays the fees.

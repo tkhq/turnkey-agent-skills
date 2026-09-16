@@ -1,5 +1,8 @@
 # Solana Signing Examples
 
+> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk sign payload` / `tk sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
+
+
 ## Turnkey-managed (simplest)
 
 Use `sol_send_transaction` when you want Turnkey to handle the fee payer, signing, and broadcasting. Unlike the EVM Turnkey-managed flow, you must still construct and serialize the unsigned transaction.

@@ -10,6 +10,9 @@ metadata:
 
 # Signing Transactions
 
+> **Partial CLI migration:** The seven core management skills now execute through the local unified `tk` CLI. This signing entrypoint and its chain SDK reference library retain construction/broadcast examples pending further CLI support. Use `tk sign payload --input-file ...` and `tk sign transaction --input-file ...` for supported serialized inputs and the root CLI for credentials; do not treat the SDK setup below as the core skills' execution path. There is no dedicated managed-send CLI in this preview yet.
+
+
 > **Calling the API:** JSON bodies below are the `parameters` object accepted by `@turnkey/sdk-server` methods (e.g. `list_wallets` → `client.getWallets(...)`, `sign_raw_payload` → `client.signRawPayload(...)`). See the root [`SKILL.md`](../../SKILL.md#calling-the-api) for SDK setup and full endpoint-to-method mapping.
 
 ## Overview

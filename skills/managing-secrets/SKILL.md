@@ -70,6 +70,17 @@ A rejected or failed activity makes the rerun fail with `api_error`, `.details.a
 
 After successful recovery, verify that the output file still exists using filesystem metadata only, then report the destination and completion metadata. A completed receipt can describe a prior write even if the file was later moved or removed; do not claim a missing file is available. Do not read or print the recovered secret. Pass the file directly to the user's authorized consumer. Plaintext output retention belongs to that task; do not silently delete it or copy it elsewhere.
 
+### Rotate a value
+
+Secrets are immutable and names are unique. Rotate by creating the new credential at its provider, deleting the old secret, and importing the new value under the same name from a protected source:
+
+```sh
+tk --profile admin --message-format json secret delete --name service-token
+tk --profile admin --message-format json secret import service-token --property consensus=unilateral --from-file "$NEW_SECRET_INPUT_FILE"
+```
+
+Wait for a pending deletion to complete before importing; the name is taken until then. Revoke the old credential at the provider only after the consumer reads the new one.
+
 ### Scope access
 
 Use a non-root identity for autonomous secret access; root quorum members bypass policy restrictions. For a metadata-scoped export policy, assign a nonsecret scope at import, such as `--property scope=demo-agent`. The following policy permits only the named agent to export secrets carrying that scope:

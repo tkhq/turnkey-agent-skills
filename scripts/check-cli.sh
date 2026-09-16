@@ -20,6 +20,7 @@ while IFS= read -r command; do
     'user create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--user-name' <<< "$help" >/dev/null; grep -F -- '--tag-name' <<< "$help" >/dev/null; grep -F -- '--public-key' <<< "$help" >/dev/null; grep -F -- '--anchor-key' <<< "$help" >/dev/null ;;
     'user tag create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--name' <<< "$help" >/dev/null ;;
     'policy create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--effect' <<< "$help" >/dev/null; grep -F -- '--condition' <<< "$help" >/dev/null; grep -F -- '--consensus' <<< "$help" >/dev/null ;;
+    'secret delete') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null ;;
     'secret env') grep -F -- '--name-prefix' <<< "$help" >/dev/null; grep -F -- '--property' <<< "$help" >/dev/null ;;
     'session request') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--replace' <<< "$help" >/dev/null ;;
     'session provision') grep -F -- '--user-id' <<< "$help" >/dev/null; grep -F -- '--public-key' <<< "$help" >/dev/null; grep -F -- '--expires-in' <<< "$help" >/dev/null ;;
@@ -80,6 +81,7 @@ request
 secret list
 secret import
 secret export
+secret delete
 secret env
 session request
 session provision

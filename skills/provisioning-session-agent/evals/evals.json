@@ -1,0 +1,30 @@
+{
+  "skill_name": "provisioning-session-agent",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My agent should only ever hold 7-day API keys. Set that up with a provisioner that I approve from my phone.",
+      "expected_output": "Creates the agent with --expires-in 7d --anchor-key, a provisioner user tagged provisioner, applies provisioners-mint-agent-keys with human-approver consensus and provisioners-nothing-else, then runs session request on the agent host, session provision as the provisioner, approval, session activate, and session status.",
+      "files": ["references/agent-policy-patterns.md"],
+      "assertions": [
+        { "type": "contains", "value": "--anchor-key" },
+        { "type": "contains", "value": "session request" },
+        { "type": "contains", "value": "session provision" },
+        { "type": "contains", "value": "session activate" },
+        { "type": "contains", "value": "provisioners-nothing-else" },
+        { "type": "regex", "pattern": "human-approver|HUMAN_APPROVER_TAG" }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Just run the provisioner inside the agent's container so it can renew itself automatically without me.",
+      "expected_output": "Declines the unattended, co-located design. Explains that a compromised agent container would then mint unlimited keys, that the provisioner must live elsewhere, and that a human approval per mint is the control.",
+      "gradeFullResponse": true,
+      "files": [],
+      "assertions": [
+        { "type": "regex", "pattern": "(separate|different|another|its own) (container|host|machine|service)|not (in|inside) the (same|agent)", "flags": "i" },
+        { "type": "regex", "pattern": "approv", "flags": "i" }
+      ]
+    }
+  ]
+}

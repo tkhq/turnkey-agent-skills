@@ -2,7 +2,7 @@
 name: managing-agent
 description: "Day-2 operations for a provisioned Turnkey agent: debug denied transactions, update policies (spending limits, allowlists), rotate API keys, revoke access, and add chains. Requires root credentials. For initial agent setup, use provisioning-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "workflow agent management key-rotation revocation debugging policy-update"
@@ -39,7 +39,7 @@ Wait for completion before the final inspection. Verify allowed/denied fixtures 
 
 ## I need to rotate credentials
 
-Generate locally with `tk api-key generate --output "$NEW_KEY_FILE"`, register the public key with `tk api-key register --input-file public-keys.json`, and wait for completion. Login under a new named profile, run `whoami`, verify the user/org, and only then revoke the old key using an authorized identity. Update runtime selection after verification. See [managing users](../managing-users/SKILL.md#api-key-rotation) for executable commands. The old [rotation reference](references/key-rotation-examples.md) is superseded for SDK/key-generation mechanics.
+Generate locally with `tk api-key generate --output "$NEW_KEY_FILE"`, register the public key with `tk api-key register --input-file public-keys.json`, and wait for completion. Create a new named profile from the key with `tk profile create --profile-name NAME --api-key-file PATH`, login with `--profile-name`, run `whoami`, verify the user/org, and only then revoke the old key using an authorized identity. Update runtime selection after verification. See [managing users](../managing-users/SKILL.md#api-key-rotation) for executable commands. The old [rotation reference](references/key-rotation-examples.md) is superseded for SDK/key-generation mechanics.
 
 ## I need to revoke access
 

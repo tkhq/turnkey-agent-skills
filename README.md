@@ -91,10 +91,16 @@ Individual operations — use for ongoing work and one-off tasks.
 | Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
 | Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
 | Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
-| Managing Secrets | `skills/managing-secrets/` | Encrypted import, metadata listing, protected export, and pending recovery |
+| Managing Secrets | `skills/managing-secrets/` | Encrypted import, metadata listing, protected export, and approval-gated completion |
 | Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
-**Note**: You don't need to run `npm install` in this repo to use the skills — your AI assistant reads the `SKILL.md` files directly as prompts. Core workflows require the unified `tk` CLI described in the root skill. Retained chain construction and broadcast examples still require the relevant SDK packages. The Running Examples section below is only for developers who want to run this repo's examples/ demos end-to-end.
+**Note**: You don't need to run `npm install` in this repo to use the skills — your AI assistant reads the `SKILL.md` files directly as prompts. Core workflows require the unified `tk` CLI (0.2.0 or later) described in the root skill. Install the released binary for Linux or macOS with:
+
+```sh
+curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/tkhq/tk/main/install.sh | sh
+```
+
+Retained chain construction and broadcast examples still require the relevant SDK packages. The Running Examples section below is only for developers who want to run this repo's examples/ demos end-to-end.
 
 ## Running Examples
 

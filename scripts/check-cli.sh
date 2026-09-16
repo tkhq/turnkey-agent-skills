@@ -12,10 +12,11 @@ while IFS= read -r command; do
       grep -F -- '--input-json' <<< "$help" >/dev/null
       grep -F -- '--input-file' <<< "$help" >/dev/null ;;
     'secret list') grep -F -- '--limit' <<< "$help" >/dev/null; grep -F -- '--cursor' <<< "$help" >/dev/null ;;
-    'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--input-file' <<< "$help" >/dev/null; grep -F -- '--init-activity-id' <<< "$help" >/dev/null; grep -F -- '--static-properties-file' <<< "$help" >/dev/null ;;
-    'secret export') grep -F -- '--output' <<< "$help" >/dev/null; grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
-    'secret resume') grep -F -- '--state-file' <<< "$help" >/dev/null; grep -F -- '--timeout' <<< "$help" >/dev/null ;;
-    'login') grep -F -- '--api-key-file' <<< "$help" >/dev/null; grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
+    'secret import') grep -F -- '<NAME>' <<< "$help" >/dev/null; grep -F -- '--from-file' <<< "$help" >/dev/null; grep -F -- '--property' <<< "$help" >/dev/null ;;
+    'secret export') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null; grep -F -- '--out' <<< "$help" >/dev/null; grep -F -- '--context' <<< "$help" >/dev/null ;;
+    'login') grep -F -- '--profile-name' <<< "$help" >/dev/null ;;
+    'profile create') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
+    'profile set'|'profile use'|'profile show'|'profile delete') grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'activity wait') grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'wallet account list') grep -F -- '--wallet-id' <<< "$help" >/dev/null ;;
@@ -25,21 +26,27 @@ while IFS= read -r command; do
 done <<'COMMANDS'
 auth status
 auth whoami
+auth logout
 login
+profile create
 profile list
 profile show
+profile set
 profile use
 profile delete
 api-key generate
 api-key register
+api-key list
 api-key delete
 user list
 user get
 user create
 user update
 user delete
+user tag list
 user tag create
 user tag update
+user tag delete
 policy list
 policy get
 policy create
@@ -64,6 +71,5 @@ request
 secret list
 secret import
 secret export
-secret resume
 COMMANDS
 printf '%s\n' 'Required local CLI commands are available. Live workflow behavior is not verified.'

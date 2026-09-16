@@ -2,7 +2,7 @@
 name: managing-wallets
 description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, Spark): create wallets, derive addresses, add chains, import/export."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "wallet blockchain address-derivation hd-wallet ethereum solana bitcoin multi-chain"

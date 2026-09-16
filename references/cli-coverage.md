@@ -1,14 +1,14 @@
 # CLI conversion coverage and examples
 
-This targets the unreleased [tkhq/tk unified CLI stack](https://github.com/tkhq/tk/pull/25), built with `cargo build -p tk --bin tk`. Verify capabilities with `scripts/check-cli.sh /absolute/path/to/tk` before executing a skill. No package version is a release gate yet.
+This targets the [tkhq/tk unified CLI](https://github.com/tkhq/tk) at version 0.2.0 or later, installed from a release or built with `cargo build -p tk --bin tk`. Verify capabilities with `scripts/check-cli.sh /absolute/path/to/tk` before executing a skill.
 
 | Maintained source | CLI-backed operation | Remaining boundary |
 |---|---|---|
-| getting-started + first-wallet walkthrough | auth status/whoami, wallet list/create/account list, sign payload | No ad hoc SDK setup |
-| managing-users + user/key references | user list/get/create/update/delete, tag list/create/update/delete, api-key generate/register/list/delete | Root quorum management is separate; get-api-key-by-ID uses request if needed |
+| getting-started + first-wallet walkthrough | profile create/login, auth status/whoami, wallet list/create/account list, sign payload | No ad hoc SDK setup |
+| managing-users + user/key references | user list/get/create/update/delete, tag list/create/update/delete, api-key generate/register/list/delete, profile create/login | Root quorum management is separate; get-api-key-by-ID uses request if needed |
 | managing-policies + API/templates/language references | policy list/get/create/create-batch/update/delete/evaluations | Contract interface requests use complete envelopes; no local policy proof |
 | managing-wallets + wallet reference | wallet list/get/create/update and account list/create | Account get/deletion, import/export crypto, full pagination remain separate |
-| managing-secrets | secret list/import/export/resume; protected recipient state across approval | Requires Secrets-capable API; no delete/update/provider rotation; live policy acceptance remains separate |
+| managing-secrets | secret list/import/export; pending export finished by rerunning export | Requires an endpoint with a known enclave quorum key; no delete/update/provider rotation; live policy acceptance remains separate |
 | monitoring-activities + activity/approver references | activity list/get/wait/approve/reject | App proof query bridge; proof verification is not retrieval |
 | provisioning-agent + walkthrough/personas | Compose wallet/user/tag/key/policy operations with explicit profiles | Persist partial IDs; verify with agent credentials |
 | managing-agent + diagnosis/update/rotation references | evaluations, policy updates, key rotation, user revocation, account creation | Preserve requested scope; no automatic recovery mutation |
@@ -18,7 +18,7 @@ This targets the unreleased [tkhq/tk unified CLI stack](https://github.com/tkhq/
 | examples/solana-signing.ts | Replace Turnkey signing leg with sign transaction | Blockhash/serialization/sendRawTransaction/confirmation remain external |
 | examples/bitcoin-signing.ts | Replace Turnkey signing leg with sign transaction/payload | UTXO discovery, PSBT/sighash, finalization, broadcast remain external |
 | scripts/run-evals.ts and skills/*/evals/evals.json | Legacy semantic/SDK evaluation inputs | Not converted CLI execution tests; do not claim they prove CLI workflows |
-| tests/key-derivation.test.ts | Executes the selected local CLI's generation and checks stamper compatibility | Requires TK_CLI_BINARY; no network calls |
+| tests/key-derivation.test.ts, tests/cli-contract.test.ts | Execute the selected local CLI's generation, profile/login, and pending/error records against loopback fixtures | Require TK_CLI_BINARY; secrets refuse loopback endpoints, so import/export are not fixture-tested |
 | scripts/refresh-api-schemas.ts | Maintains legacy reference parameter schema fixtures | Rust generated activity versions remain authoritative for dedicated CLI commands |
 
 ## Serialized signing parameters

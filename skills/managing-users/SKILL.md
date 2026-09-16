@@ -2,7 +2,7 @@
 name: managing-users
 description: "Manages Turnkey users, API keys, and user tags: create, update, and delete users; generate and rotate API keys; tag users for policy targeting; verify identity with whoami."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.2.0 or later from tkhq/tk; verify local capabilities with scripts/check-cli.sh before use."
 metadata:
   author: turnkey
   tags: "users api-keys user-tags authentication identity key-rotation"
@@ -45,7 +45,8 @@ tk --profile admin --message-format json api-key register --input-file public-ke
 `public-keys.json` contains `userId` and `apiKeys`; use only the generated public key. Wait for registration completion, then verify the replacement with a new profile before revocation:
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" login agent-next --api-key-file "$NEW_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent-next --api-key-file "$NEW_KEY_FILE"
+tk --message-format json login --profile-name agent-next
 tk --profile agent-next --message-format json whoami
 tk --profile admin --message-format json api-key delete --user-id "$USER_ID" "$OLD_KEY_ID"
 ```

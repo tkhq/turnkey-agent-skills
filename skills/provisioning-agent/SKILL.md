@@ -48,3 +48,5 @@ After every mutation persist its activity ID and created resource IDs. Pending a
 - [Managing users](../managing-users/SKILL.md): user/tag/key parameter fields.
 - [Managing policies](../managing-policies/SKILL.md): scoped expressions.
 - [Managing agent](../managing-agent/SKILL.md): rotation, denial, revocation.
+- [Provisioning agent identity](../provisioning-agent-identity/SKILL.md): tags, property-scoped secrets, and allow-always / allow-once policies for an agent that needs secrets rather than a wallet.
+- [Provisioning session agent](../provisioning-session-agent/SKILL.md): expiring keys minted by a provisioner.

@@ -64,6 +64,7 @@ For multi-step tasks, skills should be loaded in a specific order. The root [`SK
 - **First-time setup** — `getting-started` (verifies credentials, creates your first wallet)
 - **Signing a transaction** — `managing-wallets` → `signing-transactions` (one skill covers EVM, Solana, Bitcoin, and 10+ other chains)
 - **Provisioning an agent** — `provisioning-agent` (pulls in `managing-wallets`, `managing-users`, and `managing-policies` as needed)
+- **Setting up an agent identity** — `provisioning-agent-identity`, then optionally `provisioning-session-agent` for short-lived keys
 
 Agents that load the root `SKILL.md` first will follow this order automatically.
 
@@ -78,6 +79,8 @@ Guided multi-step procedures — start here for onboarding or agent setup.
 | Skill | Path | Description |
 |-------|------|-------------|
 | Getting Started | `skills/getting-started/` | Day-0 onboarding: verify credentials, create your first wallet |
+| Provisioning Agent Identity | `skills/provisioning-agent-identity/` | Tags, a non-root agent user, property-scoped secrets, and allow-always / allow-once policies |
+| Provisioning Session Agent | `skills/provisioning-session-agent/` | Expiring keys for an agent, minted by a provisioner with human approval |
 | Provisioning Agent | `skills/provisioning-agent/` | Create a scoped agent with constrained credentials and policies |
 | Managing Agent | `skills/managing-agent/` | Debug denied transactions, rotate keys, update agent policies |
 

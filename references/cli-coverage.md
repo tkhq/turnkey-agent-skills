@@ -10,6 +10,8 @@ This targets the [tkhq/tk unified CLI](https://github.com/tkhq/tk) at version 0.
 | managing-wallets + wallet reference | wallet list/get/create/update and account list/create | Account get/deletion, import/export crypto, full pagination remain separate |
 | managing-secrets | secret list/import/export; pending export finished by rerunning export | Requires an endpoint with a known enclave quorum key; no delete/update/provider rotation; live policy acceptance remains separate |
 | monitoring-activities + activity/approver references | activity list/get/wait/approve/reject | App proof query bridge; proof verification is not retrieval |
+| provisioning-agent-identity + agent-policy-patterns | user tag create --name, user create --user-name/--tag-name/--public-key, policy create --name/--effect/--condition/--consensus, secret import --property, secret env | Transport of dotenv output into the agent's runtime is the operator's |
+| provisioning-session-agent + agent-policy-patterns | user create --expires-in --anchor-key, session request/provision/activate/status, api-key list expiresAt | Moving the public key between hosts and scheduling status checks are the operator's |
 | provisioning-agent + walkthrough/personas | Compose wallet/user/tag/key/policy operations with explicit profiles | Persist partial IDs; verify with agent credentials |
 | managing-agent + diagnosis/update/rotation references | evaluations, policy updates, key rotation, user revocation, account creation | Preserve requested scope; no automatic recovery mutation |
 | signing-transactions + four chain references | sign payload and serialized sign transaction | Full SDK construction/broadcast migration remains future work; managed sends not dedicated commands yet |

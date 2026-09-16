@@ -24,13 +24,15 @@ curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/tkhq/tk/
 
 The installer writes to `~/.local/bin` unless `TK_INSTALL_DIR` names another absolute directory. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks command and flag availability without making API requests.
 
-Eight core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, managing-agent, and managing-secrets. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
+Ten core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, provisioning-agent-identity, provisioning-session-agent, managing-agent, and managing-secrets. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
 ## Skills
 
 | Skill | Use |
 |---|---|
 | [Getting started](skills/getting-started/SKILL.md) | Verify identity and create a first wallet |
+| [Provisioning agent identity](skills/provisioning-agent-identity/SKILL.md) | Tags, a non-root agent user, property-scoped secrets, allow-always / allow-once policies |
+| [Provisioning session agent](skills/provisioning-session-agent/SKILL.md) | Move an agent onto expiring keys minted by a provisioner with human approval |
 | [Provisioning agent](skills/provisioning-agent/SKILL.md) | Create a non-root agent with scoped access |
 | [Managing agent](skills/managing-agent/SKILL.md) | Diagnose denial, update access, rotate/revoke credentials |
 | [Managing users](skills/managing-users/SKILL.md) | Users, tags, and registered API keys |

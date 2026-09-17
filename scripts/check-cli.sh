@@ -16,7 +16,18 @@ while IFS= read -r command; do
     'secret export') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null; grep -F -- '--out' <<< "$help" >/dev/null; grep -F -- '--context' <<< "$help" >/dev/null ;;
     'login') grep -F -- '--profile-name' <<< "$help" >/dev/null ;;
     'profile create') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
-    'profile set'|'profile use'|'profile show'|'profile delete') grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
+    'profile set') grep -F -- '<NAME>' <<< "$help" >/dev/null; grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
+    'user create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--user-name' <<< "$help" >/dev/null; grep -F -- '--tag-name' <<< "$help" >/dev/null; grep -F -- '--public-key' <<< "$help" >/dev/null; grep -F -- '--anchor-key' <<< "$help" >/dev/null ;;
+    'user tag create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--name' <<< "$help" >/dev/null ;;
+    'policy create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--effect' <<< "$help" >/dev/null; grep -F -- '--condition' <<< "$help" >/dev/null; grep -F -- '--consensus' <<< "$help" >/dev/null ;;
+    'secret delete') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null ;;
+    'secret env') grep -F -- '--name-prefix' <<< "$help" >/dev/null; grep -F -- '--property' <<< "$help" >/dev/null ;;
+    'ssh keys create') grep -F -- '--name' <<< "$help" >/dev/null ;;
+    'session request') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--replace' <<< "$help" >/dev/null ;;
+    'session provision') grep -F -- '--user-id' <<< "$help" >/dev/null; grep -F -- '--public-key' <<< "$help" >/dev/null; grep -F -- '--expires-in' <<< "$help" >/dev/null ;;
+    'session activate') grep -F -- '--profile-name' <<< "$help" >/dev/null ;;
+    'session status') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--warn-before' <<< "$help" >/dev/null ;;
+    'profile use'|'profile show'|'profile delete') grep -F -- '<NAME>' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'activity wait') grep -F -- '--timeout' <<< "$help" >/dev/null ;;
     'wallet account list') grep -F -- '--wallet-id' <<< "$help" >/dev/null ;;
@@ -71,5 +82,12 @@ request
 secret list
 secret import
 secret export
+secret delete
+secret env
+ssh keys create
+session request
+session provision
+session activate
+session status
 COMMANDS
 printf '%s\n' 'Required local CLI commands are available. Live workflow behavior is not verified.'

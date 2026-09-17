@@ -22,6 +22,7 @@ while IFS= read -r command; do
     'policy create') grep -F -- '--input-json' <<< "$help" >/dev/null; grep -F -- '--effect' <<< "$help" >/dev/null; grep -F -- '--condition' <<< "$help" >/dev/null; grep -F -- '--consensus' <<< "$help" >/dev/null ;;
     'secret delete') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null ;;
     'secret env') grep -F -- '--name-prefix' <<< "$help" >/dev/null; grep -F -- '--property' <<< "$help" >/dev/null ;;
+    'ssh keys create') grep -F -- '--name' <<< "$help" >/dev/null ;;
     'session request') grep -F -- '--profile-name' <<< "$help" >/dev/null; grep -F -- '--replace' <<< "$help" >/dev/null ;;
     'session provision') grep -F -- '--user-id' <<< "$help" >/dev/null; grep -F -- '--public-key' <<< "$help" >/dev/null; grep -F -- '--expires-in' <<< "$help" >/dev/null ;;
     'session activate') grep -F -- '--profile-name' <<< "$help" >/dev/null ;;
@@ -83,6 +84,7 @@ secret import
 secret export
 secret delete
 secret env
+ssh keys create
 session request
 session provision
 session activate

@@ -143,6 +143,34 @@ Turnkey's policy engine default-allows a user creating or deleting **their own**
 
 For `ACTIVITY_TYPE_CREATE_API_KEYS_V2` the engine exposes `activity.params.user_id` as a string but not the target user's tags, and it does not expose `expirationSeconds`. The human approver is the check on both: `tk session provision` prints `userId`, `publicKey`, and `expiresIn` in its record, and the console or mobile app shows the activity's parameters. Approve only when the target is an agent user and the lifetime is the agreed one.
 
+## Signing keys for git
+
+An agent that pushes over SSH or signs commits holds no key material: the
+Ed25519 SSH key is a Turnkey private key served by `tk ssh agent`, and the
+OpenPGP key is a wallet account signed through `tk gpg`. Create them as root and
+allow the `agent` tag to sign with exactly those resources (allow-always, since
+every git push is a signature):
+
+```sh
+tk --profile admin --message-format json ssh keys create --name agent-ssh          # prints the OpenSSH public key for GitHub
+tk --profile admin --message-format json wallet create --input-json '{"walletName":"agent-signing","accounts":[]}'
+tk --profile admin --message-format json gpg keys create --wallet-id SIGNING_WALLET_UUID --user-id "Name <email@example.com>"
+tk --profile admin --message-format json policy create --name agents-sign-ssh --effect allow \
+  --consensus "approvers.any(user, user.tags.contains('AGENT_TAG'))" \
+  --condition "activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2' && private_key.id == 'SSH_KEY_UUID'"
+tk --profile admin --message-format json policy create --name agents-sign-gpg --effect allow \
+  --consensus "approvers.any(user, user.tags.contains('AGENT_TAG'))" \
+  --condition "activity.type == 'ACTIVITY_TYPE_SIGN_RAW_PAYLOAD_V2' && wallet.id == 'SIGNING_WALLET_UUID'"
+```
+
+These two conditions name resource ids, which is fine: they scope *what* can be
+signed, while the consensus still scopes *who* by tag. On the agent host,
+`tk ssh keys add --private-key-id` and `tk gpg keys add --wallet-id --key` register
+the keys in the agent's profile, git gets `core.sshCommand "ssh -o IdentityAgent=<socket>"`
+and `gpg.program tk`, and `tk ssh agent start` serves the key. The agent
+re-resolves its credential when a signature is refused, so session-key rotation
+does not strand it.
+
 ## Every user needs one long-lived credential
 
 Organization validation rejects a user whose only credentials are expiring API keys. An agent that should live on session keys is created with `--anchor-key`, which registers a never-expiring key whose private half was generated locally and discarded. Nothing can use it; it exists to satisfy validation.

@@ -24,6 +24,7 @@ Provision a non-root identity, wallet, and scoped policy using the local unified
 
 ```sh
 tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent --api-key-file "$AGENT_KEY_FILE"
+tk --message-format json login --profile-name agent
 tk --profile agent --message-format json whoami
 tk --profile agent --message-format json sign transaction --input-file allowed-transaction.json
 tk --profile agent --message-format json sign transaction --input-file denied-transaction.json

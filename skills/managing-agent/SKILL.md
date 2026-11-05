@@ -39,15 +39,15 @@ Wait for completion before the final inspection. Verify allowed/denied fixtures 
 
 ## I need to rotate credentials
 
-Generate locally with `tk api-key generate --output "$NEW_KEY_FILE"`, register the public key with `tk api-key register --input-file public-keys.json`, and wait for completion. Login under a new named profile, run `whoami`, verify the user/org, and only then revoke the old key using an authorized identity. Update runtime selection after verification. See [managing users](../managing-users/SKILL.md#api-key-rotation) for executable commands. The old [rotation reference](references/key-rotation-examples.md) is superseded for SDK/key-generation mechanics.
+Create the replacement profile directly in protected storage, register its public key with `tk --profile admin api-key register --input-file public-keys.json`, and wait for completion. Verify with `tk --profile agent-next --message-format json whoami` before revoking the old key. See [managing users](../managing-users/SKILL.md#api-key-rotation). For another machine use the session request/provision/activate flow described in the root guide; do not transfer a plaintext private key.
 
 ## I need to revoke access
 
-Inspect `tk user get --id "$USER_ID"` to establish that this is the intended disposable non-root agent. For authorized complete revocation use `tk user delete --id "$USER_ID"` and verify completion. If it may be a human/root/admin user or the target is ambiguous, clarify before deletion. Removing a single API key does not disable other credentials; deleting a local profile does not revoke remote access.
+Inspect `tk --profile admin user get --id "$USER_ID"` to establish that this is the intended disposable non-root agent. For authorized complete revocation use `tk --profile admin user delete --id "$USER_ID"` and verify completion. If it may be a human/root/admin user or the target is ambiguous, clarify before deletion. Removing a single API key does not disable other credentials; deleting a local profile does not revoke remote access.
 
 ## I need to add a chain
 
-Use `tk wallet account create --input-file accounts.json` with the existing `walletId` and explicit derivation parameters. Then update only the requested policy scope. Test with a reviewed chain-appropriate signing input; generic transaction construction and broadcasting remain external dependencies.
+Use `tk --profile admin wallet account create --input-file accounts.json` with the existing `walletId` and explicit derivation parameters. Then update only the requested policy scope. Test with a reviewed chain-appropriate signing input; generic transaction construction and broadcasting remain external dependencies.
 
 ## Troubleshooting
 

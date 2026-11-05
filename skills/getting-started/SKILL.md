@@ -12,7 +12,7 @@ metadata:
 
 ## Rules
 
-Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the local tk 0.8.0+ binary. Use `tk auth status` for local readiness and `tk whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
+Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the local tk 0.8.0+ binary. Use `tk --profile admin auth status` for local readiness and `tk --profile admin whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
 
 ## Instructions
 
@@ -41,13 +41,13 @@ Reuse a matching wallet when that fits the request. To create an explicitly requ
 tk --profile admin --message-format json wallet create --input-file wallet.json > wallet-result.json
 ```
 
-Check completion before reading `data.activity.result.createWalletResult.walletId`. If pending, retain its activity ID and use `tk activity wait --id ID --timeout 60`. List addresses separately:
+Check completion before reading `data.activity.result.createWalletResult.walletId`. If pending, retain its activity ID and use `tk --profile admin activity wait --id ID --timeout 60`. List addresses separately:
 
 ```sh
 tk --profile admin --message-format json wallet account list --wallet-id "$WALLET_ID"
 ```
 
-For an authorized signing test, use `tk sign payload --input-file payload.json` with explicit `signWith`, `payload`, `encoding`, and `hashFunction`. This signs only; it does not broadcast or prove that an agent policy permits transactions. See [CLI examples](../../references/cli-coverage.md).
+For an authorized signing test, use `tk --profile admin sign payload --input-file payload.json` with explicit `signWith`, `payload`, `encoding`, and `hashFunction`. This signs only; it does not broadcast or prove that an agent policy permits transactions. See [CLI examples](../../references/cli-coverage.md).
 
 ## Troubleshooting
 

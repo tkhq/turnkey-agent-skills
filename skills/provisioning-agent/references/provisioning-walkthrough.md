@@ -106,7 +106,7 @@ POST /public/v1/submit/create_user_tag
 }
 ```
 
-Obtain the agent's public key from `tk api-key generate --output PATH` or an explicitly supplied public key. Register only that public key and pass the tag UUID; the parent skill owns the CLI sequence.
+Obtain the agent's public key from `tk --profile admin api-key generate --output PATH` or an explicitly supplied public key. Register only that public key and pass the tag UUID; the parent skill owns the CLI sequence.
 
 ```
 POST /public/v1/submit/create_users

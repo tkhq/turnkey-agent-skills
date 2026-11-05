@@ -25,5 +25,13 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Build pinned tk
+        run: |
+          git clone --depth 1 --branch v0.8.0 https://github.com/tkhq/tk "$RUNNER_TEMP/tk"
+          rustup toolchain install 1.95.0 --profile minimal
+          cd "$RUNNER_TEMP/tk"
+          cargo +1.95.0 build --locked -p turnkey_tk --bin tk
+          echo "TK_CLI_BINARY=$RUNNER_TEMP/tk/target/debug/tk" >> "$GITHUB_ENV"
+
       - name: Test
         run: npm test

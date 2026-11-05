@@ -14,7 +14,7 @@ Complete request/response for the 4-step API key rotation workflow.
 You need:
 - The agent's `userId` (from `list_users` or saved during provisioning)
 - The old API key ID (from `get_api_keys`)
-- Generate a replacement using `tk api-key generate --output "$NEW_KEY_FILE"`. Read only its public metadata into registration parameters; use the new named profile to verify identity before revoking the old key. See the parent skill for the CLI sequence.
+- Generate a replacement using `tk --profile admin api-key generate --output "$NEW_KEY_FILE"`. Read only its public metadata into registration parameters; use the new named profile to verify identity before revoking the old key. See the parent skill for the CLI sequence.
 
 ## Step 1: List current API keys
 

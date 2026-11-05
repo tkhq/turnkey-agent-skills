@@ -14,9 +14,9 @@ Use `tk` for credentials, signed requests, and the core agent lifecycle. Skills 
 
 ## CLI readiness
 
-Requires **tk 0.8.0 or later**. Validated against `tkhq/tk@861a6f6f61c99cc98e5009d0fa576cff147dd8bb` (0.8.0). CLI foundations #24/#25 and Secrets #26 are merged. Run the capability check before use.
+Requires **tk 0.8.0 or later**. Validated against `tkhq/tk@861a6f6f61c99cc98e5009d0fa576cff147dd8bb` (0.8.0). CLI foundations tkhq/tk#24/#25 and Secrets tkhq/tk#26 are merged. Run the capability check before use.
 
-Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
+Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. For a full repository checkout (not the installed plugin), the local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
 
 Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
@@ -40,24 +40,24 @@ Use existing saved profiles or complete environment credentials. Never place pri
 ```sh
 tk --profile admin auth status
 tk --profile admin whoami
-tk profile list
+tk --profile admin profile list
 ```
 
-For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), create the profile, then verify identity with login:
+For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), create the profile, then verify identity without changing the active default:
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" profile create --profile-name admin --api-key-file "$ADMIN_KEY_FILE"
+tk --profile admin --message-format json --organization-id "$ORG_ID" profile create --profile-name admin --api-key-file "$ADMIN_KEY_FILE"
 ```
 
-`profile create` saves a profile and copies its credential into protected local storage without contacting Turnkey. Then verify and select it with `tk login --profile-name admin`; `--profile` selects the identity for API commands. Profiles live in `~/.config/turnkey/tk.config.toml`; isolate tests with HOME, not removed `--config`/`TK_CONFIG` overrides. `profile show|use|delete` take `--profile-name NAME`. Deletion also removes its stored credential unless shared, but does not revoke the remote API key.
+`profile create` saves a profile and copies its credential into protected local storage without contacting Turnkey. Then verify it with `tk --profile admin --message-format json whoami`; `--profile` selects the identity for API commands. Profiles live in `~/.config/turnkey/tk.config.toml`; isolate tests with HOME, not removed `--config`/`TK_CONFIG` overrides. `profile show|use|delete` take `--profile-name NAME`. Deletion also removes its stored credential unless shared, but does not revoke the remote API key.
 
-Generate replacement/agent credentials locally into an explicit, private destination outside the repository:
+Generate agent credentials directly in protected profile storage, without an extra plaintext source file:
 
 ```sh
-tk --message-format json api-key generate --output "$AGENT_KEY_FILE" > generated-key.json
+tk --profile admin --message-format json --organization-id "$ORG_ID" profile create --profile-name agent > generated-key.json
 ```
 
-The generation result contains public information and the output path; the secret lives only in the key file. Register only the public key with `tk user create` or `tk api-key register`. Do not recreate SDK stamping or inline cryptographic key-generation scripts. If a secrets manager is the requested destination, arrange a supported secure handoff explicitly; the current generate command writes a local file.
+Register only `.data.publicKey` from the result using an admin profile. Never read the stored private key. For credentials on another machine, use `session request` on that machine, `session provision` under the authorized admin identity, then `session activate` on the agent machine; this flow creates expiring credentials without transferring a private key. Inspect each command's help before use. When importing an existing credential with `--api-key-file`, delete the source securely after profile creation succeeds, unless the user's retention requirements forbid it.
 
 For unattended use, the full `TURNKEY_ORGANIZATION_ID`, `TURNKEY_API_PUBLIC_KEY`, and `TURNKEY_API_PRIVATE_KEY` bundle is supported; `TURNKEY_API_BASE_URL` is optional. Explicit `--profile NAME` selects that saved identity instead of an environment bundle. Partial/conflicting bundles must be corrected rather than mixing credential halves. `auth logout` clears selection without revoking remote credentials; `profile delete` removes the local profile entry, not the API key.
 
@@ -71,13 +71,13 @@ tk --profile admin --message-format json user create --input-file users.json
 tk --profile agent --message-format json sign payload --input-file payload.json
 ```
 
-`tk request --path /public/v1/... --body-file request.json` is the escape hatch. Unlike dedicated commands, its body is the **complete request**: query organization ID or versioned submit envelope. `--body` accepts literal bytes and `--stamp-only` signs without submission. Copy neither stale activity versions nor SDK setup from reference documents. There is no automatic envelope generation for arbitrary requests.
+`tk --profile admin request --path /public/v1/... --body-file request.json` is the escape hatch. Unlike dedicated commands, its body is the **complete request**: query organization ID or versioned submit envelope. `--body` accepts literal bytes and `--stamp-only` signs without submission. Copy neither stale activity versions nor SDK setup from reference documents. There is no automatic envelope generation for arbitrary requests.
 
 ## Machine results and pending work
 
 Use `--message-format json`; it disables interactive prompts and emits newline-delimited JSON on stdout. Dispatch on `reason` first. Successful core API records use `reason: "command_result"` and `schemaVersion: 1`. Errors use `reason: "command_error"` or `"missing_required_input"`, a stable `code`, and a nonzero exit (1 for runtime failure, 2 for usage errors); error records have no `schemaVersion`. Preserve stdout even on failure. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
 
-Recovery errors can include `.details.activity` with the last observed activity ID/status. `wait_timeout` means the bounded wait expired; `submission_unknown` requires reconciliation before any retry. Do not expect the success record's `.activity` or `.data` fields on errors, and do not parse prose messages for activity IDs.
+Recovery errors can include `.details.activity` with the last observed activity ID/status. `wait_timeout` means the bounded wait expired; `submission_unknown` and `network_uncertain` require reconciliation with `tk --profile admin activity list`; never automatically retry a mutation. Only `network_error` is safe to retry. Do not expect the success record's `.activity` or `.data` fields on errors, and do not parse prose messages for activity IDs.
 
 **Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file.
 

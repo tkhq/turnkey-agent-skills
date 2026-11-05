@@ -1,6 +1,6 @@
 # EVM Signing Examples
 
-> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk sign payload` / `tk sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
+> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk --profile admin sign payload` / `tk --profile admin sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
 
 
 ## Turnkey-managed (simplest)

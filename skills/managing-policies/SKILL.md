@@ -36,7 +36,7 @@ tk --profile admin --message-format json policy delete --id "$POLICY_ID"
 tk --profile admin --message-format json policy evaluations --activity-id "$ACTIVITY_ID"
 ```
 
-Create parameters: `policyName`, `effect`, optional `condition`/`consensus`/`time`, and `notes`. Batch creation uses `{"policies": [...]}`. Update parameters: `policyId`, optional `policyName`, `policyEffect`, `policyCondition`, `policyConsensus`, `policyNotes`, and `time`. Create field names such as `effect` are not accepted for updates. Delete accepts one or more positional policy UUIDs.
+Create parameters: `policyName`, `effect`, optional `condition`/`consensus`/`time`, and `notes`. Batch creation uses `{"policies": [...]}`. Update parameters: `policyId`, optional `policyName`, `policyEffect`, `policyCondition`, `policyConsensus`, `policyNotes`, and `time`. Create field names such as `effect` are not accepted for updates. Delete accepts repeated `--id POLICY_ID` flags, not positional UUIDs. The flag form `tk --profile admin policy create --name NAME --effect EFFECT_ALLOW --condition CONDITION` is also supported.
 
 After completion, inspect the stored policy and active policy set. Test intended allowed/denied operations under **agent credentials**, with authorized fixtures; admin success is not evidence of agent access.
 

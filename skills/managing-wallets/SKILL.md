@@ -27,7 +27,7 @@ tk --profile admin --message-format json wallet account create --input-file acco
 
 Create uses `walletName`, `accounts`, and optional `mnemonicLength`. Each account specifies `curve`, `pathFormat: "PATH_FORMAT_BIP32"`, `path`, and `addressFormat`. Account creation uses `walletId` plus an `accounts` array. Update uses `walletId` and `walletName`. Use explicit derivation paths and formats; do not assume a "next path" inference feature.
 
-Wallet get does not replace account listing. Retain activity IDs while pending, and read created addresses/IDs only after completion. The current account-list command returns one API page; when further pagination is required, use an explicitly constructed `list_wallet_accounts` request with supported pagination options rather than claiming `--all` exists.
+Wallet get does not replace account listing. Retain activity IDs while pending, and read created addresses/IDs only after completion. The current account-list command returns one API page; continue with `tk --profile admin wallet account list --wallet-id "$WALLET_ID" --limit 50 --cursor "$ACCOUNT_ID"`. There is no `--all`.
 
 ### Chain construction
 
@@ -35,7 +35,7 @@ One Ethereum-format account can serve multiple EVM networks. For Bitcoin PSBT wo
 
 ## Import/export and deletion boundary
 
-Wallet/private-key import/export and local bundle encryption/decryption are **not completed CLI workflows**. Wallet/account deletion and account get are not dedicated commands in this build. Do not invent `tk wallet export`, `tk wallet account get`, or a local bundle helper. When these operations are requested, explain the gap and use an explicitly authorized existing tool or dashboard flow; never present a request-only export as a completed decryption workflow. [Import/export examples](references/import-export-examples.md) remain legacy reference material.
+Wallet/private-key import/export and local bundle encryption/decryption are **not completed CLI workflows**. Wallet/account deletion and account get are not dedicated commands in this build. Do not invent `tk --profile admin wallet export`, `tk --profile admin wallet account get`, or a local bundle helper. When these operations are requested, explain the gap and use an explicitly authorized existing tool or dashboard flow; never present a request-only export as a completed decryption workflow. [Import/export examples](references/import-export-examples.md) remain legacy reference material.
 
 ## Troubleshooting
 

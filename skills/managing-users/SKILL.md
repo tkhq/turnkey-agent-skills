@@ -32,21 +32,21 @@ tk --profile admin --message-format json user tag update --input-file tag-update
 tk --profile admin --message-format json user tag delete --id "$TAG_ID"
 ```
 
+Flag forms also include `tk --profile admin user create --user-name NAME --public-key PUBLIC_KEY --tag-name TAG` and `tk --profile admin user tag create --name NAME`.
+
 Tag create uses `userTagName` and `userIds`. Tag update uses `userTagId`, optional `newUserTagName`, `addUserIds`, and `removeUserIds`.
 
 ## API-key rotation
 
 ```sh
-tk --message-format json api-key generate --output "$NEW_KEY_FILE" > generated-key.json
+tk --profile admin --message-format json --organization-id "$ORG_ID" profile create --profile-name agent-next > generated-key.json
 tk --profile admin --message-format json api-key list --user-id "$USER_ID"
 tk --profile admin --message-format json api-key register --input-file public-keys.json
 ```
 
-`public-keys.json` contains `userId` and `apiKeys`; use only the generated public key. Wait for registration completion, then verify the replacement with a new profile before revocation:
+`public-keys.json` contains `userId` and `apiKeys`; use only `.data.publicKey` from profile creation. Wait for registration completion, then verify the replacement with a new profile before revocation:
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent-next --api-key-file "$NEW_KEY_FILE"
-tk --message-format json login --profile-name agent-next
 tk --profile agent-next --message-format json whoami
 tk --profile admin --message-format json api-key delete --user-id "$USER_ID" --id "$OLD_KEY_ID"
 ```
@@ -55,7 +55,7 @@ Confirm whoami reports the intended user/org, then switch the agent runtime to t
 
 ## Revocation
 
-For a compromised **disposable, non-root agent**, inspect `tk user get` (`get_user`) to match its ID/name/tags against the intended agent, then perform the authorized `tk user delete --id "$USER_ID"` (`delete_users`). If its identity or root/human role is unclear, resolve that before deletion. User deletion is permanent. Key-only revocation (`delete_api_keys`) leaves another valid credential able to authenticate; it does not establish full user revocation.
+For a compromised **disposable, non-root agent**, inspect `tk --profile admin user get` (`get_user`) to match its ID/name/tags against the intended agent, then perform the authorized `tk --profile admin user delete --id "$USER_ID"` (`delete_users`). If its identity or root/human role is unclear, resolve that before deletion. User deletion is permanent. Key-only revocation (`delete_api_keys`) leaves another valid credential able to authenticate; it does not establish full user revocation.
 
 ## Troubleshooting
 

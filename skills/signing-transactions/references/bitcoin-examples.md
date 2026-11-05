@@ -1,6 +1,6 @@
 # Bitcoin Signing Examples
 
-> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk sign payload` / `tk sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
+> **Migration boundary:** This chain reference remains an SDK-based construction/broadcast example. It is not a completed CLI-backed workflow. Use the root CLI for auth and supported `tk --profile admin sign payload` / `tk --profile admin sign transaction` calls; retain the chain SDK only where construction or external broadcast is needed. Managed sends and full conversion remain future work.
 
 
 Bitcoin signing uses `signTransaction` with `TRANSACTION_TYPE_BITCOIN`. You construct a PSBT (Partially Signed Bitcoin Transaction) using `bitcoinjs-lib`, send it to Turnkey for signing, then finalize and broadcast.

@@ -17,20 +17,18 @@ Provision a non-root identity, wallet, and scoped policy using the local unified
 ## Instructions
 
 1. Verify the admin identity with `tk --profile admin whoami`. List wallets before creating one, then reuse or create the intended wallet. Record its UUID and account addresses only after completion.
-2. Generate the agent key into an explicit private destination: `tk --message-format json api-key generate --output "$AGENT_KEY_FILE" > generated-key.json`. Register only its public key; no inline SDK/key-generation scripts.
-3. List/create the intended user tag with `tk user tag list/create`. Then `tk --profile admin --message-format json user create --input-file users.json`. Use CreateUsersIntentV4 fields, including `userTags` (tag UUIDs), and public API-key entries. Save the created user ID and key-registration result.
+2. Create the agent profile in protected storage: `tk --profile admin --message-format json --organization-id "$ORG_ID" profile create --profile-name agent > generated-key.json`. Register only `.data.publicKey`; no inline SDK/key-generation scripts.
+3. List/create the intended user tag with `tk --profile admin user tag list/create`. Then `tk --profile admin --message-format json user create --input-file users.json`. Use CreateUsersIntentV4 fields, including `userTags` (tag UUIDs), and public API-key entries. Save the created user ID and key-registration result.
 4. Prepare a scoped policy file naming that user/tag and wallet. Explain its effect/condition/consensus and apply the already-authorized scope with `tk --profile admin --message-format json policy create --input-file policy.json`. List/get the policy after completion.
-5. Login with the **agent key**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
+5. Verify with the **agent profile**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent --api-key-file "$AGENT_KEY_FILE"
-tk --message-format json login --profile-name agent
 tk --profile agent --message-format json whoami
 tk --profile agent --message-format json sign transaction --input-file allowed-transaction.json
 tk --profile agent --message-format json sign transaction --input-file denied-transaction.json
 ```
 
-Use reviewed serialized transaction fixtures matching the intended chain-aware policy. Raw payload signing is optional only when the requested policy explicitly permits that narrower test; do not broaden the policy to make a raw-payload test pass. Signing does not broadcast. Inspect the denied activity through `tk policy evaluations --activity-id "$ACTIVITY_ID"` under a permitted identity.
+Use reviewed serialized transaction fixtures matching the intended chain-aware policy. Raw payload signing is optional only when the requested policy explicitly permits that narrower test; do not broaden the policy to make a raw-payload test pass. Signing does not broadcast. Inspect the denied activity through `tk --profile admin policy evaluations --activity-id "$ACTIVITY_ID"` under a permitted identity.
 
 ## Recovery and handoff
 

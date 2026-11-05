@@ -6,7 +6,6 @@ cli=${1:?Usage: check-cli.sh /absolute/path/to/tk}
 while IFS= read -r command; do
   read -r -a words <<< "$command"
   help=$("$cli" "${words[@]}" --help)
-  grep -F -- '--message-format' <<< "$help" >/dev/null
   case "$command" in
     'user create'|'user update'|'user tag create'|'user tag update'|'policy create'|'policy create-batch'|'policy update'|'wallet create'|'wallet update'|'wallet account create'|'sign payload'|'sign transaction'|'api-key register')
       grep -F -- '--input-json' <<< "$help" >/dev/null

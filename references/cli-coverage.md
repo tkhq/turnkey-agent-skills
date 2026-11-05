@@ -7,7 +7,7 @@ Minimum supported version: **tk 0.8.0**; validated at `861a6f6f61c99cc98e5009d0f
 | getting-started + first-wallet walkthrough | auth status/whoami, wallet list/create/account list, sign payload | No ad hoc SDK setup |
 | managing-users + user/key references | user list/get/create/update/delete, tag list/create/update/delete, api-key generate/register/list/delete | Root quorum management is separate; get-api-key-by-ID uses request if needed |
 | managing-policies + API/templates/language references | policy list/get/create/create-batch/update/delete/evaluations | Contract interface requests use complete envelopes; no local policy proof |
-| managing-wallets + wallet reference | wallet list/get/create/update and account list/create | Account get/deletion, import/export crypto, full pagination remain separate |
+| managing-wallets + wallet reference | wallet list/get/create/update and account list/create | Account get/deletion, import/export crypto remain separate |
 | monitoring-activities + activity/approver references | activity list/get/wait/approve/reject | App proof query bridge; proof verification is not retrieval |
 | provisioning-agent + walkthrough/personas | Compose wallet/user/tag/key/policy operations with explicit profiles | Persist partial IDs; verify with agent credentials |
 | managing-agent + diagnosis/update/rotation references | evaluations, policy updates, key rotation, user revocation, account creation | Preserve requested scope; no automatic recovery mutation |
@@ -58,7 +58,7 @@ For smart-contract interface upload/list/delete, use the current request types a
 
 ## Response handling
 
-Capture stdout in a result file and inspect the final JSON record. For wallet creation, completed results expose `.data.activity.result.createWalletResult.walletId`; user creation exposes `.data.activity.result.createUsersResult.userIds`. Pending records have no required result IDs. Retain `.activity.id`, wait separately, then inspect the completed result. Handle nonzero exits without discarding their JSON error record; use `.details.activity` on errors and reconcile `submission_unknown` before any repeat mutation. Errors carry `code` rather than the success-only `schemaVersion`/`data` contract.
+Capture stdout in a result file and inspect the final JSON record. For wallet creation, completed results expose `.data.activity.result.createWalletResult.walletId`; user creation exposes `.data.activity.result.createUsersResult.userIds`. Pending records have no required result IDs. Retain `.activity.id`, wait separately, then inspect the completed result. Handle nonzero exits without discarding their JSON error record; use `.details.activity` on errors and reconcile `submission_unknown` and `network_uncertain` with `tk --profile admin activity list`, never automatically retrying a mutation; only `network_error` is safe to retry. Errors carry `code` rather than the success-only `schemaVersion`/`data` contract.
 
 The CLI's own mock tests validate transport, input shapes, and statuses. This skill artifact's optional binary checks verify command availability and offline key generation. Neither establishes live permissions, funded-chain behavior, managed-send access, or full end-to-end agent lifecycle success.
 

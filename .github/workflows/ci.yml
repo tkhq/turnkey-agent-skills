@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, carey/tk-skills-preview-public]
 
 permissions:
   contents: read

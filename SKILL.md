@@ -16,7 +16,7 @@ Use `tk` for credentials, signed requests, and the core agent lifecycle. Skills 
 
 Requires **tk 0.8.0 or later**. Validated against `tkhq/tk@861a6f6f61c99cc98e5009d0fa576cff147dd8bb` (0.8.0). CLI foundations tkhq/tk#24/#25 and Secrets tkhq/tk#26 are merged. Run the capability check before use.
 
-Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. For a full repository checkout (not the installed plugin), the local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
+Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. For a full repository checkout (not the installed plugin), the local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests. Installed plugins omit this script; inspect `tk --help` and each required subcommand’s help instead.
 
 Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 

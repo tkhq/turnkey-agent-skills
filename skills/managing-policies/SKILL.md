@@ -2,7 +2,7 @@
 name: managing-policies
 description: "Manages Turnkey policies for access control and transaction governance: ALLOW/DENY policies, consensus expressions, allowlists, spending limits, multi-sig approval, smart contract ABIs, and policy evaluation debugging."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "policy access-control governance security allowlist deny consensus smart-contract"
@@ -28,12 +28,12 @@ Consensus must include a clause the submitting identity satisfies, along with th
 
 ```sh
 tk --profile admin --message-format json policy list
-tk --profile admin --message-format json policy get "$POLICY_ID"
+tk --profile admin --message-format json policy get --id "$POLICY_ID"
 tk --profile admin --message-format json policy create --input-file policy.json
 tk --profile admin --message-format json policy create-batch --input-file policies.json
 tk --profile admin --message-format json policy update --input-file policy-update.json
-tk --profile admin --message-format json policy delete "$POLICY_ID"
-tk --profile admin --message-format json policy evaluations "$ACTIVITY_ID"
+tk --profile admin --message-format json policy delete --id "$POLICY_ID"
+tk --profile admin --message-format json policy evaluations --activity-id "$ACTIVITY_ID"
 ```
 
 Create parameters: `policyName`, `effect`, optional `condition`/`consensus`/`time`, and `notes`. Batch creation uses `{"policies": [...]}`. Update parameters: `policyId`, optional `policyName`, `policyEffect`, `policyCondition`, `policyConsensus`, `policyNotes`, and `time`. Create field names such as `effect` are not accepted for updates. Delete accepts one or more positional policy UUIDs.

@@ -15,7 +15,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
   it("logs in by name and preserves success, pending, and error recovery records", async () => {
     const directory = mkdtempSync(join(tmpdir(), "tk-contract-"));
     const requests: string[] = [];
-    const activity = { id: "fixture-activity", status: "ACTIVITY_STATUS_CONSENSUS_NEEDED" };
+    const activity = { id: "22222222-2222-4222-8222-222222222222", status: "ACTIVITY_STATUS_CONSENSUS_NEEDED" };
     const server = createServer((req, res) => {
       requests.push(req.url!);
       req.resume();
@@ -34,7 +34,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("missing loopback address");
-    const env = { ...process.env };
+    const env: NodeJS.ProcessEnv = { ...process.env, HOME: directory };
     for (const name of Object.keys(env)) {
       if (name.startsWith("TURNKEY_") || name.startsWith("TK_") || /^(HTTPS?|ALL)_PROXY$/i.test(name)) delete env[name];
     }
@@ -42,7 +42,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
       let stdout: string;
       let code = 0;
       try {
-        ({ stdout } = await exec(binary!, ["--config", join(directory, "registry.toml"), "--message-format", "json", ...args], { env }));
+        ({ stdout } = await exec(binary!, ["--message-format", "json", ...args], { env }));
       } catch (error) {
         const failed = error as { stdout: string; code: number };
         stdout = failed.stdout;
@@ -56,7 +56,8 @@ describe.skipIf(!binary)("tk repository command contract", () => {
     try {
       const key = join(directory, "key.json");
       await run(["api-key", "generate", "--output", key]);
-      const login = await run(["--organization-id", org, "--api-base-url", `http://127.0.0.1:${address.port}`, "login", "fixture", "--api-key-file", key]);
+      await run(["--organization-id", org, "--api-base-url", `http://127.0.0.1:${address.port}`, "profile", "create", "--profile-name", "fixture", "--api-key-file", key]);
+      const login = await run(["login", "--profile-name", "fixture"]);
       expect(login.reason).toBe("command_result");
       const identity = await run(["--profile", "fixture", "whoami"]);
       expect(identity.data.organizationId).toBe(org);
@@ -65,7 +66,7 @@ describe.skipIf(!binary)("tk repository command contract", () => {
       expect(pending.status).toBe("pending");
       expect(pending.activity).toEqual(activity);
       expect(pending.data.activity).toEqual(activity);
-      const timeout = await run(["--profile", "fixture", "activity", "wait", activity.id, "--timeout", "1"], 1);
+      const timeout = await run(["--profile", "fixture", "activity", "wait", "--id", activity.id, "--timeout", "1"], 1);
       expect(timeout).toMatchObject({ reason: "command_error", code: "wait_timeout", details: { activity } });
       expect(timeout).not.toHaveProperty("schemaVersion");
       const usage = await run(["login", "--api-key-file", key], 2);

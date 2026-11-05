@@ -2,7 +2,7 @@
 name: turnkey-agent-skills
 description: "Use when working with Turnkey wallet infrastructure — creating wallets, signing blockchain transactions, managing users and policies, provisioning agents, or monitoring activities. Supports Ethereum/EVM, Solana, Bitcoin, and 10+ other chains. Keys stay in hardware-backed secure enclaves."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "turnkey wallet signing blockchain ethereum solana bitcoin crypto policy agent"
@@ -14,9 +14,9 @@ Use `tk` for credentials, signed requests, and the core agent lifecycle. Skills 
 
 ## CLI readiness
 
-This conversion targets the **unreleased unified CLI** in [tkhq/tk](https://github.com/tkhq/tk), with the output and core command surface from [#24](https://github.com/tkhq/tk/pull/24) and [#25](https://github.com/tkhq/tk/pull/25). No published minimum version is claimed. The older experimental `tk` binary and released `tvc`/`turnkey` binaries do not provide this surface. Before executing a workflow, check `tk --help` plus its required subcommand help. A matching version string alone is insufficient during development.
+Requires **tk 0.8.0 or later**. Validated against `tkhq/tk@861a6f6f61c99cc98e5009d0fa576cff147dd8bb` (0.8.0). CLI foundations #24/#25 and Secrets #26 are merged. Run the capability check before use.
 
-Build the matching `tk` checkout with `cargo build -p tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
+Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. The local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests.
 
 Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
@@ -43,13 +43,13 @@ tk --profile admin whoami
 tk profile list
 ```
 
-For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), login verifies identity before saving/selecting a new named profile:
+For an existing credential file in StoredApiKey JSON format (`public_key`, `private_key`, `curve: "p256"`), create the profile, then verify identity with login:
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" login admin --api-key-file "$ADMIN_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" profile create --profile-name admin --api-key-file "$ADMIN_KEY_FILE"
 ```
 
-Login takes a positional **new profile name**; `--profile` selects an existing identity for other commands. Profiles live in `~/.config/turnkey/tk.config.toml` (override with `--config` or `TK_CONFIG`). This surface has no `profile import` or automatic legacy `tk.toml` migration; register an existing credential file with `login NAME`.
+`profile create` saves a profile and copies its credential into protected local storage without contacting Turnkey. Then verify and select it with `tk login --profile-name admin`; `--profile` selects the identity for API commands. Profiles live in `~/.config/turnkey/tk.config.toml`; isolate tests with HOME, not removed `--config`/`TK_CONFIG` overrides. `profile show|use|delete` take `--profile-name NAME`. Deletion also removes its stored credential unless shared, but does not revoke the remote API key.
 
 Generate replacement/agent credentials locally into an explicit, private destination outside the repository:
 
@@ -82,8 +82,8 @@ Recovery errors can include `.details.activity` with the last observed activity 
 **Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file.
 
 ```sh
-tk --profile admin --message-format json activity get "$ACTIVITY_ID"
-tk --profile admin --message-format json activity wait "$ACTIVITY_ID" --timeout 60
+tk --profile admin --message-format json activity get --id "$ACTIVITY_ID"
+tk --profile admin --message-format json activity wait --id "$ACTIVITY_ID" --timeout 60
 ```
 
 No submit command has an automatic `--wait` flag. Waiting resumes by activity ID; it never repeats resource creation. After an uncertain submission/transport failure, inspect activity history and reconcile the intended operation before retrying. Do not change timestamps to force a duplicate as a recovery strategy.

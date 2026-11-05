@@ -2,7 +2,7 @@
 name: monitoring-activities
 description: "Monitors, approves, and rejects Turnkey activities (the result type for every submit endpoint): check status, list and filter activities, approve/reject for consensus workflows, and verify app proofs for audit. Includes patterns for root, admin, and automated agent approvers."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "activity monitoring consensus approval audit app-proofs multi-sig"
@@ -22,15 +22,15 @@ Created/pending means processing; consensus-needed/authenticators-needed require
 
 ```sh
 tk --profile admin --message-format json activity list --limit 50
-tk --profile admin --message-format json activity get "$ACTIVITY_ID"
-tk --profile admin --message-format json activity wait "$ACTIVITY_ID" --timeout 60
-tk --profile approver --message-format json activity approve "$ACTIVITY_ID"
-tk --profile approver --message-format json activity reject "$ACTIVITY_ID"
+tk --profile admin --message-format json activity get --id "$ACTIVITY_ID"
+tk --profile admin --message-format json activity wait --id "$ACTIVITY_ID" --timeout 60
+tk --profile approver --message-format json activity approve --id "$ACTIVITY_ID"
+tk --profile approver --message-format json activity reject --id "$ACTIVITY_ID"
 ```
 
 The CLI accepts the **activity ID** for approve/reject and resolves the fingerprint itself. Raw API references use fingerprints; do not pass those in place of the CLI ID. Review the original intent and parameters under the already-authorized workflow before approving/rejecting. Rejection is permanent; unclear targets require clarification, while an explicit existing authorization need not be repeated.
 
-List accepts `--limit` and `--cursor` (the API after cursor), not `--all`, status filters, or type filters. Filter returned records locally or use a complete supported query body with `tk request` when necessary. Continue pages explicitly. Wait is bounded and resumes an existing activity; timeout returns a nonzero exit with `code: "wait_timeout"` and the last observed identity at `.details.activity`. Save the error record and resume by that ID; timeout is not permission to repeat the original mutation.
+List accepts `--limit`, `--cursor`, repeatable `--status`/`--type` server filters, and `--all` to walk pages. Use bounded pages for large histories. Wait is bounded and resumes an existing activity; timeout returns a nonzero exit with `code: "wait_timeout"` and the last observed identity at `.details.activity`. Save the error record and resume by that ID; timeout is not permission to repeat the original mutation.
 
 Keep automated approver permissions narrow and separate from worker signing authority where the workflow requires independent review. Consensus must include the submitter and required reviewers; see [policy consensus guidance](../managing-policies/SKILL.md#the-submitter-in-consensus-rule).
 

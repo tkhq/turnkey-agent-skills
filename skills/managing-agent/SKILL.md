@@ -2,7 +2,7 @@
 name: managing-agent
 description: "Day-2 operations for a provisioned Turnkey agent: debug denied transactions, update policies (spending limits, allowlists), rotate API keys, revoke access, and add chains. Requires root credentials. For initial agent setup, use provisioning-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "workflow agent management key-rotation revocation debugging policy-update"
@@ -18,8 +18,8 @@ Use the root [CLI convention](../../SKILL.md), explicit admin/agent profiles, an
 
 ```sh
 tk --profile agent --message-format json whoami
-tk --profile admin --message-format json activity get "$ACTIVITY_ID"
-tk --profile admin --message-format json policy evaluations "$ACTIVITY_ID"
+tk --profile admin --message-format json activity get --id "$ACTIVITY_ID"
+tk --profile admin --message-format json policy evaluations --activity-id "$ACTIVITY_ID"
 tk --profile admin --message-format json policy list
 ```
 
@@ -30,9 +30,9 @@ Check DENY matches, wallet/account scope, amount units, chain-specific fields, a
 Get the intended policy, prepare `policy-update.json` using `policyId` and the `policyEffect`/`policyCondition`/`policyConsensus`/`policyNotes` update fields, explain the resulting access, then submit the authorized update:
 
 ```sh
-tk --profile admin --message-format json policy get "$POLICY_ID"
+tk --profile admin --message-format json policy get --id "$POLICY_ID"
 tk --profile admin --message-format json policy update --input-file policy-update.json
-tk --profile admin --message-format json policy get "$POLICY_ID"
+tk --profile admin --message-format json policy get --id "$POLICY_ID"
 ```
 
 Wait for completion before the final inspection. Verify allowed/denied fixtures with agent credentials. [Policy-update examples](references/policy-update-examples.md) are field/semantic references.
@@ -43,7 +43,7 @@ Generate locally with `tk api-key generate --output "$NEW_KEY_FILE"`, register t
 
 ## I need to revoke access
 
-Inspect `tk user get "$USER_ID"` to establish that this is the intended disposable non-root agent. For authorized complete revocation use `tk user delete "$USER_ID"` and verify completion. If it may be a human/root/admin user or the target is ambiguous, clarify before deletion. Removing a single API key does not disable other credentials; deleting a local profile does not revoke remote access.
+Inspect `tk user get --id "$USER_ID"` to establish that this is the intended disposable non-root agent. For authorized complete revocation use `tk user delete --id "$USER_ID"` and verify completion. If it may be a human/root/admin user or the target is ambiguous, clarify before deletion. Removing a single API key does not disable other credentials; deleting a local profile does not revoke remote access.
 
 ## I need to add a chain
 

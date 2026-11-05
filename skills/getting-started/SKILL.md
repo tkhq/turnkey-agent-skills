@@ -2,7 +2,7 @@
 name: getting-started
 description: "Day-0 onboarding workflow for Turnkey: verify API credentials, create your first wallet, and optionally test signing. Use for first-time setup; for agent provisioning, use provisioning-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "workflow onboarding getting-started first-wallet"
@@ -12,7 +12,7 @@ metadata:
 
 ## Rules
 
-Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the local unreleased binary. Use `tk auth status` for local readiness and `tk whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
+Read the root [CLI calling convention](../../SKILL.md#calling-the-api) and verify the local tk 0.8.0+ binary. Use `tk auth status` for local readiness and `tk whoami` for remote identity; inspect the selected organization before mutations. Root credentials bypass policy constraints, so use a separate non-root agent profile for constrained-operation tests.
 
 ## Instructions
 
@@ -41,7 +41,7 @@ Reuse a matching wallet when that fits the request. To create an explicitly requ
 tk --profile admin --message-format json wallet create --input-file wallet.json > wallet-result.json
 ```
 
-Check completion before reading `data.activity.result.createWalletResult.walletId`. If pending, retain its activity ID and use `tk activity wait ID --timeout 60`. List addresses separately:
+Check completion before reading `data.activity.result.createWalletResult.walletId`. If pending, retain its activity ID and use `tk activity wait --id ID --timeout 60`. List addresses separately:
 
 ```sh
 tk --profile admin --message-format json wallet account list --wallet-id "$WALLET_ID"

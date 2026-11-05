@@ -1,6 +1,6 @@
 # CLI conversion coverage and examples
 
-This targets the unreleased [tkhq/tk unified CLI stack](https://github.com/tkhq/tk/pull/25), built with `cargo build -p tk --bin tk`. Verify capabilities with `scripts/check-cli.sh /absolute/path/to/tk` before executing a skill. No package version is a release gate yet.
+Minimum supported version: **tk 0.8.0**; validated at `861a6f6f61c99cc98e5009d0fa576cff147dd8bb`. Build with `cargo build -p turnkey_tk --bin tk` (the package was renamed from `tk`). Run `scripts/check-cli.sh /absolute/path/to/tk` before use.
 
 | Maintained source | CLI-backed operation | Remaining boundary |
 |---|---|---|
@@ -61,3 +61,12 @@ For smart-contract interface upload/list/delete, use the current request types a
 Capture stdout in a result file and inspect the final JSON record. For wallet creation, completed results expose `.data.activity.result.createWalletResult.walletId`; user creation exposes `.data.activity.result.createUsersResult.userIds`. Pending records have no required result IDs. Retain `.activity.id`, wait separately, then inspect the completed result. Handle nonzero exits without discarding their JSON error record; use `.details.activity` on errors and reconcile `submission_unknown` before any repeat mutation. Errors carry `code` rather than the success-only `schemaVersion`/`data` contract.
 
 The CLI's own mock tests validate transport, input shapes, and statuses. This skill artifact's optional binary checks verify command availability and offline key generation. Neither establishes live permissions, funded-chain behavior, managed-send access, or full end-to-end agent lifecycle success.
+
+## Known gaps (retained approaches)
+
+- Wallet/private-key encrypted import/export: retain SDK bundle workflows; no dedicated tk commands.
+- Wallet/account deletion and account get: use reviewed full `request` envelopes or existing authorized tools; no dedicated commands.
+- ABI/IDL interface management and app-proof retrieval: retain reviewed raw request bridges; proof verification is separate.
+- Chain construction, RPC broadcast/confirmation, UTXO/PSBT handling and managed sends: retain chain libraries/SDK examples; tk signs serialized inputs only.
+- Root quorum administration: retain existing authorized API/dashboard workflow, separate from user creation.
+- Legacy semantic eval prompts and schema refresh: retained SDK tooling, not CLI execution validation.

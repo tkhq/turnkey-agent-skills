@@ -2,7 +2,7 @@
 name: managing-wallets
 description: "Manages Turnkey HD wallets across 14+ chains (Ethereum, Solana, Bitcoin, Cosmos, Aptos, Sui, Tron, TON, XRP, Stellar, Dogecoin, Sei, Spark): create wallets, derive addresses, add chains, import/export."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "wallet blockchain address-derivation hd-wallet ethereum solana bitcoin multi-chain"
@@ -18,7 +18,7 @@ Use the root [CLI convention](../../SKILL.md). List wallets before creating one 
 
 ```sh
 tk --profile admin --message-format json wallet list
-tk --profile admin --message-format json wallet get "$WALLET_ID"
+tk --profile admin --message-format json wallet get --id "$WALLET_ID"
 tk --profile admin --message-format json wallet create --input-file wallet.json
 tk --profile admin --message-format json wallet update --input-file wallet-update.json
 tk --profile admin --message-format json wallet account list --wallet-id "$WALLET_ID"

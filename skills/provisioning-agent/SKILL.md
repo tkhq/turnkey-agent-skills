@@ -2,7 +2,7 @@
 name: provisioning-agent
 description: "End-to-end workflow to give an AI agent a scoped Turnkey wallet: creates a wallet, a non-root agent user, and a wallet-scoped ALLOW policy, then verifies signing and outputs agent credentials. For day-2 operations, use managing-agent."
 license: Apache-2.0
-compatibility: "Requires the unreleased unified tk CLI with shared auth/resource commands; verify local capabilities before use."
+compatibility: "Requires tk 0.8.0 or later with shared auth/resource commands; verify local capabilities before use."
 metadata:
   author: turnkey
   tags: "workflow agent wallet provisioning onboarding policies scoped-access"
@@ -23,13 +23,13 @@ Provision a non-root identity, wallet, and scoped policy using the local unified
 5. Login with the **agent key**, then verify identity and authorized allowed/denied signing fixtures. Admin success does not test the agent's policies.
 
 ```sh
-tk --message-format json --organization-id "$ORG_ID" login agent --api-key-file "$AGENT_KEY_FILE"
+tk --message-format json --organization-id "$ORG_ID" profile create --profile-name agent --api-key-file "$AGENT_KEY_FILE"
 tk --profile agent --message-format json whoami
 tk --profile agent --message-format json sign transaction --input-file allowed-transaction.json
 tk --profile agent --message-format json sign transaction --input-file denied-transaction.json
 ```
 
-Use reviewed serialized transaction fixtures matching the intended chain-aware policy. Raw payload signing is optional only when the requested policy explicitly permits that narrower test; do not broaden the policy to make a raw-payload test pass. Signing does not broadcast. Inspect the denied activity through `tk policy evaluations "$ACTIVITY_ID"` under a permitted identity.
+Use reviewed serialized transaction fixtures matching the intended chain-aware policy. Raw payload signing is optional only when the requested policy explicitly permits that narrower test; do not broaden the policy to make a raw-payload test pass. Signing does not broadcast. Inspect the denied activity through `tk policy evaluations --activity-id "$ACTIVITY_ID"` under a permitted identity.
 
 ## Recovery and handoff
 

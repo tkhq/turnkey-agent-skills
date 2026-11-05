@@ -2,6 +2,7 @@
 name: managing-secrets
 description: "Manage Turnkey Secrets through the tk CLI: list metadata, encrypt file or stdin imports, export to protected files, and finish approval-gated exports without exposing plaintext to the agent."
 license: Apache-2.0
+compatibility: "Requires tk 0.8.0 or later; encrypted Secrets commands and named profiles."
 metadata:
   author: turnkey
   tags: "turnkey secrets encrypted-import export consensus"
@@ -11,7 +12,7 @@ metadata:
 
 ## Rules
 
-Use the root [CLI convention](../../SKILL.md) and verify `tk secret --help` before starting. Secrets require tk 0.8.0 or later; run `scripts/check-cli.sh /absolute/path/to/tk`. Import and export only work against an API endpoint whose enclave quorum key the CLI knows (production, preprod, or dev); any other `--api-base-url` fails locally with `invalid_input` before a request is sent. Endpoint availability also depends on the deployed API and organization. Report an unavailable endpoint as a capability gap; do not bypass it with a raw plaintext request.
+Use the root [CLI convention](../../SKILL.md) and verify `tk secret --help` before starting. Secrets require tk 0.8.0 or later; in a full repository checkout run `scripts/check-cli.sh /absolute/path/to/tk`; installed plugins omit that script, so inspect `tk secret --help` and each required subcommand help directly. Import and export only work against an API endpoint whose enclave quorum key the CLI knows (production, preprod, or dev); any other `--api-base-url` fails locally with `invalid_input` before a request is sent. Endpoint availability also depends on the deployed API and organization. Report an unavailable endpoint as a capability gap; do not bypass it with a raw plaintext request.
 
 Keep secret contents outside the agent transcript. Accept an existing file path or a producer that pipes directly into the CLI. Do not read the source with a file tool, paste it into chat, interpolate it into command arguments, enable shell tracing, or print decrypted output to verify success. The CLI owns encryption and decryption. Generic `tk request` and `--input-json` are not substitutes for this workflow.
 
@@ -36,7 +37,7 @@ Values are UTF-8 text of at most 1 MiB; one trailing newline is stripped. Choose
 tk --profile admin --message-format json secret import --name service-token --from-file "$SECRET_INPUT_FILE"
 ```
 
-To receive bytes from an already authorized producer, omit `--from-file` and connect the producer's stdout directly to the CLI's stdin. Do not construct an `echo` command containing the secret. Without `--from-file` or piped stdin, JSON mode fails with `missing_required_input` rather than prompting.
+To receive bytes from an already authorized producer, omit `--from-file` and connect the producer's stdout directly to the CLI's stdin. Do not construct an `echo` command containing the secret. Without `--from-file` or piped stdin, JSON mode fails locally with `invalid_input` rather than prompting.
 
 Optional `--property KEY=VALUE` flags, repeatable, bind policy-visible static properties to the secret forever. They appear in `tk secret list`. Never put tokens, passwords, or other secret values in them. Duplicate keys are rejected locally.
 
@@ -99,7 +100,9 @@ Validate allowed and denied access with synthetic values in an authorized test o
 - `invalid_input` naming the API base URL: the endpoint has no trusted enclave quorum key; do not switch to `tk request` to send plaintext.
 - Denied operation: inspect activity/policy evaluations with the appropriate identity; do not switch to root to bypass the requested scope.
 
-This skill covers list/import/export and pending-export completion. Secret update, automatic provider-token rotation, and wallet/private-key import/export remain known gaps. tk 0.8.0 supports deletion with `tk secret delete --name NAME` or `--id UUID` and dotenv output with `tk secret env --name-prefix PREFIX/` or `--property KEY=VALUE`. Deletion requires explicit existing authorization. Env output contains plaintext: pipe directly to an authorized consumer outside the transcript; do not capture or display it in agent tools.
+For authorized value rotation, run `tk --profile admin secret delete --name NAME`, wait for the deletion activity to complete if pending, then `tk --profile admin secret import --name NAME --from-file "$SECRET_INPUT_FILE"`. Reapply the intended static properties and verify policy scope. This is delete-and-reimport, not automatic rotation of a token at its provider.
+
+This skill covers list/import/export and pending-export completion. Secret update, automatic provider-token rotation, and wallet/private-key import/export remain known gaps. tk 0.8.0 supports deletion with `tk --profile admin secret delete --name NAME` or `--id UUID` and dotenv output with `tk --profile agent secret env --name-prefix PREFIX/` or `--property KEY=VALUE`. Deletion requires explicit existing authorization. Never send `secret env` output to a file or tool output. Env output contains plaintext: pipe directly to an authorized consumer outside the transcript; do not capture or display it in agent tools.
 
 ## Related Skills
 

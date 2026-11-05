@@ -31,6 +31,7 @@ Seven core entrypoints are CLI-backed: getting-started, managing-users, managing
 | [Managing policies](skills/managing-policies/SKILL.md) | Policy CRUD, consensus, and evaluations |
 | [Managing wallets](skills/managing-wallets/SKILL.md) | Wallets and derived accounts |
 | [Monitoring activities](skills/monitoring-activities/SKILL.md) | Inspect, approve/reject, and resume pending work |
+| [Managing Secrets](skills/managing-secrets/SKILL.md) | Encrypted import/export and pending recovery |
 | [Signing transactions](skills/signing-transactions/SKILL.md) | Serialized signing plus explicitly retained chain SDK workflows |
 
 ## Authentication and key generation

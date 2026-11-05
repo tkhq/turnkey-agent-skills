@@ -91,6 +91,7 @@ Individual operations — use for ongoing work and one-off tasks.
 | Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
 | Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
 | Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
+| Managing Secrets | `skills/managing-secrets/` | Encrypted import, protected export, and approval-gated recovery |
 | Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
 **Note**: No `npm install` is needed to use the skill prompts. Core workflows require **tk 0.8.0 or later**. Install a pinned binary from [the tk v0.8.0 release](https://github.com/tkhq/tk/releases/tag/v0.8.0), not a moving main checkout. tk handles credentials and request stamping. Retained chain construction/broadcast examples require the relevant SDK packages; Running Examples below is for developers running those demos.

@@ -18,7 +18,7 @@ Requires **tk 0.8.0 or later**. Validated against `tkhq/tk@861a6f6f61c99cc98e500
 
 Build the matching `tk` checkout with `cargo build -p turnkey_tk --bin tk`; use its `target/debug/tk` directly or place that binary on PATH. Do not replace the user's installed binary implicitly. For a full repository checkout (not the installed plugin), the local verification script is `scripts/check-cli.sh /absolute/path/to/tk`; it checks capabilities without making API requests. Installed plugins omit this script; inspect `tk --help` and each required subcommand’s help instead.
 
-Seven core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, and managing-agent. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
+Eight core entrypoints are CLI-backed: getting-started, managing-users, managing-policies, managing-wallets (excluding import/export), monitoring-activities, provisioning-agent, managing-agent, and managing-secrets. The signing skill's broader chain construction and broadcast library is not yet fully converted. See [conversion coverage](references/cli-coverage.md).
 
 ## Skills
 
@@ -31,6 +31,7 @@ Seven core entrypoints are CLI-backed: getting-started, managing-users, managing
 | [Managing policies](skills/managing-policies/SKILL.md) | Policy CRUD, consensus, and evaluations |
 | [Managing wallets](skills/managing-wallets/SKILL.md) | Wallets and derived accounts |
 | [Monitoring activities](skills/monitoring-activities/SKILL.md) | Inspect, approve/reject, and resume pending work |
+| [Managing Secrets](skills/managing-secrets/SKILL.md) | Encrypted import/export and pending recovery |
 | [Signing transactions](skills/signing-transactions/SKILL.md) | Serialized signing plus explicitly retained chain SDK workflows |
 
 ## Authentication and key generation
@@ -75,11 +76,13 @@ tk --profile agent --message-format json sign payload --input-file payload.json
 
 ## Machine results and pending work
 
-Use `--message-format json`; it disables interactive prompts and emits newline-delimited JSON on stdout. Dispatch on `reason` first. Successful core API records use `reason: "command_result"` and `schemaVersion: 1`. Errors use `reason: "command_error"` or `"missing_required_input"`, a stable `code`, and a nonzero exit (1 for runtime failure, 2 for usage errors); error records have no `schemaVersion`. Preserve stdout even on failure. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
+Use `--message-format json`; it disables interactive prompts and emits newline-delimited JSON on stdout. Dispatch on `reason` first. Successful core API records use `reason: "command_result"` and `schemaVersion: 1`. Errors use `reason: "command_error"` or `"missing_required_input"`, a stable `code`, and a nonzero exit (1 for runtime failure, 2 for usage errors); error records have no `schemaVersion`. Preserve stdout even on failure, except for Secrets plaintext workflows described below. `data` preserves the API response shape. A mutation includes activity metadata at `.activity` and the complete activity at `.data.activity`. Created resource IDs live under `.data.activity.result`, for example `.createWalletResult.walletId` or `.createUsersResult.userIds`.
 
 Recovery errors can include `.details.activity` with the last observed activity ID/status. `wait_timeout` means the bounded wait expired; `submission_unknown` and `network_uncertain` require reconciliation with `tk --profile admin activity list`; never automatically retry a mutation. Only `network_error` is safe to retry. Do not expect the success record's `.activity` or `.data` fields on errors, and do not parse prose messages for activity IDs.
 
-**Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file.
+**Exit zero does not mean a mutation completed.** Inspect `.status` and the actual `.activity.status` before using result IDs. Pending/consensus/authenticator requirements need follow-up; inspection commands can successfully return a failed/rejected activity. Record each activity ID immediately and keep the original result file, except for Secrets plaintext workflows.
+
+**Secrets carve-out:** Always pass `--out` to `secret export`; do not save its stdout. Never send `secret env` output to a file or tool output. Pipe it directly to the authorized consumer outside the agent transcript.
 
 ```sh
 tk --profile admin --message-format json activity get --id "$ACTIVITY_ID"

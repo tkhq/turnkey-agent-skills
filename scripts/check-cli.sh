@@ -12,6 +12,9 @@ while IFS= read -r command; do
       grep -F -- '--input-file' <<< "$help" >/dev/null ;;
     'login'|'profile set'|'profile show'|'profile use'|'profile delete') grep -F -- '--profile-name' <<< "$help" >/dev/null ;;
     'profile create') grep -F -- '--api-key-file' <<< "$help" >/dev/null ;;
+    'secret import') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--from-file' <<< "$help" >/dev/null ;;
+    'secret export'|'secret delete') grep -F -- '--name' <<< "$help" >/dev/null; grep -F -- '--id' <<< "$help" >/dev/null ;;
+    'secret env') grep -F -- '--name-prefix' <<< "$help" >/dev/null ;;
     'api-key generate') grep -F -- '--output' <<< "$help" >/dev/null ;;
     'user get'|'user delete'|'user tag delete'|'policy get'|'policy delete'|'wallet get'|'activity get'|'activity approve'|'activity reject') grep -F -- '--id' <<< "$help" >/dev/null ;;
     'policy evaluations') grep -F -- '--activity-id' <<< "$help" >/dev/null ;;
@@ -65,5 +68,10 @@ activity wait
 activity approve
 activity reject
 request
+secret list
+secret import
+secret export
+secret delete
+secret env
 COMMANDS
 printf '%s\n' 'Required local CLI commands are available. Live workflow behavior is not verified.'

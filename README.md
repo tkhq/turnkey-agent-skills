@@ -91,9 +91,10 @@ Individual operations — use for ongoing work and one-off tasks.
 | Signing Transactions | `skills/signing-transactions/` | Sign and broadcast on any chain (EVM, Solana, Bitcoin, +10 more) |
 | Managing Users | `skills/managing-users/` | Create users, rotate API keys, user tags |
 | Managing Policies | `skills/managing-policies/` | Access control, spending limits, allowlists, multi-sig |
+| Managing Secrets | `skills/managing-secrets/` | Encrypted import, protected export, and approval-gated recovery |
 | Monitoring Activities | `skills/monitoring-activities/` | Activity status, consensus approvals, audit |
 
-**Note**: You don't need to run `npm install` in this repo to use the skills — your AI assistant reads the `SKILL.md` files directly as prompts. The skills will, however, tell you to install `@turnkey/sdk-server` (and a chain-specific package if you're signing transactions) in your own project, since Turnkey's API requires a cryptographic stamp on every request that the SDK handles for you. The Running Examples section below is only for developers who want to run this repo's examples/ demos end-to-end.
+**Note**: No `npm install` is needed to use the skill prompts. Core workflows require **tk 0.8.0 or later**. Install a pinned binary from [the tk v0.8.0 release](https://github.com/tkhq/tk/releases/tag/v0.8.0), not a moving main checkout. tk handles credentials and request stamping. Retained chain construction/broadcast examples require the relevant SDK packages; Running Examples below is for developers running those demos.
 
 ## Running Examples
 
